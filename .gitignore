@@ -1,17 +1,62 @@
 .DS_Store
 .playwright-cli/
 
-# Local/generated outputs
+# Local/generated competition outputs
 processed_data/
 logs/
 submission/
 
-# Python/runtime caches for future agent code
+# Secrets and local config
+.env
+.envrc
+local_settings.py
+
+# Python caches
 __pycache__/
 *.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Python environments
 .venv/
 venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+__pypackages__/
 
-# Editor and OS noise
+# Packaging/build outputs
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+sdist/
+wheels/
+share/python-wheels/
+MANIFEST
+
+# Notebook and docs generated files
+.ipynb_checkpoints/
+docs/_build/
+/site
+
+# Tool and editor state
 .idea/
 .vscode/
+.ropeproject
+.spyderproject
+.spyproject
+tempCodeRunnerFile.py
+
+# App/framework local state
+instance/
+.streamlit/secrets.toml

@@ -1,4 +1,6 @@
-# Agent Competition Workspace
+# tianchi-fin-agent-track4
+
+Solution workspace for the Tianchi Financial Long-Text Agent Challenge. This repo focuses on dynamic memory compression, token-efficient retrieval, and complex financial QA pipelines using the Qwen API.
 
 AFAC2026 挑战组赛题四：金融长文本 Agent 的动态记忆压缩与高效问答挑战。
 
