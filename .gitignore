@@ -1,0 +1,17 @@
+.DS_Store
+.playwright-cli/
+
+# Local/generated outputs
+processed_data/
+logs/
+submission/
+
+# Python/runtime caches for future agent code
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editor and OS noise
+.idea/
+.vscode/
