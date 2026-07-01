@@ -176,3 +176,126 @@ python3 -m pytest workspace/01_agent_learning/sessions/2026-06-26_ins_a_007/test
 ```text
 1 passed
 ```
+
+## 已创建的第二个学习工具
+
+脚本路径：
+
+```text
+workspace/01_agent_learning/sessions/2026-06-26_ins_a_007/scripts/map_doc_id.py
+```
+
+运行方式：
+
+```bash
+python3 workspace/01_agent_learning/sessions/2026-06-26_ins_a_007/scripts/map_doc_id.py insurance 1
+```
+
+这个脚本不调用大模型 API，只做确定性路径映射：
+
+```text
+domain + doc_id
+-> public_dataset_upload/raw/<domain>/<doc_id>.pdf
+```
+
+示例输出：
+
+```text
+public_dataset_upload/raw/insurance/1.pdf
+```
+
+验证方式：
+
+```bash
+python3 -m pytest workspace/01_agent_learning/sessions/2026-06-26_ins_a_007/tests -q
+```
+
+验证结果：
+
+```text
+3 passed
+```
+
+## 已创建的第三个学习工具
+
+脚本路径：
+
+```text
+workspace/01_agent_learning/sessions/2026-06-26_ins_a_007/scripts/search_keyword.py
+```
+
+运行方式：
+
+```bash
+python3 workspace/01_agent_learning/sessions/2026-06-26_ins_a_007/scripts/search_keyword.py public_dataset_upload/raw/insurance/16.pdf 保单贷款
+```
+
+这个脚本使用 `pypdf` 从 PDF 中抽取文本，只做一个关键词的最小搜索：
+
+```text
+PDF 文件 + 关键词
+-> 命中页码 + 附近原文片段
+```
+
+示例输出含义：
+
+```text
+page: 2  # 目录命中
+page: 9  # 正文证据命中
+```
+
+验证方式：
+
+```bash
+python3 -m pytest workspace/01_agent_learning/sessions/2026-06-26_ins_a_007/tests -q
+```
+
+验证结果：
+
+```text
+5 passed
+```
+
+## 第一次手动工具链运行
+
+已手动跑通三个工具的接力：
+
+```text
+inspect_question.py
+-> map_doc_id.py
+-> search_keyword.py
+```
+
+对应流程：
+
+```text
+题目
+-> domain 和 doc_ids
+-> raw PDF 路径
+-> 关键词命中页码和上下文
+```
+
+本次实际搜索：
+
+```bash
+python3 workspace/01_agent_learning/sessions/2026-06-26_ins_a_007/scripts/search_keyword.py public_dataset_upload/raw/insurance/16.pdf 保单贷款
+```
+
+关键观察：
+
+```text
+page 2: 目录命中 6.2 保单贷款
+page 9: 正文证据命中，出现“您可申请保单贷款功能”“您可办理保单贷款”等上下文
+```
+
+遇到的问题：
+
+```text
+search_keyword.py 依赖 pypdf；当前环境缺少该库时会报 ModuleNotFoundError。
+```
+
+已记录到：
+
+```text
+research_log/2026-07-01_manual_tool_chain_run.md
+```
