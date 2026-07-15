@@ -1,0 +1,8 @@
+{
+  "parent_version": "v0",
+  "candidate_pipeline_version": "v2s1",
+  "answer_diff": [
+    {"qid": "reg_a_010", "from": "A", "to": "B"},
+    {"qid": "res_a_013", "from": "A", "to": "B"}
+  ]
+}

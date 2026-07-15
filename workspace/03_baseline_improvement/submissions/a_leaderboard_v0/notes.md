@@ -393,3 +393,88 @@ b22230895d9f421a578ecf49e70e58e46f93bde5a8434acf1040fb77f1d8e451  run_manifest.j
 ```
 
 后续 v1 微调不直接覆盖该目录。所有新提交应与本基准比较线上分数、token、low confidence、失败题和疑似错题类型。
+
+## 2026-07-08 提交记录补记：v1s1
+
+- 变量：S1 确定性层修复，包含 csrc_0009_att1 解析修复、doc_meta 标题、证据 source_header、邻近 chunk 合并、多实体配额和缓存版本化。
+- 线上分数：61.8540 | 与 63.2607 差：-1.4067 | 与上一次提交差：-1.4067
+- 答案 diff：8 题变化（相对 v0），清单：ins_a_005 ABCD->ABD；ins_a_007 AC->BC；ins_a_009 BC->C；ins_a_010 ABCD->ABD；ins_a_014 ACD->AC；ins_a_015 AB->A；ins_a_016 CD->A；ins_a_019 ABC->A。
+- token：原始 total=1280096（系数约 0.9232）；注意本地测试在冻结前覆盖了 `submission/` 和 ins_a_001/ins_a_002 reasoning sample，因此 `2026-07-05_v1s1_score_61_8540/` 是审计重建目录，不是字节级原始提交件。
+- low_confidence：原始观测 20 题。
+- 结论：S1 未提升，反推约从 68/100 降到 67/100；证据质量改善没有穿透逐选项判断层，且增加了 token 成本。
+- 下一步：进入 v2-0/v2-1；先用权威 `evaluation/local_labels.md` 做 tf 回归，再只重跑 20 道 tf，避免混入 mcq/multi 变量。
+
+执行中观察到的越界问题：
+
+- `tests/test_run_submission_batch.py::test_domain_limit_dry_run_cli_writes_two_question_outputs` 会覆盖 `submission/`，且 dry-run 会覆盖 reasoning sample；后续实验提交前必须重新生成正式 `submission/answer.csv` 并校验 `VALID`。
+- v1-S1 原始提交件未能在跑测试前冻结，这是本次记录断档的直接原因；后续每次线上提交后先冻结，再跑任何测试。
+
+## 2026-07-08 v2-0 / v2-1 实施记录：v2s1
+
+目标：
+
+- v2-0：补记 v1-S1，建立本地真值集，明确 v2-1 的 tf 验收样本。
+- v2-1：新增判断题题干级 true/false/uncertain 链路，废除正式推理中的 A/B 选项级 tf 判断。
+
+改动文件：
+
+- `workspace/03_baseline_improvement/evaluation/local_labels.md`（2026-07-15 已由旧位置迁移）
+- `workspace/03_baseline_improvement/submissions/a_leaderboard_v0/v2_s1/tf_rerun_qids.txt`
+- `workspace/03_baseline_improvement/submissions/a_leaderboard_v0/v2_s1/tf_rerun_qids.json`
+- `agent/prompts.py`
+- `agent/reason_qwen.py`
+- `agent/retrieve.py`
+- `agent/run_submission.py`
+- `agent/normalize_answer.py`
+- `tests/test_reason_tf.py`
+- `tests/test_normalize_answer.py`
+
+验收命令与结果：
+
+```text
+python -m pytest tests/test_reason_tf.py tests/test_normalize_answer.py -q
+16 passed
+
+python -m pytest tests/ -q
+88 passed
+
+python -m agent.validate_submission workspace/03_baseline_improvement/submissions/a_leaderboard_v0/2026-07-05_score_63_2607/answer.csv --evidence workspace/03_baseline_improvement/submissions/a_leaderboard_v0/2026-07-05_score_63_2607/evidence.json --manifest workspace/03_baseline_improvement/submissions/a_leaderboard_v0/2026-07-05_score_63_2607/run_manifest.json
+[VALID] questions=100 total_tokens=1161593
+
+python -m agent.validate_submission submission/answer.csv
+[VALID] questions=100 total_tokens=1161593
+```
+
+离线观察：
+
+- `PIPELINE_VERSION=v2s1`。
+- 20 道 tf 重跑清单已生成。
+- `retrieve_for_tf_question` 不再输出 A/B options 结构，而是题干级 `tf.evidence`。
+- 抽查 `fc_a_003/fc_a_013/fin_a_013/res_a_003`，每个题面 doc_id 至少有 2 条证据覆盖。
+- `local_labels.md` 当前 11 题，其中 8 道 tf 的本地标签均为 A；因此 v2-1 的已知标签收益上限可能不高，重点是让 tf 链路可审计，并暴露隐藏 B 题。
+
+当前限制：
+
+- 尚未调用 Qwen 跑 v2s1；当前 `submission/` 已恢复为 v0 安全副本，不能代表 v2s1。
+- 由于 v1-S1 原始本地产物曾被测试覆盖，v1-S1 冻结目录只能作为审计重建件，不能作为字节级提交原件。
+
+执行中观察到的越界问题：
+
+- dry-run CLI 测试会覆盖 `submission/`；本次已在测试后把 `submission/` 恢复为 v0 安全副本。真正提交前必须重新跑 v2s1 Qwen 并再次 `validate`。
+
+## 2026-07-15 E001 提交前记录：v2s1 TF-only
+
+- 变量：20 道 TF 使用已有 v2s1 题干级判断链路包；其余 80 题从冻结 v0 产物级继承。
+- 独立门槛：S2a 的 `reg_a_010`、`res_a_013` 均标为 B/high，完整性复验 2/2、0 errors。
+- 本地结果：10 道已标 TF 从 8/10 提升为 10/10；N=2、M=0、净 +2。
+- 答案 diff：仅 `reg_a_010 A→B`、`res_a_013 A→B`；其余 98 道答案不变。
+- Token：total=1,168,763，相对 v0 +7,170。
+- 全量测试：132 passed。
+- 校验：候选 validator `VALID / 100 / 1,168,763`；E001 专属审计 12/12 PASS。
+- 候选：`outputs/candidates/v2s1_tf_only/`；已逐字节晋升至根 `submission/`。
+- SHA256：answer `5e082b6f...90c69`；evidence `f19091ec...5614`；manifest `1f160f36...7b87`。
+- 线上状态：尚未上传；预期约 65.0912，仅为两题净提升推算。
+- 当前决策：`PILOT / READY_TO_UPLOAD`；取得线上分数后再写 KEEP_SCORE 或 ROLLBACK。
+
+可追溯性说明：20 道缓存没有保存调用时完整 retrieval；本次 evidence 使用当前冻结
+chunks 和检索代码重建，相关哈希在 rerun manifest 中。不能声称原始 Prompt 可字节级复现。

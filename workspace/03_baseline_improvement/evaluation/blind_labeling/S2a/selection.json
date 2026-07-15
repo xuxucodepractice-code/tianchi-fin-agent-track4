@@ -1,0 +1,6 @@
+{
+  "selection_id": "S2A_TF_GATE_2026-07-14",
+  "frozen_before_labeling": true,
+  "selection_rule": "The only two v2s1 TF answer flips, selected before independent labels",
+  "qids": ["reg_a_010", "res_a_013"]
+}

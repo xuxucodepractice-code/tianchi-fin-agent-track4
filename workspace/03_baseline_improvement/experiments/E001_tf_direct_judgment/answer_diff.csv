@@ -1,0 +1,3 @@
+qid,parent_answer,candidate_answer,gold_answer,local_outcome
+reg_a_010,A,B,B,old_wrong_new_correct
+res_a_013,A,B,B,old_wrong_new_correct

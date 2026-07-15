@@ -1,0 +1,17 @@
+{
+  "selection_id": "S2_TF_REMAINING_2026-07-14",
+  "frozen_before_labeling": true,
+  "selection_rule": "All TF questions not present in the eight historical labels or the two S2a cards",
+  "qids": [
+    "fc_a_018",
+    "fin_a_003",
+    "fin_a_010",
+    "fin_a_018",
+    "reg_a_003",
+    "reg_a_006",
+    "reg_a_013",
+    "res_a_006",
+    "res_a_010",
+    "res_a_018"
+  ]
+}

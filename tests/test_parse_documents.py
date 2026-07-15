@@ -17,6 +17,8 @@ from agent.parse_documents import (
     CHUNKS_PATH,
     PARSE_REPORT_PATH,
     load_doc_map,
+    merge_char_lines,
+    parse_all,
 )
 
 
@@ -117,3 +119,39 @@ def test_parse_report_chunk_count_matches_jsonl():
     chunks = _load_chunks()
     assert report["chunk_count"] == len(chunks)
     assert report["parsed_document_count"] + report["failed_document_count"] == report["document_count"]
+
+
+def test_merge_char_lines_repairs_pdf_single_character_lines():
+    raw = "上\n市\n公\n司\n信\n息\n披\n露\n管\n理\n办\n法\n第\n一\n章\n总\n则\n董\n事\n会\n审\n议\n通\n过 。"
+
+    repaired = merge_char_lines(raw)
+
+    assert "上市公司信息披露管理办法" in repaired
+    assert "董事会审议通过" in repaired
+    assert "\n市\n" not in repaired
+
+
+def test_merge_char_lines_leaves_normal_paragraphs_unchanged():
+    raw = "第一条 为了规范上市公司信息披露行为。\n第二条 信息披露义务人应当真实、准确、完整。"
+
+    assert merge_char_lines(raw) == raw
+
+
+def test_parse_all_can_refresh_only_requested_doc_id(monkeypatch):
+    doc_map = {
+        "mappings": [
+            {"domain": "regulatory", "doc_id": "csrc_0009_att1", "source_type": "pdf", "path": "a.pdf"},
+            {"domain": "insurance", "doc_id": "1", "source_type": "pdf", "path": "b.pdf"},
+        ]
+    }
+    calls = []
+
+    def fake_parse_one(mapping, refresh=False):
+        calls.append((mapping["doc_id"], refresh))
+        return [], []
+
+    monkeypatch.setattr("agent.parse_documents._parse_one_cached", fake_parse_one)
+
+    parse_all(doc_map, refresh_doc_ids={"csrc_0009_att1"})
+
+    assert calls == [("csrc_0009_att1", True), ("1", False)]

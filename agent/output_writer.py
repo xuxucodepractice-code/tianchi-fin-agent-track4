@@ -67,6 +67,13 @@ def write_evidence_json(
             "total_tokens": r["total_tokens"],
             "mode": r["mode"],
             "model": r.get("model", ""),
+            "pipeline_version": r.get("pipeline_version", "v0"),
+            "tf_judgment": r.get("tf_judgment"),
+            "source_kind": r.get("source_kind", "fresh"),
+            "source_pipeline_version": r.get(
+                "source_pipeline_version", r.get("pipeline_version", "v0")
+            ),
+            "source_run_id": r.get("source_run_id", ""),
         }
         for r in results
     ]

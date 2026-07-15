@@ -1,0 +1,48 @@
+{
+  "selection_id": "S2A_TF_GATE_2026-07-14",
+  "complete": false,
+  "expected_count": 2,
+  "validated_count": 2,
+  "errors": [
+    "reg_a_010_blind.md: missing answer",
+    "reg_a_010_blind.md: missing confidence",
+    "reg_a_010_blind.md: missing evidence",
+    "reg_a_010_blind.md: missing reason",
+    "reg_a_010_blind.md: missing labeler",
+    "reg_a_010_blind.md: missing completed_at",
+    "reg_a_010_blind.md: invalid answer ''",
+    "reg_a_010_blind.md: invalid confidence ''",
+    "res_a_013_blind.md: missing answer",
+    "res_a_013_blind.md: missing confidence",
+    "res_a_013_blind.md: missing evidence",
+    "res_a_013_blind.md: missing reason",
+    "res_a_013_blind.md: missing labeler",
+    "res_a_013_blind.md: missing completed_at",
+    "res_a_013_blind.md: invalid answer ''",
+    "res_a_013_blind.md: invalid confidence ''"
+  ],
+  "results": [
+    {
+      "qid": "reg_a_010",
+      "answer_format": "tf",
+      "answer": "",
+      "confidence": "",
+      "decisive_evidence": "",
+      "reason": "",
+      "labeler": "",
+      "completed_at": "",
+      "source_card": "reg_a_010_blind.md"
+    },
+    {
+      "qid": "res_a_013",
+      "answer_format": "tf",
+      "answer": "",
+      "confidence": "",
+      "decisive_evidence": "",
+      "reason": "",
+      "labeler": "",
+      "completed_at": "",
+      "source_card": "res_a_013_blind.md"
+    }
+  ]
+}

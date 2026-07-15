@@ -1,0 +1,18 @@
+{
+  "plan_id": "S2_LABELING_PLAN_2026-07-14",
+  "historical_tf_qids": [
+    "fc_a_003",
+    "fc_a_006",
+    "fc_a_010",
+    "fc_a_013",
+    "fin_a_006",
+    "fin_a_013",
+    "reg_a_018",
+    "res_a_003"
+  ],
+  "s2a_tf_qids": ["reg_a_010", "res_a_013"],
+  "remaining_tf_selection": "blind_labeling/tf_remaining/selection.json",
+  "mcq_selection": "blind_labeling/tier1_mcq/selection.json",
+  "multi_selection": "blind_labeling/multi_tier1/selection.json",
+  "gold_oracle_cases": "../experiments/O_gold_oracle/cases.json"
+}

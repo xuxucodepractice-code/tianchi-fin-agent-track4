@@ -1,0 +1,31 @@
+{
+  "selection_id": "S2A_TF_GATE_2026-07-14",
+  "complete": true,
+  "expected_count": 2,
+  "validated_count": 2,
+  "errors": [],
+  "results": [
+    {
+      "qid": "reg_a_010",
+      "answer_format": "tf",
+      "answer": "B",
+      "confidence": "high",
+      "decisive_evidence": "`doc_id: strict_v3_009_中国人民银行_国家金融监督管理总局_中国证券监督管理委员会令〔2025〕第11号（金融机构客户尽职调查和客户身份资料及交易记录保存管理办法）` 第三十条，chunk `regulatory:strict_v3_009_中国人民银行_国家金融监督管理总局_中国证券监督管理委员会令〔2025〕第11号（金融机构客户尽职调查和客户身份资料及交易记录保存管理办法）:na:33`：\"已经建立业务关系的，应当根据情形终止已建立的业务关系，并提交可疑交易报告。\"",
+      "reason": "前半句关于董监事同一机构内调任\"10 日内报告\"符合实施细则第三十八条（chunk :na:42）；但后半句报告类型错误——第三十条要求提交的是\"可疑交易报告\"而非\"大额交易报告\"（该办法全文未出现\"大额交易报告\"）。必要事实 F5 错误，整体判 B。",
+      "labeler": "Claude Fable（independent blind label）",
+      "completed_at": "2026-07-15T17:13:38+08:00",
+      "source_card": "reg_a_010_blind.md"
+    },
+    {
+      "qid": "res_a_013",
+      "answer_format": "tf",
+      "answer": "B",
+      "confidence": "high",
+      "decisive_evidence": "`doc_id: pack2_text13` 第 7 页（chunk `research:pack2_text13:7:0`）：\"2024年，美国宠物行业总规模达人民币 9234亿元，其中宠物医疗市场规模为人民币 2786 亿元，占总体的 30.2%\"",
+      "reason": "题干把美国 2024 年的数据（2786 亿元、30.2%）错误安在\"2025 年我国\"头上。同一报告明确给出我国数据：2025 年我国宠物市场规模 3126 亿元、宠物医疗行业规模估计 395 亿元（pack2_text13 第 3 页）。年份、国别、数值、占比四项必要事实全部不符，判 B。",
+      "labeler": "Claude Fable（independent blind label）",
+      "completed_at": "2026-07-15T17:13:38+08:00",
+      "source_card": "res_a_013_blind.md"
+    }
+  ]
+}

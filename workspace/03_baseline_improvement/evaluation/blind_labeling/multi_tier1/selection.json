@@ -1,0 +1,22 @@
+{
+  "selection_id": "S2_MULTI_TIER1_2026-07-14",
+  "frozen_before_labeling": true,
+  "selection_rule": "Union of six all-select cases and eight v1s1 changed insurance Multi cases, plus three cross-domain three-option cases",
+  "qids": [
+    "fc_a_016",
+    "fin_a_005",
+    "ins_a_005",
+    "ins_a_007",
+    "ins_a_009",
+    "ins_a_010",
+    "ins_a_014",
+    "ins_a_015",
+    "ins_a_016",
+    "ins_a_017",
+    "ins_a_019",
+    "res_a_014",
+    "fc_a_001",
+    "fin_a_002",
+    "reg_a_002"
+  ]
+}

@@ -5,6 +5,14 @@
 processed_data/
 logs/
 submission/
+outputs/tests/*
+!outputs/tests/.gitkeep
+outputs/dry_runs/*
+!outputs/dry_runs/.gitkeep
+outputs/experiments/*
+!outputs/experiments/.gitkeep
+outputs/candidates/*
+!outputs/candidates/.gitkeep
 
 # Secrets and local config
 .env

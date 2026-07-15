@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from agent.normalize_answer import normalize_answer, validate_answer_format
+from agent.normalize_answer import normalize_answer, normalize_tf_verdict, validate_answer_format
 
 OPTIONS_4 = {"A": "a", "B": "b", "C": "c", "D": "d"}
 OPTIONS_TF = {"A": "对", "B": "错"}
@@ -94,6 +94,20 @@ def test_tf_b_support():
     r = normalize_answer("tf", {"A": _j("insufficient"), "B": _j("support")}, OPTIONS_TF)
     assert r["answer"] == "B"
     assert r["low_confidence"] is False
+
+
+def test_tf_verdict_true_false_uncertain_paths():
+    true_result = normalize_tf_verdict("true", OPTIONS_TF)
+    false_result = normalize_tf_verdict("false", OPTIONS_TF)
+    uncertain_result = normalize_tf_verdict("uncertain", OPTIONS_TF, fallback_answer="A")
+
+    assert true_result["answer"] == "A"
+    assert true_result["low_confidence"] is False
+    assert false_result["answer"] == "B"
+    assert false_result["low_confidence"] is False
+    assert uncertain_result["answer"] == "A"
+    assert uncertain_result["low_confidence"] is True
+    assert uncertain_result["warnings"]
 
 
 # ------------------------------------------------- validate

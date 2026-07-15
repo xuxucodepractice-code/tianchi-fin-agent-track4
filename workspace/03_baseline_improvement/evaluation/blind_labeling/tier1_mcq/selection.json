@@ -1,0 +1,22 @@
+{
+  "selection_id": "S2_MCQ_ALL_2026-07-14",
+  "frozen_before_labeling": true,
+  "selection_rule": "All 15 group A MCQ questions",
+  "qids": [
+    "fc_a_008",
+    "fc_a_015",
+    "fin_a_008",
+    "fin_a_015",
+    "ins_a_001",
+    "ins_a_002",
+    "ins_a_003",
+    "ins_a_004",
+    "ins_a_006",
+    "ins_a_013",
+    "ins_a_020",
+    "reg_a_008",
+    "reg_a_015",
+    "res_a_008",
+    "res_a_015"
+  ]
+}

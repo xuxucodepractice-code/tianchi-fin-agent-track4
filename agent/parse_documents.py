@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Any
 
 from agent.chunk_schema import make_chunk
+from agent.doc_meta import write_doc_meta
 from agent.paths import PROCESSED_DATA_DIR, REPO_ROOT
 
 DOC_ID_MAP_PATH = PROCESSED_DATA_DIR / "doc_id_map.json"
@@ -60,6 +61,35 @@ def _sliding_window(text: str, max_chars: int = MAX_CHARS, overlap: int = OVERLA
     return [text[i : i + max_chars].strip() for i in range(0, len(text), step) if text[i : i + max_chars].strip()]
 
 
+def _is_char_line(line: str) -> bool:
+    stripped = line.strip()
+    if not stripped:
+        return False
+    compact = re.sub(r"\s+", "", stripped)
+    return 1 <= len(compact) <= 3 and not re.search(r"[A-Za-z]{2,}", compact)
+
+
+def merge_char_lines(text: str) -> str:
+    """修复 PDF 抽取产生的逐字换行页。
+
+    触发条件保守：非空行中 60% 以上像单字行时，才把整页非空行拼回连续文本。
+    正常段落页原样返回，避免误伤其他 67 份文档。
+    """
+    lines = text.splitlines()
+    nonempty = [line for line in lines if line.strip()]
+    if not nonempty:
+        return text
+    char_line_ratio = sum(1 for line in nonempty if _is_char_line(line)) / len(nonempty)
+    if char_line_ratio <= 0.6:
+        return text
+
+    merged = "".join(line.strip() for line in nonempty)
+    merged = re.sub(r"\s+([，。；：、,.!?！？）】》])", r"\1", merged)
+    merged = re.sub(r"([（【《])\s+", r"\1", merged)
+    merged = re.sub(r"[ \t]{2,}", " ", merged)
+    return re.sub(r"([。！？；])", r"\1\n", merged).strip()
+
+
 # ---------------------------------------------------------------- PDF
 
 
@@ -84,6 +114,7 @@ def parse_pdf(
                 }
             )
             continue
+        text = merge_char_lines(text)
         for idx, piece in enumerate(_sliding_window(text)):
             if not _keep(piece):
                 continue
@@ -283,7 +314,9 @@ def _parse_one_cached(
 
 
 def parse_all(
-    doc_map: dict[str, Any], refresh: bool = False
+    doc_map: dict[str, Any],
+    refresh: bool = False,
+    refresh_doc_ids: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """解析 doc_map 中全部文档，返回 (chunks, report)。单文档失败不中断。"""
     failures: list[dict[str, Any]] = []
@@ -297,7 +330,10 @@ def parse_all(
     for mapping in mappings:
         src, dom = mapping["source_type"], mapping["domain"]
         try:
-            chunks, doc_failures = _parse_one_cached(mapping, refresh=refresh)
+            should_refresh = refresh or (
+                refresh_doc_ids is not None and str(mapping["doc_id"]) in refresh_doc_ids
+            )
+            chunks, doc_failures = _parse_one_cached(mapping, refresh=should_refresh)
             failures.extend(doc_failures)
             all_chunks.extend(chunks)
             parsed_count += 1
@@ -343,6 +379,12 @@ def main() -> int:
     parser.add_argument(
         "--refresh", action="store_true", help="忽略 parse_cache 缓存，强制重新解析"
     )
+    parser.add_argument(
+        "--refresh-doc-id",
+        action="append",
+        default=[],
+        help="只刷新指定 doc_id 的 parse_cache；可重复传入",
+    )
     args = parser.parse_args()
 
     try:
@@ -351,7 +393,11 @@ def main() -> int:
         print(f"[error] {exc}", file=sys.stderr)
         return 1
 
-    chunks, report = parse_all(doc_map, refresh=args.refresh)
+    chunks, report = parse_all(
+        doc_map,
+        refresh=args.refresh,
+        refresh_doc_ids=set(args.refresh_doc_id) if args.refresh_doc_id else None,
+    )
 
     PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
     with CHUNKS_PATH.open("w", encoding="utf-8") as f:
@@ -359,6 +405,7 @@ def main() -> int:
             f.write(json.dumps(chunk, ensure_ascii=False) + "\n")
     with PARSE_REPORT_PATH.open("w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
+    doc_meta_path = write_doc_meta(chunks)
 
     print(
         f"[parse] documents={report['document_count']} "
@@ -369,6 +416,7 @@ def main() -> int:
         print(f"[parse]   {src}: {s['documents']} docs, {s['chunks']} chunks")
     print(f"[out] {CHUNKS_PATH}")
     print(f"[out] {PARSE_REPORT_PATH}")
+    print(f"[out] {doc_meta_path}")
     if report["failures"]:
         print(f"[warn] failures={len(report['failures'])}（详见 parse_report.json）", file=sys.stderr)
 

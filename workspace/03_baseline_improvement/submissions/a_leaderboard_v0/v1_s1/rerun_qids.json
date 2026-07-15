@@ -1,0 +1,111 @@
+{
+  "baseline_evidence": "workspace/03_baseline_improvement/submissions/a_leaderboard_v0/2026-07-05_score_63_2607/evidence.json",
+  "top_k": 5,
+  "jaccard_threshold": 0.6,
+  "rerun_count": 24,
+  "rerun_qids": [
+    "fin_a_005",
+    "fin_a_006",
+    "ins_a_001",
+    "ins_a_002",
+    "ins_a_003",
+    "ins_a_004",
+    "ins_a_005",
+    "ins_a_007",
+    "ins_a_008",
+    "ins_a_009",
+    "ins_a_010",
+    "ins_a_011",
+    "ins_a_012",
+    "ins_a_013",
+    "ins_a_014",
+    "ins_a_015",
+    "ins_a_016",
+    "ins_a_017",
+    "ins_a_018",
+    "ins_a_019",
+    "ins_a_020",
+    "reg_a_006",
+    "reg_a_015",
+    "reg_a_018"
+  ],
+  "reasons": {
+    "fin_a_005": [
+      "s1_seed"
+    ],
+    "fin_a_006": [
+      "s1_seed"
+    ],
+    "ins_a_001": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_002": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_003": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_004": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_005": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_007": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_008": [
+      "multi_entity_doc_coverage",
+      "retrieval_jaccard=0.571"
+    ],
+    "ins_a_009": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_010": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_011": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_012": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_013": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_014": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_015": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_016": [
+      "multi_entity_doc_coverage",
+      "retrieval_jaccard=0.538"
+    ],
+    "ins_a_017": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_018": [
+      "multi_entity_doc_coverage",
+      "retrieval_jaccard=0.588"
+    ],
+    "ins_a_019": [
+      "multi_entity_doc_coverage"
+    ],
+    "ins_a_020": [
+      "multi_entity_doc_coverage"
+    ],
+    "reg_a_006": [
+      "s1_seed"
+    ],
+    "reg_a_015": [
+      "s1_seed",
+      "retrieval_jaccard=0.158"
+    ],
+    "reg_a_018": [
+      "s1_seed",
+      "retrieval_jaccard=0.111"
+    ]
+  }
+}

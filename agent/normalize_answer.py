@@ -39,6 +39,32 @@ def validate_answer_format(
         raise ValueError(f"未知 answer_format: {answer_format!r}")
 
 
+def normalize_tf_verdict(
+    verdict: str,
+    options: dict[str, Any],
+    *,
+    fallback_answer: str = "A",
+) -> dict[str, Any]:
+    """把 tf 题干级 verdict 合成 A/B。
+
+    v2s1 正式 tf 链路只接受题干级 true/false/uncertain：
+    true -> A，false -> B，uncertain/error -> 数据决定的 fallback，并标低置信。
+    """
+    verdict = str(verdict).strip().lower()
+    warnings: list[str] = []
+    low_confidence = False
+    if verdict == "true":
+        answer = "A"
+    elif verdict == "false":
+        answer = "B"
+    else:
+        answer = fallback_answer
+        warnings.append(f"tf verdict={verdict or 'missing'}，fallback 到 {fallback_answer}")
+        low_confidence = True
+    validate_answer_format(answer, "tf", options)
+    return {"answer": answer, "warnings": warnings, "low_confidence": low_confidence}
+
+
 def normalize_answer(
     answer_format: str,
     option_judgments: dict[str, dict[str, Any]],

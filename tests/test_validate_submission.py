@@ -112,6 +112,31 @@ def test_summary_token_mismatch_is_rejected(tmp_path: Path):
     assert any("summary" in error for error in report["errors"])
 
 
+def test_per_question_token_arithmetic_is_rejected(tmp_path: Path):
+    answer_csv, evidence_json, manifest_json = _write_valid_bundle(tmp_path)
+    _write_csv(answer_csv, [["summary", "", 100, 20, 120], ["ins_a_007", "BC", 100, 20, 121]])
+    records = json.loads(evidence_json.read_text(encoding="utf-8"))
+    records[0]["total_tokens"] = 121
+    _write_json(evidence_json, records)
+
+    report = validate_submission_files(answer_csv, evidence_json, manifest_json)
+
+    assert report["ok"] is False
+    assert any("prompt_tokens + completion_tokens" in error for error in report["errors"])
+
+
+def test_manifest_token_arithmetic_is_rejected(tmp_path: Path):
+    answer_csv, evidence_json, manifest_json = _write_valid_bundle(tmp_path)
+    manifest = json.loads(manifest_json.read_text(encoding="utf-8"))
+    manifest["total_tokens"] = 121
+    _write_json(manifest_json, manifest)
+
+    report = validate_submission_files(answer_csv, evidence_json, manifest_json)
+
+    assert report["ok"] is False
+    assert any("run_manifest total_prompt_tokens" in error for error in report["errors"])
+
+
 def test_invalid_answer_format_is_rejected(tmp_path: Path):
     answer_csv, evidence_json, manifest_json = _write_valid_bundle(tmp_path)
     _write_csv(answer_csv, [["summary", "", 100, 20, 120], ["ins_a_007", "B,C", 100, 20, 120]])
@@ -130,6 +155,45 @@ def test_missing_evidence_record_is_rejected(tmp_path: Path):
 
     assert report["ok"] is False
     assert any("evidence" in error.lower() or "ins_a_007" in error for error in report["errors"])
+
+
+def test_official_scope_rejects_bundle_that_omits_official_qids(tmp_path: Path):
+    answer_csv, evidence_json, manifest_json = _write_valid_bundle(tmp_path)
+    manifest = json.loads(manifest_json.read_text(encoding="utf-8"))
+    manifest["submission_scope"] = "official_group_a"
+    manifest["qids"] = ["ins_a_007"]
+    _write_json(manifest_json, manifest)
+
+    report = validate_submission_files(answer_csv, evidence_json, manifest_json)
+
+    assert report["ok"] is False
+    assert any("official group_a" in error for error in report["errors"])
+
+
+def test_manifest_qids_must_match_csv(tmp_path: Path):
+    answer_csv, evidence_json, manifest_json = _write_valid_bundle(tmp_path)
+    manifest = json.loads(manifest_json.read_text(encoding="utf-8"))
+    manifest["qids"] = ["wrong_qid"]
+    _write_json(manifest_json, manifest)
+
+    report = validate_submission_files(answer_csv, evidence_json, manifest_json)
+
+    assert report["ok"] is False
+    assert any("run_manifest.qids" in error for error in report["errors"])
+
+
+def test_placeholder_rationale_is_rejected(tmp_path: Path):
+    answer_csv, evidence_json, manifest_json = _write_valid_bundle(tmp_path)
+    records = json.loads(evidence_json.read_text(encoding="utf-8"))
+    records[0]["option_judgments"] = {
+        "A": {"judgment": "insufficient", "rationale": "dry-run 占位：未调用 Qwen"}
+    }
+    _write_json(evidence_json, records)
+
+    report = validate_submission_files(answer_csv, evidence_json, manifest_json)
+
+    assert report["ok"] is False
+    assert any("placeholder" in error for error in report["errors"])
 
 
 def test_cli_exits_nonzero_for_invalid_submission(tmp_path: Path):

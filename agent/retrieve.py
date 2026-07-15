@@ -23,6 +23,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from agent.doc_meta import build_doc_meta, format_source_header, load_doc_meta
 from agent.load_questions import find_question_by_qid
 from agent.paths import PROCESSED_DATA_DIR, REPO_ROOT
 from agent.query_terms import (
@@ -34,7 +35,11 @@ from agent.query_terms import (
 CHUNKS_PATH = PROCESSED_DATA_DIR / "chunks.jsonl"
 RETRIEVAL_SAMPLES_DIR = PROCESSED_DATA_DIR / "retrieval_samples"
 
-MAX_EVIDENCE_TEXT = 1200  # evidence text 截断上限（字符）
+MAX_EVIDENCE_TEXT = 1400  # 普通 evidence text 截断上限（字符）
+QUOTA_EVIDENCE_TEXT = 800  # 多实体配额补足 evidence 使用更短摘录
+MAX_OPTION_EVIDENCE_TEXT = 7000  # 每个选项 evidence 总字符预算
+MULTI_DOC_MIN_EVIDENCE_PER_DOC = 2
+B_MODE_DOC_TOP_K = 12
 
 
 # ---------------------------------------------------------------- 加载与过滤
@@ -56,15 +61,28 @@ def load_chunks(chunks_path: Path = CHUNKS_PATH) -> list[dict[str, Any]]:
 
 
 def filter_chunks_for_question(
-    chunks: list[dict[str, Any]], question: dict[str, Any]
+    chunks: list[dict[str, Any]],
+    question: dict[str, Any],
+    *,
+    doc_cards: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
-    """A 榜：按 doc_ids 限定候选；B 榜 fallback：按 domain 全域（本任务不优化）。"""
+    """A mode uses supplied doc_ids; B mode selects candidate document cards."""
     domain = question.get("domain", "")
     doc_ids = question.get("doc_ids") or []
     if doc_ids:
         wanted = set(doc_ids)
         return [c for c in chunks if c["domain"] == domain and c["doc_id"] in wanted]
-    # B 榜 fallback：无 doc_ids 时退化为领域内全部 chunks
+    if doc_cards is None:
+        from agent.doc_retrieval import load_document_cards
+
+        doc_cards = load_document_cards()
+    if doc_cards:
+        from agent.doc_retrieval import select_documents
+
+        selected = select_documents(question, doc_cards, top_k=B_MODE_DOC_TOP_K)
+        wanted = {card["doc_id"] for card in selected}
+        return [c for c in chunks if c["domain"] == domain and c["doc_id"] in wanted]
+    # Safe compatibility fallback before the card artifact has been built.
     return [c for c in chunks if c["domain"] == domain]
 
 
@@ -125,17 +143,146 @@ def score_chunk(
     return score, matched
 
 
-def _truncate_around_match(text: str, matched_terms: list[str]) -> str:
+def _truncate_around_match(
+    text: str,
+    matched_terms: list[str],
+    max_chars: int = MAX_EVIDENCE_TEXT,
+) -> str:
     """超长文本围绕最早命中的 term 截取窗口，保留上下文。"""
-    if len(text) <= MAX_EVIDENCE_TEXT:
+    if len(text) <= max_chars:
         return text
     norm = normalize_text(text)
+    formula_terms = [
+        "160%",
+        "较大值",
+        "较大者",
+        "身故给付比例",
+        "保险金额为下列",
+        "现金价值",
+    ]
+    formula_pos = min(
+        (norm.find(t) for t in formula_terms if norm.find(t) >= 0),
+        default=-1,
+    )
+    if formula_pos >= 0:
+        start = max(0, formula_pos - max_chars // 3)
+        return text[start : start + max_chars]
     first_pos = min(
         (norm.find(t) for t in matched_terms if norm.find(t) >= 0),
         default=0,
     )
-    start = max(0, first_pos - MAX_EVIDENCE_TEXT // 3)
-    return text[start : start + MAX_EVIDENCE_TEXT]
+    start = max(0, first_pos - max_chars // 3)
+    return text[start : start + max_chars]
+
+
+def _neighbor_positions(index: Bm25LiteIndex, pos: int) -> list[int]:
+    hit = index.chunks[pos]
+    positions: list[int] = []
+    for neighbor_pos in (pos, pos - 1, pos + 1):
+        if neighbor_pos < 0 or neighbor_pos >= index.n:
+            continue
+        other = index.chunks[neighbor_pos]
+        if other.get("domain") != hit.get("domain") or other.get("doc_id") != hit.get("doc_id"):
+            continue
+        hit_page = hit.get("page")
+        other_page = other.get("page")
+        if hit_page is not None and other_page is not None and abs(int(other_page) - int(hit_page)) > 1:
+            continue
+        positions.append(neighbor_pos)
+    return positions
+
+
+def _make_evidence(
+    index: Bm25LiteIndex,
+    pos: int,
+    score: float,
+    matched: list[str],
+    doc_meta: dict[str, dict[str, dict[str, str]]],
+    max_chars: int,
+) -> dict[str, Any]:
+    c = index.chunks[pos]
+    neighbor_positions = _neighbor_positions(index, pos)
+    merged_text = "\n".join(index.chunks[p]["text"] for p in neighbor_positions)
+    return {
+        "chunk_id": c["chunk_id"],
+        "merged_chunk_ids": [index.chunks[p]["chunk_id"] for p in neighbor_positions],
+        "doc_id": c["doc_id"],
+        "source_type": c["source_type"],
+        "source_path": c["source_path"],
+        "page": c["page"],
+        "section": c.get("section", ""),
+        "source_header": format_source_header(c, doc_meta),
+        "score": round(score, 4),
+        "matched_terms": sorted(matched, key=lambda t: (-len(t), t))[:20],
+        "text": _truncate_around_match(merged_text, matched, max_chars=max_chars),
+    }
+
+
+def _coverage_enabled(question: dict[str, Any]) -> bool:
+    return (
+        question.get("domain") in {"insurance", "financial_reports"}
+        and len(question.get("doc_ids") or []) >= 3
+    )
+
+
+def _select_scored_hits(
+    scored: list[tuple[float, int, list[str]]],
+    index: Bm25LiteIndex,
+    question: dict[str, Any],
+    top_k: int,
+) -> list[tuple[float, int, list[str], bool]]:
+    selected = [(score, pos, matched, False) for score, pos, matched in scored[:top_k]]
+    if not _coverage_enabled(question):
+        return selected
+
+    selected_positions = {pos for _, pos, _, _ in selected}
+    wanted_doc_ids = [str(doc_id) for doc_id in question.get("doc_ids") or []]
+    for doc_id in wanted_doc_ids:
+        current = sum(1 for _, pos, _, _ in selected if str(index.chunks[pos]["doc_id"]) == doc_id)
+        for hit in scored:
+            if current >= MULTI_DOC_MIN_EVIDENCE_PER_DOC:
+                break
+            _, pos, _ = hit
+            if pos in selected_positions or str(index.chunks[pos]["doc_id"]) != doc_id:
+                continue
+            score, pos, matched = hit
+            selected.append((score, pos, matched, True))
+            selected_positions.add(pos)
+            current += 1
+    selected.sort(key=lambda x: (-x[0], index.chunks[x[1]]["chunk_id"]))
+    return selected
+
+
+def _select_tf_scored_hits(
+    scored: list[tuple[float, int, list[str]]],
+    index: Bm25LiteIndex,
+    question: dict[str, Any],
+    top_k: int,
+) -> list[tuple[float, int, list[str], bool]]:
+    """tf 题按题干检索，并保证每个题面 doc_id 至少 2 条证据。"""
+    selected = [(score, pos, matched, False) for score, pos, matched in scored[:top_k]]
+    selected_positions = {pos for _, pos, _, _ in selected}
+    for doc_id in [str(doc_id) for doc_id in question.get("doc_ids") or []]:
+        current = sum(1 for _, pos, _, _ in selected if str(index.chunks[pos]["doc_id"]) == doc_id)
+        for hit in scored:
+            if current >= MULTI_DOC_MIN_EVIDENCE_PER_DOC:
+                break
+            score, pos, matched = hit
+            if pos in selected_positions or str(index.chunks[pos]["doc_id"]) != doc_id:
+                continue
+            selected.append((score, pos, matched, True))
+            selected_positions.add(pos)
+            current += 1
+    selected.sort(key=lambda x: (-x[0], index.chunks[x[1]]["chunk_id"]))
+    return selected
+
+
+def _evidence_char_budget(is_quota_extra: bool, evidence_count: int) -> int:
+    per_evidence_cap = MAX_OPTION_EVIDENCE_TEXT // max(evidence_count, 1)
+    max_chars = min(MAX_EVIDENCE_TEXT, per_evidence_cap)
+    if is_quota_extra:
+        max_chars = min(max_chars, QUOTA_EVIDENCE_TEXT)
+    return max(200, max_chars)
 
 
 # ---------------------------------------------------------------- 检索主流程
@@ -148,6 +295,7 @@ def retrieve_for_option(
     option_text: str,
     top_k: int = 5,
     index: Bm25LiteIndex | None = None,
+    doc_meta: dict[str, dict[str, dict[str, str]]] | None = None,
 ) -> list[dict[str, Any]]:
     """对单个选项检索，返回按 score 降序的 evidence 列表（不超过 top_k）。"""
     if index is None:
@@ -162,23 +310,68 @@ def retrieve_for_option(
     # score 降序；同分按 chunk_id 升序，保证确定性
     scored.sort(key=lambda x: (-x[0], index.chunks[x[1]]["chunk_id"]))
 
-    evidence = []
-    for score, pos, matched in scored[:top_k]:
-        c = index.chunks[pos]
-        evidence.append(
-            {
-                "chunk_id": c["chunk_id"],
-                "doc_id": c["doc_id"],
-                "source_type": c["source_type"],
-                "source_path": c["source_path"],
-                "page": c["page"],
-                "section": c.get("section", ""),
-                "score": round(score, 4),
-                "matched_terms": sorted(matched, key=lambda t: (-len(t), t))[:20],
-                "text": _truncate_around_match(c["text"], matched),
-            }
+    selected = _select_scored_hits(scored, index, question, top_k)
+    doc_meta = doc_meta if doc_meta is not None else build_doc_meta(index.chunks)
+    evidence_count = len(selected)
+    return [
+        _make_evidence(
+            index,
+            pos,
+            score,
+            matched,
+            doc_meta,
+            max_chars=_evidence_char_budget(is_quota_extra, evidence_count),
         )
-    return evidence
+        for score, pos, matched, is_quota_extra in selected
+    ]
+
+
+def retrieve_for_tf_question(
+    question: dict[str, Any],
+    chunks: list[dict[str, Any]],
+    top_k: int = 5,
+) -> dict[str, Any]:
+    """tf 题干级检索：不按 A/B「正确/错误」选项分路。"""
+    candidates = filter_chunks_for_question(chunks, question)
+    index = build_bm25_index(candidates)
+    question_text = question.get("question", "")
+    query_terms = build_option_query_terms(question, "__tf__", question_text)
+    weights = build_term_weights(question, "__tf__", question_text)
+
+    scored: list[tuple[float, int, list[str]]] = []
+    for pos in range(index.n):
+        score, matched = score_chunk(index, pos, weights)
+        if matched:
+            scored.append((score, pos, matched))
+    scored.sort(key=lambda x: (-x[0], index.chunks[x[1]]["chunk_id"]))
+
+    selected = _select_tf_scored_hits(scored, index, question, top_k)
+    doc_meta = load_doc_meta() or build_doc_meta(chunks)
+    evidence_count = len(selected)
+    evidence = [
+        _make_evidence(
+            index,
+            pos,
+            score,
+            matched,
+            doc_meta,
+            max_chars=_evidence_char_budget(is_quota_extra, evidence_count),
+        )
+        for score, pos, matched, is_quota_extra in selected
+    ]
+    return {
+        "qid": question["qid"],
+        "domain": question.get("domain", ""),
+        "question": question_text,
+        "answer_format": question.get("answer_format", ""),
+        "doc_ids": question.get("doc_ids", []),
+        "top_k": top_k,
+        "candidate_chunk_count": len(candidates),
+        "tf": {
+            "query_terms": query_terms,
+            "evidence": evidence,
+        },
+    }
 
 
 def retrieve_for_question(
@@ -189,6 +382,7 @@ def retrieve_for_question(
     """对一道题的全部选项检索，输出可供 Task 5 Qwen 逐项判断直接消费的结构。"""
     candidates = filter_chunks_for_question(chunks, question)
     index = build_bm25_index(candidates)
+    doc_meta = load_doc_meta() or build_doc_meta(chunks)
 
     options_out: dict[str, Any] = {}
     for option_key in sorted(question.get("options", {})):
@@ -197,7 +391,13 @@ def retrieve_for_question(
             "option_text": option_text,
             "query_terms": build_option_query_terms(question, option_key, option_text),
             "evidence": retrieve_for_option(
-                candidates, question, option_key, option_text, top_k=top_k, index=index
+                candidates,
+                question,
+                option_key,
+                option_text,
+                top_k=top_k,
+                index=index,
+                doc_meta=doc_meta,
             ),
         }
 
