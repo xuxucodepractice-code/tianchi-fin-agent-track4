@@ -1,0 +1,11 @@
+qid,answer,prompt_tokens,completion_tokens,total_tokens
+fc_a_001,ABD,5580,2,5582
+fc_a_002,ABD,5311,2,5313
+fc_a_003,A,4983,1,4984
+fc_a_004,AD,5788,1,5789
+fc_a_005,ABCD,5308,2,5310
+fc_a_006,A,5192,1,5193
+fc_a_007,BD,5373,1,5374
+fc_a_008,D,5384,1,5385
+fc_a_009,AB,5475,1,5476
+fc_a_010,A,5448,1,5449
