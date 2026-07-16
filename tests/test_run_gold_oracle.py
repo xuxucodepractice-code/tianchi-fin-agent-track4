@@ -7,7 +7,7 @@ class FakeClient:
     def __init__(self):
         self.calls = []
 
-    def chat(self, messages, temperature=0.0):
+    def chat(self, messages, temperature=0.0, **kwargs):
         self.calls.append(messages)
         return {
             "content": '{"verdict":"true","fact_checks":[{"claim":"x","verdict":"true","evidence_refs":[1]}],"rationale":"证据支持"}',

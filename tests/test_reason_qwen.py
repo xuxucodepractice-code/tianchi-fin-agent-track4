@@ -111,6 +111,17 @@ def test_non_json_output_recorded_as_error():
     assert result["low_confidence"] is True
 
 
+def test_option_response_must_match_the_requested_option():
+    client = FakeQwenClient([_judgment_json("B", "support")])
+
+    judgment = judge_option_with_qwen(
+        client, QUESTION, "A", "选项A文本", EVIDENCE
+    )
+
+    assert judgment["judgment"] == "error"
+    assert "option 字段不匹配" in judgment["error"]
+
+
 def test_json_extractable_from_wrapped_text():
     wrapped = "好的，我的判断如下：\n```json\n" + _judgment_json("A", "support") + "\n```"
     obj = extract_json_from_text(wrapped)

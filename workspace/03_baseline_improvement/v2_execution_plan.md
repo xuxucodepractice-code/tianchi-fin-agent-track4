@@ -1,5 +1,10 @@
 # v2 执行计划（详细版）
 
+> 历史说明（2026-07-16）：本文件中的早期 `--qid/--all --use-qwen --resume`
+> 命令早于 Agent Trace Gate，只能作为历史设计背景，不能再生成可晋升候选。E002 起请以
+> `governance/agent_trace_gate.md` 和 `experiments/E002_mcq_global_comparison/experiment.md`
+> 的 selection-backed fresh-run 命令为准。
+
 制定日期：2026-07-08
 前置文档：`v1_architecture_review.md`（瓶颈分析）、`v1_s1_diagnosis_and_v2_plan.md`（v1_s1 提分失败诊断）、`submissions/a_leaderboard_v0/v1_error_analysis/task_v1_0_manual_labeling_audit.md`（人工标定审计）
 基准：v0 线上 63.2607（冻结于 `2026-07-05_score_63_2607/`）；当前 `submission/` 为 v1_s1 产物（pipeline_version=v1s1）
@@ -174,7 +179,12 @@ python -m agent.validate_submission submission/answer.csv
 
 ---
 
-## Task v2-2：mcq 全题比较判定 + 确定性计算校验（实验二）
+## Task v2-2：mcq 全题比较判定 + 确定性计算校验（历史合并规格）
+
+> 2026-07-16 范围勘误：当前权威 E002 只实现 M1 四选一统一比较，保留 4 次参考判断并
+> 新增 1 次 global comparison；本节下方的 `verify_calc`、算术重问和相应测试已拆到 E003，
+> 本轮不得实现。E002 的状态与命令以 `experiments/E002_mcq_global_comparison/experiment.md`
+> 和 `governance/agent_trace_gate.md` 为准。
 
 ### 目标
 

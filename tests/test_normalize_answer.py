@@ -4,7 +4,12 @@ from __future__ import annotations
 
 import pytest
 
-from agent.normalize_answer import normalize_answer, normalize_tf_verdict, validate_answer_format
+from agent.normalize_answer import (
+    normalize_answer,
+    normalize_mcq_global_choice,
+    normalize_tf_verdict,
+    validate_answer_format,
+)
 
 OPTIONS_4 = {"A": "a", "B": "b", "C": "c", "D": "d"}
 OPTIONS_TF = {"A": "对", "B": "错"}
@@ -79,6 +84,21 @@ def test_mcq_no_support_fallback():
     r = normalize_answer("mcq", {k: _j("refute") for k in OPTIONS_4}, OPTIONS_4)
     assert r["answer"] == "A"
     assert r["low_confidence"] is True
+
+
+def test_mcq_global_choice_is_direct_and_invalid_choice_is_explicit_fallback():
+    direct = normalize_mcq_global_choice("C", OPTIONS_4)
+    assert direct == {
+        "answer": "C",
+        "warnings": [],
+        "low_confidence": False,
+        "fallback_used": False,
+    }
+
+    fallback = normalize_mcq_global_choice("BC", OPTIONS_4, fallback_answer="A")
+    assert fallback["answer"] == "A"
+    assert fallback["low_confidence"] is True
+    assert fallback["fallback_used"] is True
 
 
 # ------------------------------------------------- tf

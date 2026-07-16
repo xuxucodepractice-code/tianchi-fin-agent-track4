@@ -1,0 +1,43 @@
+{
+  "selection_id": "E002_MCQ_TRACE_GATE_2026-07-16",
+  "frozen_before_labeling": true,
+  "selection_rule": "All 15 group A MCQ questions; fresh traced inference for all, prospective temporal evaluation for the 13 whose labels were not known before candidate freeze",
+  "qids": [
+    "fc_a_008",
+    "fc_a_015",
+    "fin_a_008",
+    "fin_a_015",
+    "ins_a_001",
+    "ins_a_002",
+    "ins_a_003",
+    "ins_a_004",
+    "ins_a_006",
+    "ins_a_013",
+    "ins_a_020",
+    "reg_a_008",
+    "reg_a_015",
+    "res_a_008",
+    "res_a_015"
+  ],
+  "prospective_qids": [
+    "fc_a_008",
+    "fc_a_015",
+    "fin_a_008",
+    "fin_a_015",
+    "ins_a_003",
+    "ins_a_004",
+    "ins_a_006",
+    "ins_a_013",
+    "ins_a_020",
+    "reg_a_008",
+    "reg_a_015",
+    "res_a_008",
+    "res_a_015"
+  ],
+  "known_before_freeze_qids": [
+    "ins_a_001",
+    "ins_a_002"
+  ],
+  "source_selection_path": "workspace/03_baseline_improvement/evaluation/blind_labeling/tier1_mcq/selection.json",
+  "source_selection_sha256": "c63850fbd9139d318f82022074f9ec7ed9071e44e7d342b5870b8b4f0302f504"
+}

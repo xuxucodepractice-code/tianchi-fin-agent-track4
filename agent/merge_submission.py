@@ -18,6 +18,14 @@ from typing import Any
 from agent.load_questions import load_all_questions
 from agent.output_writer import ANSWER_CSV_COLUMNS
 from agent.paths import REPO_ROOT, bundle_paths
+from agent.trace_gate import (
+    freeze_candidate,
+    load_frozen_selection,
+    resolve_recorded_path,
+    sha256_file as trace_sha256_file,
+    validate_trace_directory,
+)
+from agent.validate_submission import validate_submission_files
 
 MERGE_TOOL_VERSION = "v1"
 
@@ -107,6 +115,7 @@ def merge_submission_bundles(
     parent_version: str,
     experiment_id: str,
     experiment_pipeline_version: str,
+    selection_path: Path | None = None,
 ) -> tuple[Path, Path, Path]:
     parent_dir = parent_dir.resolve()
     output_dir = output_dir.resolve()
@@ -114,12 +123,43 @@ def merge_submission_bundles(
     for path in parent_paths:
         if not path.is_file():
             raise FileNotFoundError(f"parent artifact missing: {path}")
+    parent_manifest = json.loads(parent_paths[2].read_text(encoding="utf-8"))
+    declared_parent_version = str(
+        parent_manifest.get("pipeline_version") or ""
+    ).strip()
+    if declared_parent_version and declared_parent_version != parent_version:
+        raise ValueError("parent_version does not match frozen parent manifest")
+    parent_version_provenance = (
+        "parent_manifest" if declared_parent_version else "legacy_parent_version_claim"
+    )
+    legacy_parent_version_claim = (
+        None
+        if declared_parent_version
+        else {
+            "claimed_version": parent_version,
+            "reason": "parent manifest predates the pipeline_version field",
+        }
+    )
+    if output_dir.exists() and any(output_dir.iterdir()):
+        raise FileExistsError(f"candidate output directory must be empty: {output_dir}")
     output_dir.mkdir(parents=True, exist_ok=True)
     output_paths = bundle_paths(output_dir)
 
     if not rerun_qids:
         for source, target in zip(parent_paths, output_paths):
             shutil.copyfile(source, target)
+        report = validate_submission_files(*output_paths)
+        if not report["ok"]:
+            raise ValueError("parent-copy candidate validation failed: " + "; ".join(report["errors"]))
+        freeze_candidate(
+            output_dir,
+            parent_dir=parent_dir,
+            experiment_id=experiment_id,
+            pipeline_version=experiment_pipeline_version,
+            parent_version=parent_version,
+            trace_dir=None,
+            generation_mode="byte_identical_parent_copy",
+        )
         return output_paths
 
     if rerun_dir is None:
@@ -153,13 +193,56 @@ def merge_submission_bundles(
         rerun_evidence[qid] if qid in rerun_qids else parent_evidence[qid]
         for qid in official_qids
     ]
+    rerun_manifest = json.loads(rerun_paths[2].read_text(encoding="utf-8"))
+    if str(rerun_manifest.get("pipeline_version", "")) != experiment_pipeline_version:
+        raise ValueError("rerun manifest pipeline_version does not match experiment version")
+    trace_meta = rerun_manifest.get("agent_trace")
+    if not isinstance(trace_meta, dict) or not trace_meta.get("trace_dir"):
+        raise ValueError("rerun artifact is missing required agent_trace provenance")
+    trace_dir = resolve_recorded_path(str(trace_meta["trace_dir"]))
+    trace_report = validate_trace_directory(
+        trace_dir,
+        artifact_dir=rerun_dir,
+        require_candidate_eligible=True,
+        require_current_code_match=True,
+    )
+    if not trace_report["ok"]:
+        raise ValueError("rerun agent trace is invalid: " + "; ".join(trace_report["errors"]))
+    traced_qids = [
+        str(value)
+        for value in (trace_report.get("manifest", {}).get("config", {}).get("qids", []))
+    ]
+    if set(traced_qids) != rerun_qids or len(traced_qids) != len(rerun_qids):
+        raise ValueError("rerun_qids do not exactly match traced derivation qids")
+    if selection_path is None:
+        raise ValueError("non-empty traced candidate requires --selection-file")
+    selection_path = selection_path.resolve()
+    selection = load_frozen_selection(selection_path)
+    selection_qids = selection["qids"]
+    if set(selection_qids) != rerun_qids:
+        raise ValueError("blind selection qids do not exactly match rerun_qids")
+    traced_config = trace_report["manifest"].get("config", {})
+    if str(traced_config.get("experiment_id", "")) != experiment_id:
+        raise ValueError("experiment_id does not match traced run config")
+    if str(traced_config.get("pipeline_version", "")) != experiment_pipeline_version:
+        raise ValueError("traced code/config pipeline_version does not match experiment version")
+    if traced_config.get("selection_sha256") != trace_sha256_file(selection_path):
+        raise ValueError("trace was not run from this frozen blind selection")
+    mismatched_record_versions = sorted(
+        qid
+        for qid in rerun_qids
+        if str(rerun_evidence[qid].get("pipeline_version", ""))
+        != experiment_pipeline_version
+    )
+    if mismatched_record_versions:
+        raise ValueError(
+            "rerun evidence pipeline_version mismatch: "
+            + ", ".join(mismatched_record_versions)
+        )
     _write_answer(output_paths[0], merged_rows)
     output_paths[1].write_text(
         json.dumps(merged_evidence, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-
-    parent_manifest = json.loads(parent_paths[2].read_text(encoding="utf-8"))
-    rerun_manifest = json.loads(rerun_paths[2].read_text(encoding="utf-8"))
     prompt = sum(int(row["prompt_tokens"]) for row in merged_rows)
     completion = sum(int(row["completion_tokens"]) for row in merged_rows)
     total = sum(int(row["total_tokens"]) for row in merged_rows)
@@ -173,7 +256,10 @@ def merge_submission_bundles(
             "source_pipeline_version": (
                 experiment_pipeline_version
                 if qid in rerun_qids
-                else str(parent_manifest.get("pipeline_version") or parent_version)
+                else declared_parent_version or parent_version
+            ),
+            "source_pipeline_version_provenance": (
+                "rerun_manifest" if qid in rerun_qids else parent_version_provenance
             ),
             "source_run_id": (
                 str(rerun_manifest.get("run_id") or rerun_manifest.get("run_started_at") or "rerun")
@@ -206,6 +292,7 @@ def merge_submission_bundles(
         "experiment_id": experiment_id,
         "experiment_pipeline_version": experiment_pipeline_version,
         "parent_version": parent_version,
+        "legacy_parent_version_claim": legacy_parent_version_claim,
         "parent_artifact_dir": _relative_or_absolute(parent_dir),
         "parent_artifact_sha256": bundle_sha256(parent_dir),
         "rerun_artifact_dir": _relative_or_absolute(rerun_dir),
@@ -213,6 +300,21 @@ def merge_submission_bundles(
         "rerun_qids": sorted(rerun_qids),
         "merge_tool_version": MERGE_TOOL_VERSION,
         "per_record_lineage": per_record_lineage,
+        "agent_trace_gate": {
+            "schema_version": "agent-trace/v1",
+            "status": "PASS",
+            "trace_run_id": trace_report.get("trace_run_id"),
+            "trace_dir": _relative_or_absolute(trace_dir),
+            "fresh_traced_qids": traced_qids,
+            "prospective_qids": selection["prospective_qids"],
+            "known_before_freeze_qids": selection["known_before_freeze_qids"],
+            "legacy_inherited_qids": [
+                qid for qid in official_qids if qid not in rerun_qids
+            ],
+            "legacy_inheritance_reason": "frozen_parent_predates_agent_trace_gate",
+            "blind_selection": _relative_or_absolute(selection_path),
+            "blind_selection_sha256": trace_sha256_file(selection_path),
+        },
         "output_paths": {
             "answer_csv": _relative_or_absolute(output_paths[0]),
             "evidence_json": _relative_or_absolute(output_paths[1]),
@@ -221,6 +323,20 @@ def merge_submission_bundles(
     }
     output_paths[2].write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    report = validate_submission_files(*output_paths)
+    if not report["ok"]:
+        raise ValueError("candidate submission validation failed: " + "; ".join(report["errors"]))
+    freeze_candidate(
+        output_dir,
+        parent_dir=parent_dir,
+        experiment_id=experiment_id,
+        pipeline_version=experiment_pipeline_version,
+        parent_version=parent_version,
+        trace_dir=trace_dir,
+        generation_mode="traced_rerun_plus_frozen_parent",
+        selection_path=selection_path,
+        trace_artifact_dir=rerun_dir,
     )
     return output_paths
 
@@ -235,8 +351,12 @@ def _load_qids(path: Path | None) -> set[str]:
         data = json.loads(raw)
     except json.JSONDecodeError:
         data = None
-    if isinstance(data, dict) and isinstance(data.get("rerun_qids"), list):
-        return {str(item) for item in data["rerun_qids"]}
+    if isinstance(data, dict):
+        qids = data.get("rerun_qids")
+        if not isinstance(qids, list):
+            qids = data.get("qids")
+        if isinstance(qids, list):
+            return {str(item) for item in qids}
     if isinstance(data, list):
         return {str(item) for item in data}
     return {
@@ -256,6 +376,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--parent-version", required=True)
     parser.add_argument("--experiment-id", required=True)
     parser.add_argument("--experiment-pipeline-version", required=True)
+    parser.add_argument("--selection-file")
     args = parser.parse_args(argv)
     try:
         paths = merge_submission_bundles(
@@ -266,6 +387,7 @@ def main(argv: list[str] | None = None) -> int:
             parent_version=args.parent_version,
             experiment_id=args.experiment_id,
             experiment_pipeline_version=args.experiment_pipeline_version,
+            selection_path=Path(args.selection_file) if args.selection_file else None,
         )
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"[error] {exc}")

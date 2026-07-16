@@ -1,0 +1,21 @@
+{
+  "schema_version": "e002-human-label-seal/v1",
+  "status": "RECORDED_WITH_IDENTITY_LIMITATION",
+  "experiment_id": "E002",
+  "pipeline_version": "v2s2",
+  "selection_sha256": "662cb1694c8e2b87ce98f96f04604da0f141b2c76a213eeb0b4812d3438e80f5",
+  "prospective_qid_count": 13,
+  "attested_at": "2026-07-16T16:56:57+08:00",
+  "attestation_text": "我确认截至现在，13 个 prospective qid 的答案尚未向 E002 生成方、当前生成会话或代码作者揭晓。",
+  "attestor": {
+    "source": "workspace_user_in_current_codex_task",
+    "identity_verification": "not_available_to_agent",
+    "message_id": "not_exposed_to_agent",
+    "recorded_by": "Codex"
+  },
+  "limitations": [
+    "This records the user's written attestation but does not independently verify identity.",
+    "This is not an OS-level seal, trusted timestamp, or cryptographic non-disclosure proof.",
+    "No prospective label value is stored in this attestation."
+  ]
+}

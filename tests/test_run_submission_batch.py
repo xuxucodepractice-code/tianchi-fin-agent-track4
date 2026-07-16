@@ -13,7 +13,9 @@ from agent.run_submission import (
     _build_manifest,
     is_reusable_qwen_result,
     run_questions,
+    solve_question,
 )
+from agent.reason_qwen import MCQ_GLOBAL_METHOD
 
 
 def test_load_questions_by_domain_returns_insurance_questions_in_order():
@@ -125,10 +127,10 @@ def test_official_output_rejects_partial_or_dry_run_scope():
     assert dry.returncode == 1
     assert "requires --use-qwen" in dry.stderr
     assert partial.returncode == 1
-    assert "unbounded --all" in partial.stderr
+    assert "direct traced inference into submission/ is disabled" in partial.stderr
 
 
-def test_run_questions_continues_after_single_question_failure(monkeypatch):
+def test_run_questions_continues_after_single_question_failure(monkeypatch, tmp_path):
     questions = [
         {"qid": "q1", "domain": "insurance", "options": {"A": "a"}, "answer_format": "mcq"},
         {"qid": "q2", "domain": "insurance", "options": {"A": "a"}, "answer_format": "mcq"},
@@ -159,7 +161,14 @@ def test_run_questions_continues_after_single_question_failure(monkeypatch):
 
     monkeypatch.setattr("agent.run_submission.solve_question", fake_solve)
 
-    results, failures = run_questions(questions, chunks=[], use_qwen=False, top_k=5, client=None)
+    results, failures = run_questions(
+        questions,
+        chunks=[],
+        use_qwen=False,
+        top_k=5,
+        client=None,
+        reasoning_samples_dir=tmp_path,
+    )
 
     assert [r["qid"] for r in results] == ["q2"]
     assert len(failures) == 1
@@ -167,7 +176,59 @@ def test_run_questions_continues_after_single_question_failure(monkeypatch):
     assert "boom" in failures[0]["error"]
 
 
+def test_solve_question_routes_mcq_multi_and_tf_to_separate_reasoners(monkeypatch):
+    calls: list[str] = []
+
+    def option_retrieval(question, chunks, top_k=5):
+        return {
+            "options": {
+                key: {"option_text": text, "evidence": []}
+                for key, text in question["options"].items()
+            }
+        }
+
+    def tf_retrieval(question, chunks, top_k=5):
+        return {"tf": {"evidence": []}}
+
+    def result(question, route):
+        calls.append(route)
+        return {
+            "qid": question["qid"],
+            "answer_format": question["answer_format"],
+            "answer": "A",
+        }
+
+    monkeypatch.setattr("agent.run_submission.retrieve_for_question", option_retrieval)
+    monkeypatch.setattr("agent.run_submission.retrieve_for_tf_question", tf_retrieval)
+    monkeypatch.setattr(
+        "agent.run_submission.reason_mcq_question_with_qwen",
+        lambda question, retrieval, client=None: result(question, "mcq"),
+    )
+    monkeypatch.setattr(
+        "agent.run_submission.reason_question_with_qwen",
+        lambda question, retrieval, client=None: result(question, "multi"),
+    )
+    monkeypatch.setattr(
+        "agent.run_submission.reason_tf_question_with_qwen",
+        lambda question, retrieval, client=None: result(question, "tf"),
+    )
+    four = {"A": "a", "B": "b", "C": "c", "D": "d"}
+    questions = [
+        {"qid": "m1", "answer_format": "mcq", "options": four},
+        {"qid": "m2", "answer_format": "multi", "options": four},
+        {"qid": "t1", "answer_format": "tf", "options": {"A": "对", "B": "错"}},
+    ]
+
+    for question in questions:
+        solve_question(question, [], use_qwen=True, client=object())
+
+    assert calls == ["mcq", "multi", "tf"]
+
+
 def _qwen_result(qid: str, *, tokens: int = 120, judgment: str = "support", error: str | None = None) -> dict:
+    options = {"A": "a", "B": "b", "C": "c", "D": "d"}
+    prompt = tokens - 1 if tokens else 0
+    completion = 1 if tokens else 0
     return {
         "qid": qid,
         "domain": "insurance",
@@ -176,25 +237,43 @@ def _qwen_result(qid: str, *, tokens: int = 120, judgment: str = "support", erro
         "model": "qwen-plus",
         "pipeline_version": CURRENT_PIPELINE_VERSION,
         "question": "question",
-        "options": {"A": "a"},
+        "options": options,
         "doc_ids": [],
         "option_judgments": {
-            "A": {
+            key: {
                 "judgment": judgment,
                 "rationale": "",
                 "evidence_refs": [],
-                "prompt_tokens": tokens,
-                "completion_tokens": 1 if tokens else 0,
+                "prompt_tokens": prompt,
+                "completion_tokens": completion,
                 "total_tokens": tokens,
                 "error": error,
             }
+            for key in options
+        },
+        "mcq_comparison": {
+            "answer": "A",
+            "eliminated": {"B": "x", "C": "x", "D": "x"},
+            "calculations": [],
+            "confidence": "high",
+            "rationale": "x",
+            "prompt_tokens": prompt,
+            "completion_tokens": completion,
+            "total_tokens": tokens,
+            "error": error,
+        },
+        "answer_derivation": {
+            "method": MCQ_GLOBAL_METHOD,
+            "input_choice": "A",
+            "fallback_used": False,
+            "output_answer": "A",
         },
         "answer": "A",
         "warnings": [],
         "low_confidence": False,
-        "prompt_tokens": tokens,
-        "completion_tokens": 1 if tokens else 0,
-        "total_tokens": tokens,
+        "prompt_tokens": prompt * 5,
+        "completion_tokens": completion * 5,
+        "total_tokens": tokens * 5,
         "evidence": [],
         "retrieval": {},
     }
@@ -223,9 +302,10 @@ def test_is_reusable_qwen_result_rejects_mismatched_pipeline_version():
 
 
 def test_run_questions_resume_reuses_valid_samples_and_reruns_bad_samples(tmp_path, monkeypatch):
+    options = {"A": "a", "B": "b", "C": "c", "D": "d"}
     questions = [
-        {"qid": "q1", "domain": "insurance", "options": {"A": "a"}, "answer_format": "mcq"},
-        {"qid": "q2", "domain": "insurance", "options": {"A": "a"}, "answer_format": "mcq"},
+        {"qid": "q1", "domain": "insurance", "options": options, "answer_format": "mcq"},
+        {"qid": "q2", "domain": "insurance", "options": options, "answer_format": "mcq"},
     ]
     (tmp_path / "q1.json").write_text(json.dumps(_qwen_result("q1"), ensure_ascii=False), encoding="utf-8")
     (tmp_path / "q2.json").write_text(
@@ -235,7 +315,12 @@ def test_run_questions_resume_reuses_valid_samples_and_reruns_bad_samples(tmp_pa
     solved: list[str] = []
 
     def fake_retrieve(question, chunks, top_k=5):
-        return {"options": {"A": {"option_text": "a", "evidence": [{"chunk_id": "c1"}]}}}
+        return {
+            "options": {
+                key: {"option_text": text, "evidence": [{"chunk_id": f"c-{key}"}]}
+                for key, text in options.items()
+            }
+        }
 
     def fake_solve(question, chunks, use_qwen, top_k=5, client=None):
         solved.append(question["qid"])
@@ -254,20 +339,26 @@ def test_run_questions_resume_reuses_valid_samples_and_reruns_bad_samples(tmp_pa
     assert [r["qid"] for r in results] == ["q1", "q2"]
     assert solved == ["q2"]
     assert results[0]["_reused_from_cache"] is True
-    assert results[0]["retrieval"]["A"]["evidence"] == [{"chunk_id": "c1"}]
+    assert results[0]["retrieval"]["A"]["evidence"] == [{"chunk_id": "c-A"}]
 
 
 def test_run_questions_rerun_qids_force_rerun_even_when_cache_is_reusable(tmp_path, monkeypatch):
+    options = {"A": "a", "B": "b", "C": "c", "D": "d"}
     questions = [
-        {"qid": "q1", "domain": "insurance", "options": {"A": "a"}, "answer_format": "mcq"},
-        {"qid": "q2", "domain": "insurance", "options": {"A": "a"}, "answer_format": "mcq"},
+        {"qid": "q1", "domain": "insurance", "options": options, "answer_format": "mcq"},
+        {"qid": "q2", "domain": "insurance", "options": options, "answer_format": "mcq"},
     ]
     (tmp_path / "q1.json").write_text(json.dumps(_qwen_result("q1"), ensure_ascii=False), encoding="utf-8")
     (tmp_path / "q2.json").write_text(json.dumps(_qwen_result("q2"), ensure_ascii=False), encoding="utf-8")
     solved: list[str] = []
 
     def fake_retrieve(question, chunks, top_k=5):
-        return {"options": {"A": {"option_text": "a", "evidence": [{"chunk_id": "c1"}]}}}
+        return {
+            "options": {
+                key: {"option_text": text, "evidence": [{"chunk_id": f"c-{key}"}]}
+                for key, text in options.items()
+            }
+        }
 
     def fake_solve(question, chunks, use_qwen, top_k=5, client=None):
         solved.append(question["qid"])

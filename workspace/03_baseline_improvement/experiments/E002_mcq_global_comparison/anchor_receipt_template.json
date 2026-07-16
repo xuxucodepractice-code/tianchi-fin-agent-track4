@@ -1,0 +1,29 @@
+{
+  "schema_version": "e002-external-anchor/v1",
+  "status": "TEMPLATE_NOT_AN_ANCHOR",
+  "experiment_id": "E002",
+  "pipeline_version": "v2s2",
+  "selection_sha256": "662cb1694c8e2b87ce98f96f04604da0f141b2c76a213eeb0b4812d3438e80f5",
+  "code_freeze": {
+    "remote": "git@github.com:xuxucodepractice-code/tianchi-fin-agent-track4.git",
+    "branch": "codex/e002-v2s2-code-freeze",
+    "commit_sha": "<required-after-code-freeze>"
+  },
+  "candidate_freeze": {
+    "path": "<required-candidate_freeze.json-path>",
+    "sha256": "<required>",
+    "candidate_frozen_at": "<required>",
+    "trace_manifest_sha256": "<required>",
+    "answer_csv_sha256": "<required>",
+    "evidence_json_sha256": "<required>",
+    "run_manifest_json_sha256": "<required>"
+  },
+  "external_anchor": {
+    "remote_branch": "codex/e002-freeze-anchor-<UTC>",
+    "commit_sha": "<required-after-push>",
+    "remote_verified_at": "<required>",
+    "witness_role": "independent_labeling_lead_or_teammate",
+    "witness_ack_message_id": "<required-before-label-reveal>",
+    "witness_acknowledged_at": "<required-before-label-reveal>"
+  }
+}

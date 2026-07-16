@@ -5,6 +5,9 @@
 - multi：多个大写字母，去重、按字母序、无分隔符。
 - 无 support 时 fallback 到排序最前合法选项，标记 low_confidence 并写 warning。
 fallback 只保证格式合法，不代表高置信答案。
+
+注意：v2s2 的正式 MCQ 链路使用 normalize_mcq_global_choice；下方
+normalize_answer 的 MCQ 分支仅为历史产物、dry-run 与兼容测试保留。
 """
 
 from __future__ import annotations
@@ -47,7 +50,7 @@ def normalize_tf_verdict(
 ) -> dict[str, Any]:
     """把 tf 题干级 verdict 合成 A/B。
 
-    v2s1 正式 tf 链路只接受题干级 true/false/uncertain：
+    题干级 tf 链路只接受 true/false/uncertain：
     true -> A，false -> B，uncertain/error -> 数据决定的 fallback，并标低置信。
     """
     verdict = str(verdict).strip().lower()
@@ -63,6 +66,43 @@ def normalize_tf_verdict(
         low_confidence = True
     validate_answer_format(answer, "tf", options)
     return {"answer": answer, "warnings": warnings, "low_confidence": low_confidence}
+
+
+def normalize_mcq_global_choice(
+    choice: str,
+    options: dict[str, Any],
+    *,
+    fallback_answer: str | None = None,
+) -> dict[str, Any]:
+    """把 M1 统一比较调用的直接选择确定性地规范化为 MCQ 答案。
+
+    合法选择原样采用；缺失或非法选择只为保证产物格式而 fallback，并显式
+    标记低置信。候选 Trace Gate 会拒绝使用 fallback 的 fresh MCQ 推理。
+    """
+    letters = _valid_letters(options)
+    if not letters:
+        raise ValueError("mcq options 不能为空")
+    fallback = fallback_answer or letters[0]
+    if fallback not in letters:
+        raise ValueError(f"fallback_answer {fallback!r} 不在合法选项 {letters}")
+
+    normalized_choice = str(choice).strip().upper()
+    warnings: list[str] = []
+    fallback_used = normalized_choice not in letters or len(normalized_choice) != 1
+    if fallback_used:
+        answer = fallback
+        warnings.append(
+            f"mcq global choice={normalized_choice or 'missing'} 非法，fallback 到 {fallback}"
+        )
+    else:
+        answer = normalized_choice
+    validate_answer_format(answer, "mcq", options)
+    return {
+        "answer": answer,
+        "warnings": warnings,
+        "low_confidence": fallback_used,
+        "fallback_used": fallback_used,
+    }
 
 
 def normalize_answer(
