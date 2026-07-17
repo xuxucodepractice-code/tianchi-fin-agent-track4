@@ -1,0 +1,47 @@
+{
+  "schema_version": "e002-external-anchor/v1",
+  "status": "EXTERNAL_ANCHOR_VERIFIED_PENDING_WITNESS_ACK",
+  "recorded_at": "2026-07-18T00:20:06+08:00",
+  "experiment_id": "E002",
+  "pipeline_version": "v2s2",
+  "selection_sha256": "662cb1694c8e2b87ce98f96f04604da0f141b2c76a213eeb0b4812d3438e80f5",
+  "code_freeze": {
+    "remote": "git@github.com:xuxucodepractice-code/tianchi-fin-agent-track4.git",
+    "branch": "codex/e002-v2s2-code-freeze",
+    "commit_sha": "07c8e66b9a1c38a36d5d015ceddde54940972f3d"
+  },
+  "candidate_freeze": {
+    "source_path": "outputs/candidates/v2s2_mcq_global_comparison/candidate_freeze.json",
+    "anchored_copy_path": "workspace/03_baseline_improvement/experiments/E002_mcq_global_comparison/candidate_freeze_anchor_copy.json",
+    "sha256": "bdfd42ad80574f1d42a9e773074e5d6ced644406157abcd63174bd6ab62a5c53",
+    "candidate_frozen_at": "2026-07-18T00:05:35.454447+08:00",
+    "trace_manifest_sha256": "8816599b3c6965a80f8f305dcd5b491cf22d629037e6b637616418eedbc09d6b",
+    "answer_csv_sha256": "8d59cbc410945340c11426d4b0fa0859b85c908f00b1d35952df386a8ae4e8be",
+    "evidence_json_sha256": "e9733957d9a111838d21ba4df18a462e2d17469999eaf0de5b080ef157245f7d",
+    "run_manifest_json_sha256": "8f2b1fae6d308f019306da652fde4e85504291dcba3c2155086d9c76f24aba53"
+  },
+  "external_anchor": {
+    "remote": "git@github.com:xuxucodepractice-code/tianchi-fin-agent-track4.git",
+    "remote_branch": "codex/e002-freeze-anchor-20260717T161842Z",
+    "payload_commit_sha": "118cf35e4866a7e504a72abae7fb9167ae29ce28",
+    "payload_parent_sha": "07c8e66b9a1c38a36d5d015ceddde54940972f3d",
+    "remote_verified_at": "2026-07-18T00:20:06+08:00",
+    "remote_ref_matches_payload_commit": true,
+    "remote_candidate_freeze_sha256_matches": true,
+    "two_commit_receipt_design": "The payload commit anchors the candidate bytes; this later receipt commit references that already-pushed commit and avoids a self-referential commit SHA."
+  },
+  "witness": {
+    "required_role": "independent_labeling_lead_or_teammate",
+    "status": "PENDING",
+    "must_acknowledge_candidate_freeze_sha256": "bdfd42ad80574f1d42a9e773074e5d6ced644406157abcd63174bd6ab62a5c53",
+    "must_acknowledge_payload_commit_sha": "118cf35e4866a7e504a72abae7fb9167ae29ce28",
+    "ack_message_id": null,
+    "acknowledged_at": null
+  },
+  "governance": {
+    "prospective_labels_read": false,
+    "label_revealed": false,
+    "label_reveal_authorized": false,
+    "next_gate": "INDEPENDENT_WITNESS_ACK"
+  }
+}
