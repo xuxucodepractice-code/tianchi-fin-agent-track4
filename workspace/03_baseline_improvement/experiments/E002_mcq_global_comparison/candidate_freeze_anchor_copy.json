@@ -1,0 +1,48 @@
+{
+  "schema_version": "candidate-freeze/v1",
+  "experiment_id": "E002",
+  "pipeline_version": "v2s2",
+  "parent_version": "v2s1",
+  "generation_mode": "traced_rerun_plus_frozen_parent",
+  "candidate_dir": "outputs/candidates/v2s2_mcq_global_comparison",
+  "parent_dir": "workspace/03_baseline_improvement/submissions/a_leaderboard_v0/2026-07-16_v2s1_score_65_0912",
+  "candidate_frozen_at": "2026-07-18T00:05:35.454447+08:00",
+  "artifacts": {
+    "answer.csv": {
+      "path": "outputs/candidates/v2s2_mcq_global_comparison/answer.csv",
+      "sha256": "8d59cbc410945340c11426d4b0fa0859b85c908f00b1d35952df386a8ae4e8be"
+    },
+    "evidence.json": {
+      "path": "outputs/candidates/v2s2_mcq_global_comparison/evidence.json",
+      "sha256": "e9733957d9a111838d21ba4df18a462e2d17469999eaf0de5b080ef157245f7d"
+    },
+    "run_manifest.json": {
+      "path": "outputs/candidates/v2s2_mcq_global_comparison/run_manifest.json",
+      "sha256": "8f2b1fae6d308f019306da652fde4e85504291dcba3c2155086d9c76f24aba53"
+    }
+  },
+  "parent_artifacts": {
+    "answer.csv": {
+      "path": "workspace/03_baseline_improvement/submissions/a_leaderboard_v0/2026-07-16_v2s1_score_65_0912/answer.csv",
+      "sha256": "5e082b6fe7824ee326ff1d0c2aa209b3d62115860125e25ba0107f93a4a90c69"
+    },
+    "evidence.json": {
+      "path": "workspace/03_baseline_improvement/submissions/a_leaderboard_v0/2026-07-16_v2s1_score_65_0912/evidence.json",
+      "sha256": "f19091ec079a9162d2d174f00427c4969b5396826c47678b0804606f075f5614"
+    },
+    "run_manifest.json": {
+      "path": "workspace/03_baseline_improvement/submissions/a_leaderboard_v0/2026-07-16_v2s1_score_65_0912/run_manifest.json",
+      "sha256": "1f160f367d559e565d063546febd68ed2c9ce3cea05853a0f734551bf3997b87"
+    }
+  },
+  "agent_trace": {
+    "dir": "outputs/candidates/v2s2_mcq_global_comparison/agent_trace",
+    "manifest": "outputs/candidates/v2s2_mcq_global_comparison/agent_trace/trace_manifest.json",
+    "manifest_sha256": "8816599b3c6965a80f8f305dcd5b491cf22d629037e6b637616418eedbc09d6b"
+  },
+  "blind_selection": {
+    "path": "workspace/03_baseline_improvement/experiments/E002_mcq_global_comparison/selection_gate.json",
+    "sha256": "662cb1694c8e2b87ce98f96f04604da0f141b2c76a213eeb0b4812d3438e80f5"
+  },
+  "prospective_label_gate": "AWAITING_SEPARATE_LABEL_REVEAL_RECORD"
+}
