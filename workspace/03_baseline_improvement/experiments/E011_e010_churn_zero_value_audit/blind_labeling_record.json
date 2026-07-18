@@ -1,0 +1,94 @@
+{
+  "schema_version": "e011-blind-labeling-record/v1",
+  "experiment_id": "E011",
+  "audit_id": "e011-e010-churn-audit-01",
+  "created_at": "2026-07-18T19:48:05.735485+08:00",
+  "method": "three_independent_context_free_labeling_tasks",
+  "isolation": {
+    "conversation_context_forked": false,
+    "generation_outputs_visible": false,
+    "experiment_outputs_visible": false,
+    "candidate_or_submission_answers_visible": false,
+    "allowed_sources": [
+      "questions/group_a",
+      "processed_data/chunks.jsonl",
+      "processed_data/doc_meta.json",
+      "original documents referenced by doc_meta"
+    ],
+    "answers_preserved_without_comparison_to_generation": true
+  },
+  "tasks": [
+    {
+      "task_name": "/root/blind_fc",
+      "qids": ["fc_a_011", "fc_a_002", "fc_a_007", "fc_a_012"],
+      "answers": {
+        "fc_a_011": "AB",
+        "fc_a_002": "ABD",
+        "fc_a_007": "BD",
+        "fc_a_012": "ACD"
+      },
+      "evidence_summary": {
+        "fc_a_011": "text02 p1 gives the Shenzhen Financial Leasing issuer and RMB 0.5bn cap; text07 p1 gives Shenzhen Stock Exchange and identifies a restructuring report.",
+        "fc_a_002": "text01 p1 and text14 p1/p4 give AAA issuers and RMB 1bn/RMB 2bn caps; '-' means no issue rating, not a negative rating.",
+        "fc_a_007": "text02 p1 and text14 p1 distinguish the leasing/securities issuers, caps and ratings; text02 p192 and text14 p171 enumerate default provisions.",
+        "fc_a_012": "text03 p11 gives the 2031-04-23 payment date; text13 p55/p57 gives rising profit and declining leverage; text03 p167 contains the 150% default-related formula. The labeler recorded a terminology caveat but selected ACD under the question's ordinary wording."
+      }
+    },
+    {
+      "task_name": "/root/blind_fin",
+      "qids": ["fin_a_017", "fin_a_014", "fin_a_009", "fin_a_007"],
+      "answers": {
+        "fin_a_017": "AC",
+        "fin_a_014": "AB",
+        "fin_a_009": "ABC",
+        "fin_a_007": "ABD"
+      },
+      "evidence_summary": {
+        "fin_a_017": "CATL 2024 annual report p25 gives a roughly RMB 29.2bn financing-cash-flow decrease; CSCEC p10/p88 gives RMB 11.218bn dividends and 24.29% of attributable profit.",
+        "fin_a_014": "CATL 2025 p11/p59 gives 17.04% revenue growth and the 50%-of-profit dividend plan; BYD 2025 p32/p39 gives R&D above 5% and p40 gives negative operating-cash-flow growth.",
+        "fin_a_009": "China Mobile 2025 p8 gives RMB 1.050187tn revenue and positive operating cash flow; BYD 2024 p34 gives 6.97% R&D intensity and positive operating cash flow.",
+        "fin_a_007": "BYD 2024 p34 gives 6.97% R&D and -21.37% operating-cash-flow growth; CATL 2025 p58 and p30 give RMB 69.57 per ten shares and 37.35% operating-cash-flow growth."
+      }
+    },
+    {
+      "task_name": "/root/blind_reg_res",
+      "qids": ["reg_a_016", "reg_a_011", "reg_a_009", "reg_a_020", "res_a_009", "res_a_012", "res_a_020"],
+      "answers": {
+        "reg_a_016": "ABD",
+        "reg_a_011": "ACD",
+        "reg_a_009": "ABD",
+        "reg_a_020": "ABD",
+        "res_a_009": "ABC",
+        "res_a_012": "ABC",
+        "res_a_020": "ABD"
+      },
+      "evidence_summary": {
+        "reg_a_016": "CSRC governance rules articles 10/19 support A/B; csrc_0271 supports D and contradicts C's claimed penalty basis.",
+        "reg_a_011": "csrc_0038_att1 article 12, customer-due-diligence articles 13/32/44 support A/C/D and refute B.",
+        "reg_a_009": "PBOC data-security articles 22/42/52 support A/B/D; customer-due-diligence article 44 requires ten years, refuting C.",
+        "reg_a_020": "csrc_0037_att1 article 12 supports A/B; csrc_0027_att1 article 35 gives the effective date supporting D.",
+        "res_a_009": "pack2_text01 pp3-4 supports A/C; pack2_text02 p22 supports B and says the 3384 rules automate, not manually perform, parsing.",
+        "res_a_012": "pack2_text09 pp1/6/25 and pack2_text02 p22 support A/B/C; the 3384 rules are for automatic parsing, refuting D.",
+        "res_a_020": "pack2_text09 pp1/6, pack2_text04 pp2/90 support A/B/D; pack2_text09 p25 attributes the FY27 forecast to Broadcom, refuting C."
+      }
+    }
+  ],
+  "answers": {
+    "fc_a_011": "AB",
+    "fc_a_002": "ABD",
+    "fc_a_007": "BD",
+    "fc_a_012": "ACD",
+    "fin_a_017": "AC",
+    "fin_a_014": "AB",
+    "fin_a_009": "ABC",
+    "fin_a_007": "ABD",
+    "reg_a_016": "ABD",
+    "reg_a_011": "ACD",
+    "reg_a_009": "ABD",
+    "reg_a_020": "ABD",
+    "res_a_009": "ABC",
+    "res_a_012": "ABC",
+    "res_a_020": "ABD"
+  },
+  "complete": true
+}

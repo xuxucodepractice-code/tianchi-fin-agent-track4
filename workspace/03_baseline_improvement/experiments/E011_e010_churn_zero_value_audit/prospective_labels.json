@@ -1,0 +1,52 @@
+{
+  "schema_version": "e011-prospective-labels/v1",
+  "experiment_id": "E011",
+  "audit_id": "e011-e010-churn-audit-01",
+  "created_at": "2026-07-18T19:49:12.789853+08:00",
+  "qids": [
+    "fc_a_011",
+    "fc_a_002",
+    "fc_a_007",
+    "fc_a_012",
+    "fin_a_017",
+    "fin_a_014",
+    "fin_a_009",
+    "fin_a_007",
+    "reg_a_016",
+    "reg_a_011",
+    "reg_a_009",
+    "reg_a_020",
+    "res_a_009",
+    "res_a_012",
+    "res_a_020"
+  ],
+  "answers": {
+    "fc_a_011": "AB",
+    "fc_a_002": "ABD",
+    "fc_a_007": "BD",
+    "fc_a_012": "ACD",
+    "fin_a_017": "AC",
+    "fin_a_014": "AB",
+    "fin_a_009": "ABC",
+    "fin_a_007": "ABD",
+    "reg_a_016": "ABD",
+    "reg_a_011": "ACD",
+    "reg_a_009": "ABD",
+    "reg_a_020": "ABD",
+    "res_a_009": "ABC",
+    "res_a_012": "ABC",
+    "res_a_020": "ABD"
+  },
+  "created_after_audit_freeze": true,
+  "revealed_to_generation": false,
+  "independent_labeling": true,
+  "audit_report_sha256": "c614344588a8546df9d57bd1636d0adb27dcc09fec5af45ba30a7cf19cabda68",
+  "selection_sha256": "02e331cb33815cb5b64bf5b2406bf7cbdd0738774746929d5f59e47544e0b7ba",
+  "blind_labeling_record": {
+    "path": "workspace/03_baseline_improvement/experiments/E011_e010_churn_zero_value_audit/blind_labeling_record.json",
+    "sha256": "9a31211b3bc4c1f4b6283c0035fef88479a9765f773617e2148ae681a9ad99b4"
+  },
+  "generation_answers_consulted_during_labeling": false,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}
