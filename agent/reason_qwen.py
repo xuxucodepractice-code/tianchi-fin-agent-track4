@@ -161,8 +161,20 @@ def judge_option_with_qwen(
 ) -> dict[str, Any]:
     """调用 Qwen 判断单个选项。API/解析失败记入 error，不抛异常。"""
     messages = build_option_judgment_messages(question, option_key, option_text, evidence)
+    stage_prefix = str(question.get("_trace_stage_prefix", ""))
     try:
-        resp = client.chat(messages, temperature=0.0)
+        resp = client.chat(
+            messages,
+            temperature=0.0,
+            trace_context={
+                "qid": question.get("qid", ""),
+                "answer_format": question.get("answer_format", ""),
+                "stage": f"{stage_prefix}option_independent_judgment",
+                "option_key": option_key,
+                "option_text": option_text,
+                "evidence": evidence,
+            },
+        )
     except Exception as exc:
         return {
             "judgment": "error",
@@ -179,6 +191,11 @@ def judge_option_with_qwen(
         "prompt_tokens": resp["prompt_tokens"],
         "completion_tokens": resp["completion_tokens"],
         "total_tokens": resp["total_tokens"],
+        "trace_call_id": resp.get("trace_call_id"),
+        "trace_run_id": resp.get("trace_run_id"),
+        "local_request_id": resp.get("local_request_id"),
+        "provider_request_id": resp.get("provider_request_id"),
+        "retry_count": int(resp.get("retry_count") or 0),
         "error": error,
     }
 
@@ -194,8 +211,19 @@ def judge_tf_with_qwen(
     messages = build_tf_judgment_messages(
         question, evidence, extra_instruction=extra_instruction
     )
+    stage_prefix = str(question.get("_trace_stage_prefix", ""))
     try:
-        resp = client.chat(messages, temperature=0.0)
+        resp = client.chat(
+            messages,
+            temperature=0.0,
+            trace_context={
+                "qid": question.get("qid", ""),
+                "answer_format": question.get("answer_format", ""),
+                "stage": f"{stage_prefix}tf_direct_judgment",
+                "extra_instruction": extra_instruction or "",
+                "evidence": evidence,
+            },
+        )
     except Exception as exc:
         return {
             "verdict": "error",
@@ -212,6 +240,11 @@ def judge_tf_with_qwen(
         "prompt_tokens": resp["prompt_tokens"],
         "completion_tokens": resp["completion_tokens"],
         "total_tokens": resp["total_tokens"],
+        "trace_call_id": resp.get("trace_call_id"),
+        "trace_run_id": resp.get("trace_run_id"),
+        "local_request_id": resp.get("local_request_id"),
+        "provider_request_id": resp.get("provider_request_id"),
+        "retry_count": int(resp.get("retry_count") or 0),
         "error": error,
     }
 
@@ -233,6 +266,28 @@ def _assemble_result(
     for key, j in sorted(option_judgments.items()):
         if j.get("error"):
             warnings.append(f"选项 {key}: {j['error']}")
+    trace_run_ids = sorted(
+        {
+            str(judgment.get("trace_run_id"))
+            for judgment in option_judgments.values()
+            if judgment.get("trace_run_id")
+        }
+    )
+    answer_derivation = {
+        "method": "agent.normalize_answer.normalize_answer",
+        "answer_format": question.get("answer_format", ""),
+        "input_judgments": {
+            key: {
+                "judgment": judgment.get("judgment"),
+                "evidence_refs": judgment.get("evidence_refs", []),
+                "error": judgment.get("error"),
+            }
+            for key, judgment in sorted(option_judgments.items())
+        },
+        "output_answer": normalized["answer"],
+        "warnings": warnings,
+        "low_confidence": normalized["low_confidence"],
+    }
     return {
         "qid": question["qid"],
         "domain": question.get("domain", ""),
@@ -245,6 +300,8 @@ def _assemble_result(
         "doc_ids": question.get("doc_ids", []),
         "option_judgments": option_judgments,
         "answer": normalized["answer"],
+        "answer_derivation": answer_derivation,
+        "trace_run_id": trace_run_ids[0] if len(trace_run_ids) == 1 else None,
         "warnings": warnings,
         "low_confidence": normalized["low_confidence"],
         "prompt_tokens": sum(j["prompt_tokens"] for j in option_judgments.values()),
@@ -258,9 +315,12 @@ def reason_question_with_qwen(
     retrieval: dict[str, Any],
     client: QwenClient | None = None,
 ) -> dict[str, Any]:
-    """正式模式：对每个选项调用 Qwen，合成答案。client 可注入（测试用 fake）。"""
+    """正式模式：对每个选项调用 Qwen，合成答案。"""
     if client is None:
-        client = QwenClient()
+        raise RuntimeError(
+            "governed Qwen inference requires an injected traced client from "
+            "agent.run_submission or agent.run_gold_oracle"
+        )
     option_judgments: dict[str, dict[str, Any]] = {}
     for key in sorted(question.get("options", {})):
         opt = retrieval["options"][key]
@@ -309,7 +369,10 @@ def reason_tf_question_with_qwen(
 ) -> dict[str, Any]:
     """v2s1 正式 tf 链路：题干级单次判断，uncertain 最多重问一次。"""
     if client is None:
-        client = QwenClient()
+        raise RuntimeError(
+            "governed Qwen inference requires an injected traced client from "
+            "agent.run_submission or agent.run_gold_oracle"
+        )
     evidence = retrieval.get("tf", {}).get("evidence", [])
     first = judge_tf_with_qwen(client, question, evidence)
     attempts = [first]
@@ -337,9 +400,31 @@ def reason_tf_question_with_qwen(
     tf_judgment = {
         **final,
         "attempt_count": len(attempts),
+        "trace_call_ids": [
+            str(attempt.get("trace_call_id"))
+            for attempt in attempts
+            if attempt.get("trace_call_id")
+        ],
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
         "total_tokens": total_tokens,
+    }
+    trace_run_ids = sorted(
+        {
+            str(attempt.get("trace_run_id"))
+            for attempt in attempts
+            if attempt.get("trace_run_id")
+        }
+    )
+    answer_derivation = {
+        "method": "agent.normalize_answer.normalize_tf_verdict",
+        "answer_format": "tf",
+        "input_verdict": str(final.get("verdict", "error")),
+        "fallback_answer": fallback_answer,
+        "attempt_count": len(attempts),
+        "output_answer": normalized["answer"],
+        "warnings": warnings,
+        "low_confidence": normalized["low_confidence"] or bool(final.get("error")),
     }
     return {
         "qid": question["qid"],
@@ -354,6 +439,8 @@ def reason_tf_question_with_qwen(
         "tf_judgment": tf_judgment,
         "option_judgments": _tf_option_judgments(tf_judgment),
         "answer": normalized["answer"],
+        "answer_derivation": answer_derivation,
+        "trace_run_id": trace_run_ids[0] if len(trace_run_ids) == 1 else None,
         "warnings": warnings,
         "low_confidence": normalized["low_confidence"] or bool(final.get("error")),
         "prompt_tokens": prompt_tokens,

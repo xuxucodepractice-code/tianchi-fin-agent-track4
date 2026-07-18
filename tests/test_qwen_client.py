@@ -5,16 +5,35 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from agent.qwen_client import (
     DEFAULT_MODEL,
     MissingApiKeyError,
+    QwenApiError,
     QwenClient,
     resolve_api_key,
 )
+from agent.paths import REPO_ROOT
+from agent.trace_gate import (
+    AgentTraceRecorder,
+    blind_data_guard,
+    default_candidate_forbidden_roots,
+)
 
 FAKE_KEY = "sk-test-fake-key-do-not-use"
+
+
+def _recorder(tmp_path: Path) -> AgentTraceRecorder:
+    return AgentTraceRecorder(
+        tmp_path / "trace",
+        purpose="unscored_diagnostic",
+        model="qwen-plus-test",
+        base_url="https://example.invalid/v1",
+        config={"runner": "tests.test_qwen_client", "qids": ["unit-q1"]},
+    )
 
 
 def _clear_keys(monkeypatch):
@@ -44,22 +63,27 @@ def test_qwen_api_key_fallback(monkeypatch):
 # ------------------------------------------------- 2. key 不泄漏
 
 
-def test_api_key_not_in_repr_or_error_strings(monkeypatch):
+def test_api_key_not_in_repr_or_error_strings(monkeypatch, tmp_path: Path):
     _clear_keys(monkeypatch)
     monkeypatch.setenv("DASHSCOPE_API_KEY", FAKE_KEY)
-    client = QwenClient()
-    assert FAKE_KEY not in repr(client)
-    assert FAKE_KEY not in str(client.__dict__.get("model", ""))
-    # 模拟网络错误路径：错误信息不应包含 key
-    import urllib.error
+    with blind_data_guard(
+        default_candidate_forbidden_roots(),
+        allowed_read_roots=((REPO_ROOT / "agent").resolve(),),
+        allowed_write_roots=(tmp_path,),
+    ):
+        client = QwenClient(trace_recorder=_recorder(tmp_path))
+        assert FAKE_KEY not in repr(client)
+        assert FAKE_KEY not in str(client.__dict__.get("model", ""))
+        # 模拟网络错误路径：错误信息不应包含 key
+        import urllib.error
 
-    def _fail(payload):
-        raise urllib.error.URLError("connection refused")
+        def _fail(payload):
+            raise urllib.error.URLError("connection refused")
 
-    monkeypatch.setattr(client, "_post", _fail)
-    client.max_retries = 0
-    with pytest.raises(Exception) as exc_info:
-        client.chat([{"role": "user", "content": "hi"}])
+        monkeypatch.setattr(client, "_post", _fail)
+        client.max_retries = 0
+        with pytest.raises(Exception) as exc_info:
+            client.chat([{"role": "user", "content": "hi"}])
     assert FAKE_KEY not in str(exc_info.value)
 
 
@@ -86,19 +110,50 @@ def test_parse_response_missing_usage_defaults_zero():
     assert result["total_tokens"] == 0
 
 
-def test_chat_end_to_end_with_fake_post(monkeypatch):
+def test_chat_end_to_end_with_fake_post(monkeypatch, tmp_path: Path):
     monkeypatch.setenv("DASHSCOPE_API_KEY", FAKE_KEY)
-    client = QwenClient()
+    with blind_data_guard(
+        default_candidate_forbidden_roots(),
+        allowed_read_roots=((REPO_ROOT / "agent").resolve(),),
+        allowed_write_roots=(tmp_path,),
+    ):
+        recorder = _recorder(tmp_path)
+        client = QwenClient(trace_recorder=recorder)
 
-    def _fake_post(payload):
-        assert payload["model"] == client.model
-        assert payload["temperature"] == 0.0
-        return {
-            "choices": [{"message": {"content": '{"judgment": "support"}'}}],
-            "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
-        }
+        def _fake_post(payload):
+            assert payload["model"] == client.model
+            assert payload["temperature"] == 0.0
+            return {
+                "id": "provider-unit-test",
+                "model": "qwen-plus-test",
+                "choices": [
+                    {
+                        "message": {"content": '{"judgment": "support"}'},
+                        "finish_reason": "stop",
+                    }
+                ],
+                "usage": {
+                    "prompt_tokens": 10,
+                    "completion_tokens": 5,
+                    "total_tokens": 15,
+                },
+            }
 
-    monkeypatch.setattr(client, "_post", _fake_post)
-    result = client.chat([{"role": "user", "content": "test"}])
+        monkeypatch.setattr(client, "_post", _fake_post)
+        result = client.chat([{"role": "user", "content": "test"}])
     assert result["total_tokens"] == 15
     assert "support" in result["content"]
+    assert recorder.call_count == 1
+
+
+def test_chat_refuses_an_untraced_api_call(monkeypatch):
+    monkeypatch.setenv("DASHSCOPE_API_KEY", FAKE_KEY)
+    client = QwenClient()
+    monkeypatch.setattr(
+        client,
+        "_post",
+        lambda payload: pytest.fail("untraced client must fail before network I/O"),
+    )
+
+    with pytest.raises(QwenApiError, match="requires an AgentTraceRecorder"):
+        client.chat([{"role": "user", "content": "test"}])

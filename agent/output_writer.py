@@ -69,6 +69,8 @@ def write_evidence_json(
             "model": r.get("model", ""),
             "pipeline_version": r.get("pipeline_version", "v0"),
             "tf_judgment": r.get("tf_judgment"),
+            "answer_derivation": r.get("answer_derivation", {}),
+            "trace_run_id": r.get("trace_run_id"),
             "source_kind": r.get("source_kind", "fresh"),
             "source_pipeline_version": r.get(
                 "source_pipeline_version", r.get("pipeline_version", "v0")
