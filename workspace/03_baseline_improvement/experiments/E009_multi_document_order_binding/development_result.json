@@ -1,0 +1,37 @@
+{
+  "schema_version": "e009-development-result/v1",
+  "experiment_id": "E009",
+  "pair_id": "e009-development-pair-01",
+  "status": "PASS",
+  "decision": "DEVELOPMENT_GATE_PASS",
+  "accuracy": {"control_correct": 8, "treatment_correct": 10, "delta": 2},
+  "answer_churn": ["fc_a_016:ABCD->ABC", "fc_a_001:AD->ABD"],
+  "frozen_parent_correct_regressions": [],
+  "tokens": {"control": 178969, "treatment": 181361, "delta": 2392},
+  "physical_attempts": {"control": 52, "treatment": 52},
+  "served_models": {"control": ["qwen-plus"], "treatment": ["qwen-plus"]},
+  "checks": {
+    "control_trace_receipt_schema_pass": true,
+    "treatment_trace_receipt_schema_pass": true,
+    "treatment_unexpected_evidence_refs_or_extra_fields_zero": true,
+    "treatment_accuracy_not_below_fresh_control": true,
+    "frozen_parent_correct_zero_regression": true,
+    "retrieval_evidence_byte_identical": true,
+    "temporal_claim_chain_pass": true,
+    "both_arms_exact_52_physical_attempts": true
+  },
+  "artifacts": {
+    "run_freeze_sha256": "1053a0a99cbdd0acff0e4c934ca6c044003084b7b22776dca61e6a3468ae4287",
+    "control_output_bundle_sha256": "2cc492f189e952e005bfc6f50122a39fb7ffd65199442b91d501f1b147a99dbb",
+    "treatment_output_bundle_sha256": "f0906ac10ca31f0fa4cf8eddb30e42dde33cd047b45af0e0a1c8f45ddaa26895",
+    "control_observations_sha256": "82c7adbb5885c851bd3e30d839ba6ce2149231a729b8b0c377ae323f90aa9fed",
+    "control_receipt_sha256": "979db48ac0b0f07070a1fa0255b4ab9ff220f2b7144955ce66868c0ab3240384",
+    "treatment_observations_sha256": "76454324d7e810e022ff727326796f4c6664c16dc98250e7dcfd48d69e7454ec",
+    "treatment_receipt_sha256": "dfa664a8efba8a063dfedc50e574e1c02352295b65536e04ff36f9c6b0f4c9f1",
+    "treatment_claim_sha256": "8ecd2e759a560cfcfb0c0623730a616935d04edbb822ddd2d8c531e0def010b2",
+    "evaluation_sha256": "f0ee46182bca98e11ec55628d50d579a36f3402c3e349c9088c51dfa2631cc56"
+  },
+  "prospective_preregistration_authorized": true,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}

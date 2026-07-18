@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`DEVELOPMENT_CONTROL_PASS / TREATMENT_AUTHORIZED / DO_NOT_SUBMIT`。
+`DEVELOPMENT_GATE_PASS / PROSPECTIVE_PREREGISTRATION_PENDING / DO_NOT_SUBMIT`。
 
 E008 的 control/treatment 13/13 答案完全一致，reference-free provenance 可稳定工作，但
 `fc_a_001` 把 evidence 呈现顺序误当成题面“第一份/第二份文档”的顺序。题面 `doc_ids`
@@ -32,3 +32,8 @@ NO-GO；PASS 后才进入全新 prospective primary/repeat/churn 与盲标。
 
 fresh control：13/13、52 logical/physical attempts、零 retry、178,969 tokens、唯一 served
 model=`qwen-plus`，receipt/Trace PASS。一次性 treatment authorization 已生成。
+
+treatment 同样完成 52/52、零 retry、181,361 tokens。准确率 8/13→10/13，净 +2；
+`fc_a_016:ABCD→ABC` 与 `fc_a_001:AD→ABD` 均改对，冻结父正确 6 题零回退。
+Trace/schema/temporal、reference-free provenance 与 retrieval equality 全部 PASS，允许进入
+全新 prospective selection 的预注册，但仍不授权 candidate 或 submission。
