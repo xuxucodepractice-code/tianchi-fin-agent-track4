@@ -1278,7 +1278,9 @@ def validate_trace_directory(
                 parsed_raw = extract_json_from_text(str(matches[0].get("response_content", "")))
                 if not isinstance(parsed_raw, dict) or str(
                     parsed_raw.get("judgment", "")
-                ).lower() != str((expected or {}).get("judgment", "")).lower():
+                ).strip().lower() != str(
+                    (expected or {}).get("judgment", "")
+                ).strip().lower():
                     errors.append(
                         f"{prefix}: option {option_key} derivation differs from raw verdict"
                     )
@@ -1291,9 +1293,9 @@ def validate_trace_directory(
                 )
                 if not isinstance(parsed_raw, dict) or str(
                     parsed_raw.get("verdict", "")
-                ).lower() != str(
+                ).strip().lower() != str(
                     (item.get("answer_derivation") or {}).get("input_verdict", "")
-                ).lower():
+                ).strip().lower():
                     errors.append(f"{prefix}: TF derivation differs from final raw verdict")
         for call_id in item.get("trace_call_ids") or []:
             matching = next(
