@@ -1,0 +1,47 @@
+{
+  "schema_version": "e007-development-labels/v1",
+  "experiment_id": "E007",
+  "role": "retrospective_development_only",
+  "labels_known_before_code_freeze": true,
+  "source_path": "workspace/03_baseline_improvement/experiments/E006_multi_retrieval_coverage/development_labels.json",
+  "source_sha256": "ac20951dab02ec5fd2c31571a78f9129f08a2f969db81c722b9128a437d9fedd",
+  "labels": {
+    "fc_a_016": "ABC",
+    "fin_a_005": "ABD",
+    "ins_a_005": "ABCD",
+    "ins_a_007": "BC",
+    "ins_a_009": "C",
+    "ins_a_010": "AB",
+    "ins_a_015": "AB",
+    "ins_a_016": "CD",
+    "ins_a_017": "ABCD",
+    "ins_a_019": "ABCD",
+    "res_a_014": "ABC",
+    "fc_a_001": "ABD",
+    "reg_a_002": "ABC"
+  },
+  "frozen_online_v2s1_answers": {
+    "fc_a_016": "ABCD",
+    "fin_a_005": "ABCD",
+    "ins_a_005": "ABCD",
+    "ins_a_007": "AC",
+    "ins_a_009": "BC",
+    "ins_a_010": "ABCD",
+    "ins_a_015": "AB",
+    "ins_a_016": "CD",
+    "ins_a_017": "ABCD",
+    "ins_a_019": "ABC",
+    "res_a_014": "ABCD",
+    "fc_a_001": "ABD",
+    "reg_a_002": "ABC"
+  },
+  "frozen_parent_correct_qids": [
+    "ins_a_005",
+    "ins_a_015",
+    "ins_a_016",
+    "ins_a_017",
+    "fc_a_001",
+    "reg_a_002"
+  ],
+  "evaluation_limit": "Development labels cannot be used for prospective claims."
+}
