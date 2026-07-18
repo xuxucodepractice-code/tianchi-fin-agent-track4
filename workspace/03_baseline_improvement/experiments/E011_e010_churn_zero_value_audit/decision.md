@@ -12,3 +12,4 @@
 - 正式 audit bundle errors=0、全部 checks PASS、C=0；audit report 在 labels 缺席时冻结；
 - 已允许独立盲标，尚未允许全量扩展或 candidate。
 - scorer 已在 label reveal 前实现，189 tests PASS；下一步冻结 scorer/input/gate 后接收盲标。
+- score run-freeze 已绑定 scorer 与所有输入哈希；labels/scored 槽为空，允许接收盲标。

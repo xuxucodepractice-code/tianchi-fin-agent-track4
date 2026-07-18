@@ -1,0 +1,42 @@
+{
+  "schema_version": "e011-score-run-freeze/v1",
+  "experiment_id": "E011",
+  "audit_id": "e011-e010-churn-audit-01",
+  "status": "AUTHORIZED_FOR_BLIND_LABEL_SCORING",
+  "created_at": "2026-07-18T19:44:32+08:00",
+  "source_code_commit": "24781bfb6616096d7193d3811a59bd224d4303c5",
+  "scorer": {
+    "path": "agent/evaluate_e011_prospective_scored.py",
+    "sha256": "af554d285294724a9845989179ce3a806214c6a4f874411503e5aeea51c3c35a"
+  },
+  "frozen_inputs": {
+    "audit_report_sha256": "c614344588a8546df9d57bd1636d0adb27dcc09fec5af45ba30a7cf19cabda68",
+    "audit_result_sha256": "25aa281ba9b52f06bebbaedd3f4bb8e3d7efcf7dbfeddf4c99a85a8123e6bf86",
+    "selection_sha256": "02e331cb33815cb5b64bf5b2406bf7cbdd0738774746929d5f59e47544e0b7ba",
+    "primary_observations_sha256": "6a8f0fe60c1b64593be0c78ad5f9a31b45cc351296e6b591756e0cc4fdbc036f",
+    "primary_receipt_sha256": "b58ec5e66cfcfc15dfc3583762fb219f6fe3d8c181e4b6e4aabb4912dc41add6",
+    "parent_multi_answers_sha256": "c1a70a5697fbb55b0248d2a6b9aa34ca7279975ed3689d5cadc5f9a7b22421ff"
+  },
+  "registered_paths": {
+    "labels": "workspace/03_baseline_improvement/experiments/E011_e010_churn_zero_value_audit/prospective_labels.json",
+    "scored_result": "workspace/03_baseline_improvement/experiments/E011_e010_churn_zero_value_audit/prospective_scored_result.json"
+  },
+  "gate": {
+    "N_minus_M_strictly_greater_than_C": true,
+    "token_penalized_projected_score_strictly_above": 65.0912,
+    "parent_correct": 70,
+    "parent_total_tokens": 1168763,
+    "full_multi_question_count": 65
+  },
+  "initial_state": {
+    "labels_created": false,
+    "scored_result_exists": false
+  },
+  "label_policy": {
+    "independent_from_generation": true,
+    "created_after_audit_freeze": true,
+    "revealed_to_generation": false
+  },
+  "candidate_authorized": false,
+  "submission_authorized": false
+}

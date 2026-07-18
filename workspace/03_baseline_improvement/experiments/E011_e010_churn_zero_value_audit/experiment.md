@@ -31,3 +31,7 @@ retrieval drift=0，且 primary/repeat exact served model 均为 `qwen-plus`。a
 scored evaluator 已在 labels 创建前实现并通过 189 tests；它固定读取 E010 primary、E011
 audit 与未来 E011 blind labels，计算 N/M/C 和 65-Multi Token 投影。需先提交 scorer code
 并创建独立 score run-freeze，之后才接收盲标答案。
+
+score code commit=`24781bfb6616096d7193d3811a59bd224d4303c5`；score run-freeze SHA256=
+`de09b64813d691c101338093e05ad9a6933f7d737132810bb2e3303d86ec8f6c`，labels/scored slots
+初始为空且自校验 PASS。现在允许接收独立盲标结果。
