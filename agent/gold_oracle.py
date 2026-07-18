@@ -13,6 +13,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from agent.doc_meta import build_doc_meta, format_source_header, load_doc_meta
 from agent.prompts import format_evidence_block
 
 
@@ -51,13 +52,17 @@ def canonical_answer(value: Any) -> str:
 
 
 def build_gold_evidence(
-    required_chunk_ids: list[str], chunks: list[dict[str, Any]]
+    required_chunk_ids: list[str],
+    chunks: list[dict[str, Any]],
+    *,
+    doc_meta: dict[str, dict[str, dict[str, str]]] | None = None,
 ) -> list[dict[str, Any]]:
-    """Build evidence objects from exact chunk ids without injecting an answer."""
+    """Build production-shaped evidence from exact chunks without injecting an answer."""
     by_id = {str(chunk.get("chunk_id")): chunk for chunk in chunks}
     missing = [chunk_id for chunk_id in required_chunk_ids if chunk_id not in by_id]
     if missing:
         raise ValueError(f"Gold chunk ids not found: {', '.join(missing)}")
+    resolved_meta = doc_meta if doc_meta is not None else (load_doc_meta() or build_doc_meta(chunks))
     evidence: list[dict[str, Any]] = []
     for chunk_id in required_chunk_ids:
         chunk = by_id[chunk_id]
@@ -67,6 +72,10 @@ def build_gold_evidence(
                 "doc_id": chunk["doc_id"],
                 "page": chunk.get("page"),
                 "section": chunk.get("section", ""),
+                # Production retrieval always supplies this human-readable
+                # identity.  Omitting it turns product-level Gold Evidence into
+                # opaque doc ids and can falsely look like a reasoning failure.
+                "source_header": format_source_header(chunk, resolved_meta),
                 "text": chunk["text"],
             }
         )
@@ -74,19 +83,26 @@ def build_gold_evidence(
 
 
 def render_gold_evidence(
-    required_chunk_ids: list[str], chunks: list[dict[str, Any]]
+    required_chunk_ids: list[str],
+    chunks: list[dict[str, Any]],
+    *,
+    doc_meta: dict[str, dict[str, dict[str, str]]] | None = None,
 ) -> str:
     """Render gold evidence through the exact production prompt formatter."""
-    return format_evidence_block(build_gold_evidence(required_chunk_ids, chunks))
+    return format_evidence_block(
+        build_gold_evidence(required_chunk_ids, chunks, doc_meta=doc_meta)
+    )
 
 
 def build_gold_retrieval(
     question: dict[str, Any],
     required_chunk_ids: list[str],
     chunks: list[dict[str, Any]],
+    *,
+    doc_meta: dict[str, dict[str, dict[str, str]]] | None = None,
 ) -> dict[str, Any]:
     """Create a retrieval payload accepted by the production reasoning functions."""
-    evidence = build_gold_evidence(required_chunk_ids, chunks)
+    evidence = build_gold_evidence(required_chunk_ids, chunks, doc_meta=doc_meta)
     base = {
         "qid": question["qid"],
         "domain": question.get("domain", ""),

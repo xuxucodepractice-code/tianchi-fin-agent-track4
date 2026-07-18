@@ -101,26 +101,43 @@ def test_gold_evidence_uses_production_format_and_retrieval_shape():
     chunks = [
         {
             "chunk_id": "doc:1",
+            "domain": "test",
             "doc_id": "doc",
+            "source_path": "raw/test/doc.pdf",
             "page": 7,
             "section": "Section",
             "text": "Decisive fact",
         }
     ]
-    rendered = render_gold_evidence(["doc:1"], chunks)
-    assert rendered == "[证据1] doc_id=doc 第7页 [Section]\nDecisive fact"
+    doc_meta = {
+        "test": {
+            "doc": {
+                "title": "Named source document",
+                "entity": "Named source document",
+                "source_path": "raw/test/doc.pdf",
+            }
+        }
+    }
+    rendered = render_gold_evidence(["doc:1"], chunks, doc_meta=doc_meta)
+    assert rendered == (
+        "[证据1] 【Named source document · doc_id=doc · 第7页 · Section】\n"
+        "Decisive fact"
+    )
 
     tf = build_gold_retrieval(
         {"qid": "tf", "answer_format": "tf", "options": {"A": "yes", "B": "no"}},
         ["doc:1"],
         chunks,
+        doc_meta=doc_meta,
     )
     assert tf["tf"]["evidence"][0]["chunk_id"] == "doc:1"
+    assert "Named source document" in tf["tf"]["evidence"][0]["source_header"]
 
     mcq = build_gold_retrieval(
         {"qid": "mcq", "answer_format": "mcq", "options": {"A": "one", "B": "two"}},
         ["doc:1"],
         chunks,
+        doc_meta=doc_meta,
     )
     assert set(mcq["options"]) == {"A", "B"}
     assert mcq["options"]["A"]["evidence"] == mcq["options"]["B"]["evidence"]
