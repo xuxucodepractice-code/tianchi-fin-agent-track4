@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`PREREGISTERED / DEVELOPMENT_NOT_RUN / DO_NOT_SUBMIT`。
+`DEVELOPMENT_CONTROL_PASS / TREATMENT_AUTHORIZED / DO_NOT_SUBMIT`。
 
 E008 的 control/treatment 13/13 答案完全一致，reference-free provenance 可稳定工作，但
 `fc_a_001` 把 evidence 呈现顺序误当成题面“第一份/第二份文档”的顺序。题面 `doc_ids`
@@ -29,3 +29,6 @@ CA bundle 与 65.0912 锚点全部不变。
 13 题 fresh paired 各 52 logical/physical attempts。treatment schema/Trace/temporal errors=0；
 准确率不低于 control；冻结父正确 6 题零回退；retrieval/evidence 逐字节一致。失败立即
 NO-GO；PASS 后才进入全新 prospective primary/repeat/churn 与盲标。
+
+fresh control：13/13、52 logical/physical attempts、零 retry、178,969 tokens、唯一 served
+model=`qwen-plus`，receipt/Trace PASS。一次性 treatment authorization 已生成。
