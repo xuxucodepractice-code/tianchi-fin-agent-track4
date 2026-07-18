@@ -1,0 +1,97 @@
+{
+  "schema_version": "e007-development-run-freeze/v1",
+  "experiment_id": "E007",
+  "pair_id": "e007-development-pair-01",
+  "phase": "development",
+  "status": "AUTHORIZED_TO_RUN_DEVELOPMENT_PAIR",
+  "created_at": "2026-07-18T17:37:52+08:00",
+  "source_code_commit": "eb32607dbc2a601065de2738eafdf70f35cfc9df",
+  "agent_code_snapshot_sha256": "5f9099714d16a519d467c0b63d33acb26e5f85e4fb1b75fb33b837f169a22b7a",
+  "code_files": {
+    "runner": {
+      "path": "agent/run_e007_development_arm.py",
+      "sha256": "b780a49d3642afc9159a595d11b5c718b55f06c5dc5cfcda077abd32b49ab0fd"
+    },
+    "reasoner": {
+      "path": "agent/reason_e007_reference_integrity.py",
+      "sha256": "6008718e481758679a069543ed0177cc9f3ff342ba90f2b6a72c9f2e63c9c0b7"
+    },
+    "evaluator": {
+      "path": "agent/evaluate_e007_development.py",
+      "sha256": "75a3e826991f5ed52b5753336752bc167f52373a92a7651c2dab0beb03971ee2"
+    }
+  },
+  "qids": [
+    "fc_a_016",
+    "fin_a_005",
+    "ins_a_005",
+    "ins_a_007",
+    "ins_a_009",
+    "ins_a_010",
+    "ins_a_015",
+    "ins_a_016",
+    "ins_a_017",
+    "ins_a_019",
+    "res_a_014",
+    "fc_a_001",
+    "reg_a_002"
+  ],
+  "frozen_input_sha256": {
+    "questions": "c33dde8ac97d8a00ef3796f4312274cea74fce699f52b15c006c45fab80c0676",
+    "chunks": "02aa2f9b33f304a4d9a74789acc5aa47ec9efff42d7a68bdd2390e7cea30a878",
+    "doc_meta": "df9af050cce73707536d2798f62b1e4640747d4cfe595b2e12cddd22d6d472d7",
+    "selection": "f212139d30455608092917cf9c242046e0dd16db92b6ac203e099416bbeac871",
+    "e006_control_reference": "db90509ba127f662b333e07664e79ff7ce0264db9f1b3cbb34cca177d10d4572",
+    "e006_offline_gate": "6c7ec2a4ff7b9efefe8923bb8c5a8d18e0e7f8f69e63b1b8eba2c8cb50a9b7b0"
+  },
+  "registered_outputs": {
+    "control": "outputs/experiments/E007_multi_evidence_reference_integrity/development_control_01",
+    "treatment": "outputs/experiments/E007_multi_evidence_reference_integrity/development_treatment_01",
+    "treatment_authorization": "outputs/experiments/E007_multi_evidence_reference_integrity/development_treatment_authorization.json",
+    "treatment_claim": "outputs/experiments/E007_multi_evidence_reference_integrity/development_treatment_claim.json"
+  },
+  "prompt_bundle_sha256": "68280368a6632498e7bbe11bad531ec43c605a675804a9c987b8d370abccd9fb",
+  "pipeline": {
+    "pipeline_version": "v2s1-e006-route-e007-reference-integrity",
+    "retrieval_parent": "E006-treatment",
+    "enable_option_document_route": true,
+    "top_k": 5,
+    "route_thresholds": {
+      "minimum_title_score": 12,
+      "minimum_longest_match": 4,
+      "minimum_score_ratio": 3.0,
+      "minimum_score_margin": 8
+    },
+    "v0_retrieve_source_sha256": "1e55d7f8c725805fd4b752c2bab929119cb39ee3409275b45b1cdd782484dc3c",
+    "per_option_call_count": 1,
+    "whole_question_review_calls": 0,
+    "normalize_answer": "agent.normalize_answer.normalize_answer"
+  },
+  "model": {
+    "provider": "dashscope-openai-compatible",
+    "requested_model": "qwen-plus",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "temperature": 0.0,
+    "timeout_seconds": 90.0,
+    "max_retries": 0
+  },
+  "call_topology": {
+    "question_count_per_arm": 13,
+    "logical_calls_per_arm": 52,
+    "physical_attempts_per_arm": 52,
+    "derivations_per_arm": 13
+  },
+  "initial_state": {
+    "control_output_exists": false,
+    "treatment_output_exists": false,
+    "treatment_authorization_exists": false,
+    "treatment_claim_exists": false
+  },
+  "failure_policy": {
+    "stop_after_first_api_or_schema_failure": true,
+    "failed_or_partial_arm_may_be_retried": false,
+    "failed_outputs_or_claims_may_be_deleted_or_replaced": false
+  },
+  "candidate_authorized": false,
+  "submission_authorized": false
+}
