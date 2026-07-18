@@ -1,0 +1,82 @@
+{
+  "schema_version": "e007-development-result/v1",
+  "experiment_id": "E007",
+  "pair_id": "e007-development-pair-01",
+  "status": "FAIL",
+  "decision": "DEVELOPMENT_NO_GO",
+  "failure_stage": "development_control_first_call_transport",
+  "failure_class": "TLS_CERTIFICATE_VERIFY_FAILED",
+  "failed_qid": "fc_a_016",
+  "failed_option": "A",
+  "failed_at": "2026-07-18T17:38:53.646590+08:00",
+  "frozen_contract": {
+    "source_code_commit": "eb32607dbc2a601065de2738eafdf70f35cfc9df",
+    "run_freeze_sha256": "e41e72234b37d2f28050da18903d784c363424c5a221537b093640981f143b33",
+    "agent_code_snapshot_sha256": "5f9099714d16a519d467c0b63d33acb26e5f85e4fb1b75fb33b837f169a22b7a",
+    "selection_sha256": "f212139d30455608092917cf9c242046e0dd16db92b6ac203e099416bbeac871",
+    "requested_model": "qwen-plus",
+    "temperature": 0.0,
+    "max_retries": 0
+  },
+  "control": {
+    "completed_questions": 0,
+    "logical_calls": 1,
+    "physical_attempts": 1,
+    "derivations": 0,
+    "total_tokens": 0,
+    "served_models": [],
+    "provider_raw_response_present": false,
+    "receipt_status": "FAIL",
+    "trace_status": "failed",
+    "trace_run_id": "trace-c8ab422f-af3e-4451-b773-ccb9a80d18f2"
+  },
+  "treatment": {
+    "status": "NOT_RUN",
+    "authorization_created": false,
+    "claim_created": false,
+    "api_calls": 0
+  },
+  "hard_gates": {
+    "control_trace_schema_pass": false,
+    "treatment_unknown_or_out_of_range_refs_zero": null,
+    "treatment_schema_trace_errors_zero": null,
+    "treatment_accuracy_not_below_control": null,
+    "frozen_parent_correct_zero_regression": null,
+    "development_pass": false
+  },
+  "metrics_unavailable": [
+    "control_accuracy",
+    "treatment_accuracy",
+    "answer_churn",
+    "treatment_reference_integrity",
+    "treatment_tokens",
+    "treatment_served_model"
+  ],
+  "artifacts": {
+    "control_output_bundle_sha256": "d8bda076dc1aa753d5983a25e48d9bef1bc6133b5b52872c8dcd7e5d18beafca",
+    "control_observations": {
+      "path": "outputs/experiments/E007_multi_evidence_reference_integrity/development_control_01/observations.json",
+      "sha256": "f111d1fde03fa8c79feaacfe53360644e9bf44a5f213fb26d04652017f980e0f"
+    },
+    "control_receipt": {
+      "path": "outputs/experiments/E007_multi_evidence_reference_integrity/development_control_01/run_receipt.json",
+      "sha256": "e480d3c64579d8655b9ae28387f67fff2031d952e349886a9e34e3d3f27db93f"
+    },
+    "trace_manifest": {
+      "path": "outputs/experiments/E007_multi_evidence_reference_integrity/development_control_01/agent_traces/e007-control-0224794b-85f3-407c-8c53-4aeac6e28434/trace_manifest.json",
+      "sha256": "551b2608e291bfc69206a7ae966bdd1061363e136fbcc18837cd02e38bc68d29"
+    },
+    "calls": {
+      "path": "outputs/experiments/E007_multi_evidence_reference_integrity/development_control_01/agent_traces/e007-control-0224794b-85f3-407c-8c53-4aeac6e28434/calls.jsonl",
+      "sha256": "c53355d6d9ffc1e2d0825fd689a781b538fb6f99d786c2f4bb64fab71deaecc2"
+    },
+    "derivations": {
+      "path": "outputs/experiments/E007_multi_evidence_reference_integrity/development_control_01/agent_traces/e007-control-0224794b-85f3-407c-8c53-4aeac6e28434/derivations.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "prospective_authorized": false,
+  "candidate_authorized": false,
+  "submission_authorized": false,
+  "retry_same_pair_authorized": false
+}

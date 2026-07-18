@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`PREREGISTERED / DEVELOPMENT_NOT_RUN / DO_NOT_SUBMIT`。
+`DEVELOPMENT_NO_GO / CONTROL_TRANSPORT_FAILURE / TREATMENT_NOT_RUN / DO_NOT_SUBMIT`。
 
 E006 development 已证明选项到唯一文档的保守路由有效，但其 prospective primary 在
 `ins_a_008:A` 仅渲染 5 条 evidence 时返回了整数引用 `[2,23]`。E007 只消融证据标识，
@@ -60,6 +60,23 @@ manifest 和 SHA256。
 6. retrieval 与 evidence 在两臂间逐字节一致，所有非标识文本保持一致。
 
 任一硬门失败立即 `DEVELOPMENT_NO_GO`，永久保留失败产物，不再调用 API。
+
+## Development 执行结果
+
+2026-07-18 17:38（Asia/Shanghai）按冻结 commit `eb32607` 和 run-freeze
+`e41e7223…3b33` 启动 fresh control。首个 logical call `fc_a_016:A` 发生
+`SSL: CERTIFICATE_VERIFY_FAILED`，且没有 provider raw response。runner 按
+`max_retries=0` 和 fail-fast 规则保存 1 个失败 physical attempt 后立即停止：
+
+- control：0/13 完整题，1 logical call，1 physical attempt，0 tokens；
+- Trace：`failed`，0 derivations，served model 为空（请求模型仍为 qwen-plus）；
+- treatment authorization 未生成，treatment claim 未生成，treatment 未运行；
+- prospective selection 未创建，后续 API 永久停止。
+
+因此 control Trace/schema 硬门失败，结论为 `DEVELOPMENT_NO_GO`。这是传输层失败，
+没有产生模型回答，故本次不能估计 opaque EV ID 的因果效果；冻结协议禁止删除失败产物
+或把修复证书后的运行冒充同一 one-shot pair。若未来重试，必须新建实验 ID/输出槽和
+新的预注册 freeze。
 
 ## Prospective 与扩展门
 

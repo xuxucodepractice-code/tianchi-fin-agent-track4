@@ -11,7 +11,7 @@
 | E004 | Multi 逐要素 support 试点 | 最佳已保留版本 | support 判准 | 待测 | 待测 | 待测 | PLANNED |
 | E005 | Multi 整题一致性复核 | E004 KEEP 版本 | 仅增加整题复核 | 待测 | 待测 | 待测 | PLANNED |
 | E006 | Multi 选项到文档的保守路由 | 线上 v2s1 的 v0 Multi 检索 | 仅改变高置信唯一标题命中时的 top-5 chunk 选择 | canonical recall 30/41→34/41；development 6/13→9/13；prospective primary 因 1 个越界 evidence ref NO-GO | development +356；primary 196,512 tokens | 不提交 | DEVELOPMENT_GATE_PASS / PROSPECTIVE_PRIMARY_SCHEMA_NO_GO / REPEAT_NOT_RUN |
-| E007 | Multi evidence reference integrity | E006 treatment 检索 | `[证据N]`+整数引用改为 `[EVN]`+严格字符串引用 | 待测 | 待测 | 不提交 | PREREGISTERED / DEVELOPMENT_NOT_RUN |
+| E007 | Multi evidence reference integrity | E006 treatment 检索 | `[证据N]`+整数引用改为 `[EVN]`+严格字符串引用 | 未形成可评分 paired 结果；control 首调用 TLS 失败 | 1 physical attempt / 0 tokens | 不提交 | DEVELOPMENT_NO_GO / CONTROL_TRANSPORT_FAILURE / TREATMENT_NOT_RUN |
 
 状态建议使用：
 
