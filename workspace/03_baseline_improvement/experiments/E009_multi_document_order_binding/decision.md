@@ -1,6 +1,6 @@
 # E009 Decision
 
-状态：`DEVELOPMENT_GATE_PASS / PROSPECTIVE_SELECTION_FROZEN / PRIMARY_NOT_RUN / DO_NOT_SUBMIT`
+状态：`DEVELOPMENT_GATE_PASS / PROSPECTIVE_PRIMARY_NO_GO / DO_NOT_SUBMIT`
 
 - E008 及以前产物只读保留；
 - E009 只测试题面 doc_ids 顺序映射；
@@ -13,3 +13,7 @@
 - 资格池审计发现 insurance 仅 1 道未使用未标注 Multi，无法满足五领域各 3 道；
 - labels/output 均未创建，183 tests PASS，尚无 prospective API 调用；
 - 不得删除或覆盖未来任一失败槽，不得复用 E006 holdout 或已知标签题。
+- primary 实际完成 60/60、零 retry、192,238 tokens、served model=`qwen-plus`；
+- 冻结 Trace validator 因读取错误 evidence 字段产生 60 个 message mismatch，receipt=FAIL；
+- E009 primary/claim/run-freeze/output 永久只读，禁止修补、删除、覆盖或重跑；
+- repeat、churn、盲标和全量 65 Multi 均不授权。

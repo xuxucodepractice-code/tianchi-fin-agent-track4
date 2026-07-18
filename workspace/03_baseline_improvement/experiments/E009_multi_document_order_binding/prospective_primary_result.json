@@ -1,0 +1,50 @@
+{
+  "schema_version": "e009-prospective-primary-result/v1",
+  "experiment_id": "E009",
+  "pair_id": "e009-prospective-pair-01",
+  "attempt": "primary",
+  "status": "FAIL",
+  "decision": "PROSPECTIVE_PRIMARY_NO_GO",
+  "failure_class": "FROZEN_TRACE_VALIDATOR_IMPLEMENTATION_ERROR",
+  "failure_detail": "validator reconstructed messages from context.evidence, but Agent Trace stores the rendered pack in model_evidence; context intentionally omits evidence",
+  "governance_effect": {
+    "primary_is_scoring_arm": true,
+    "primary_slot_permanently_consumed": true,
+    "primary_may_be_deleted_or_replaced": false,
+    "primary_may_be_rerun": false,
+    "repeat_authorized": false,
+    "churn_authorized": false,
+    "blind_labels_authorized": false,
+    "full_65_expansion_authorized": false,
+    "candidate_authorized": false,
+    "submission_authorized": false
+  },
+  "run_facts": {
+    "question_count": 15,
+    "logical_calls": 60,
+    "physical_attempts": 60,
+    "max_retries": 0,
+    "total_tokens": 192238,
+    "served_models": ["qwen-plus"],
+    "strict_parser_pass_calls": 60,
+    "provider_request_id_present_calls": 60,
+    "request_messages_replay_pass_using_model_evidence": 60,
+    "frozen_validator_errors": 60,
+    "receipt_status": "FAIL"
+  },
+  "root_cause_audit": {
+    "actual_request_messages_equal_trace_top_level_messages": true,
+    "actual_request_messages_equal_frozen_builder_when_using_model_evidence": true,
+    "validator_used_missing_context_evidence_as_empty_list": true,
+    "retroactive_receipt_repair_allowed": false
+  },
+  "artifacts": {
+    "source_code_commit": "9f8d76c0e49223f121b5883e5ffc8e34c283d73e",
+    "run_freeze_sha256": "04af55a5b552f933d061261bc769d99623c8dd09439b7563bb3fe2bfea548b72",
+    "primary_claim_sha256": "36a3382b9c30576d6be865f35a966e0a0b99c0fe81480808f5402c14a5fe0e7e",
+    "primary_observations_sha256": "84a003190a2b6d83e59527954ed1532745dc4aa815f225f5bf22ac27649ba08e",
+    "primary_receipt_sha256": "d828bcba3804ba402ce15a1b3315d83376e8f1522e759414ff8d6911dca667f5",
+    "primary_trace_manifest_sha256": "b44af1e0898993d6910ad38fe7e32bac83a9a6548d6bd58e4c9f72eaafc39ce7"
+  },
+  "created_at": "2026-07-18T19:09:50+08:00"
+}
