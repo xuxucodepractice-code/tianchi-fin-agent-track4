@@ -1,0 +1,29 @@
+{
+  "schema_version": "e010-prospective-primary-result/v1",
+  "experiment_id": "E010",
+  "pair_id": "e010-prospective-pair-01",
+  "attempt": "primary",
+  "status": "PASS",
+  "decision": "PRIMARY_PASS_REPEAT_AUTHORIZED",
+  "question_count": 15,
+  "logical_calls": 60,
+  "physical_attempts": 60,
+  "max_retries": 0,
+  "total_tokens": 184925,
+  "served_models": ["qwen-plus"],
+  "provider_request_ids_present": 60,
+  "trace_errors": [],
+  "strict_contract_errors": [],
+  "labels_accessed": false,
+  "repeat_authorized": true,
+  "candidate_authorized": false,
+  "submission_authorized": false,
+  "artifacts": {
+    "run_freeze_sha256": "f1c7472775724a00f080c27364f355075a3e3b055577ccbd4713417088aea5a5",
+    "primary_claim_sha256": "8a55dbdfacab72d9073bc4e5af21542b4c12318a2aa668345061cb91589c57a1",
+    "observations_sha256": "6a8f0fe60c1b64593be0c78ad5f9a31b45cc351296e6b591756e0cc4fdbc036f",
+    "receipt_sha256": "b58ec5e66cfcfc15dfc3583762fb219f6fe3d8c181e4b6e4aabb4912dc41add6",
+    "trace_manifest_sha256": "008a89930c7d109ba1c5dacc1a50ab0c52c657307a288fe25ff14bd88b0d6137"
+  },
+  "created_at": "2026-07-18T19:29:00+08:00"
+}

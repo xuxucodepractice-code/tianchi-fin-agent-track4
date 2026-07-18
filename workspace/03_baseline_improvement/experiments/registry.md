@@ -15,7 +15,7 @@
 | E007R1 | Multi evidence reference integrity TLS-fixed rerun | E007 设计、全新治理身份 | 仅 `[证据N]`+整数引用改为 `[EVN]`+严格字符串引用；CA bundle 是冻结传输环境 | refs 违规归零，但 accuracy 9/13→8/13；父正确题回退 1 | +275 | 不提交 | DEVELOPMENT_NO_GO / TREATMENT_ACCURACY_REGRESSION |
 | E008 | Multi trace-bound provenance | E006 treatment retrieval | treatment 取消模型自报 evidence_refs，以完整 Trace evidence pack 作为 provenance | refs 通道安全且 accuracy 8/13 持平，但父正确题回退 1 | -1,643 | 不提交 | DEVELOPMENT_NO_GO / FROZEN_PARENT_REGRESSION |
 | E009 | Multi document-order binding | E008 reference-free technical base | 显式绑定题面第一/第二份文档与 doc_ids 顺序 | development 8/13→10/13；primary 60/60 后冻结 validator 误读 evidence 字段，receipt FAIL | primary 192,238 | 不提交 | DEVELOPMENT_GATE_PASS / PROSPECTIVE_PRIMARY_NO_GO / TRACE_VALIDATOR_IMPLEMENTATION_ERROR |
-| E010 | Multi Trace evidence-pack binding | E009 model behavior 与 immutable failure Trace | validator replay 从 `context.evidence` 改为 `call.model_evidence`，模型行为不变 | 离线旧绑定 0/60、新绑定 60/60；全新 15 题 4/4/0/4/3 已冻结 | 0 API tokens | 不提交 | TECHNICAL_REPLAY_PASS / CODE_READY / PRIMARY_NOT_RUN |
+| E010 | Multi Trace evidence-pack binding | E009 model behavior 与 immutable failure Trace | validator replay 从 `context.evidence` 改为 `call.model_evidence`，模型行为不变 | 离线 60/60；primary 60/60、零 retry、Trace/receipt PASS | primary 184,925 | 不提交 | PRIMARY_PASS / REPEAT_AUTHORIZED / LABELS_SEALED |
 
 状态建议使用：
 

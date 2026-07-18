@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`TECHNICAL_REPLAY_PASS / RUN_FROZEN / PRIMARY_NOT_RUN / DO_NOT_SUBMIT`。
+`PRIMARY_PASS / REPEAT_AUTHORIZED / LABELS_SEALED / DO_NOT_SUBMIT`。
 
 E009 prospective primary 已完整执行 15 题、60 calls、零 retry，模型、parser 与实际 messages
 均正常，但冻结 validator 从不存在的 `context.evidence` 重建 prompt；Agent Trace 的完整证据
@@ -38,3 +38,7 @@ E009 输入哈希前后相同。全量 187 tests PASS。已生成技术授权，
 
 code-freeze commit 为 `2ed5c6b51c4815c8996a7a4db8d348f0a83cde31`；run-freeze SHA256
 为 `f1c7472775724a00f080c27364f355075a3e3b055577ccbd4713417088aea5a5`，自校验 PASS。
+
+primary 已完成 15 题、60 logical/physical calls、零 retry、184,925 tokens；唯一 served
+model=`qwen-plus`。Trace、strict contract、messages/model_evidence replay、schema 与 receipt
+全部 PASS，未访问 labels。primary 已永久冻结，允许运行非计分 repeat。
