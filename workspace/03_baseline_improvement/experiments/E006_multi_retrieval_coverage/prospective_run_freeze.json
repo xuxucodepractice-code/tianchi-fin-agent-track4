@@ -1,0 +1,130 @@
+{
+  "schema_version": "e006-prospective-run-freeze/v1",
+  "freeze_id": "E006_PROSPECTIVE_PAIR_01_2026-07-18",
+  "experiment_id": "E006",
+  "phase": "prospective",
+  "pair_id": "e006-prospective-pair-01",
+  "status": "AUTHORIZED_TO_RUN_PRIMARY_REPEAT",
+  "created_at": "2026-07-18T16:54:07.034518+08:00",
+  "source_code_commit": "9af870b2c36bd65ae5524c14b9d05c8680af6fcd",
+  "agent_code_snapshot_sha256": "70955227f079d74d7cf898fba1e299a8f0cdd17f91c2dd95d4fe9f01307bebf8",
+  "code_files": {
+    "runner": {
+      "path": "agent/run_e006_prospective_arm.py",
+      "sha256": "20dfed338125f33e779b505cae1f4dbec1b25fc9083c9628ee1a32ed2e25d5b9"
+    },
+    "churn_evaluator": {
+      "path": "agent/evaluate_e006_prospective_churn.py",
+      "sha256": "0c72f5b28f601b5feaf79ecadb62406d4c06721e74cd7f9b80a7ce60f3ea873a"
+    }
+  },
+  "qids": [
+    "fc_a_004",
+    "fc_a_014",
+    "fc_a_009",
+    "fin_a_001",
+    "fin_a_011",
+    "fin_a_016",
+    "ins_a_011",
+    "ins_a_018",
+    "ins_a_008",
+    "reg_a_004",
+    "reg_a_005",
+    "reg_a_019",
+    "res_a_002",
+    "res_a_005",
+    "res_a_016"
+  ],
+  "frozen_input_sha256": {
+    "questions": "c33dde8ac97d8a00ef3796f4312274cea74fce699f52b15c006c45fab80c0676",
+    "chunks": "02aa2f9b33f304a4d9a74789acc5aa47ec9efff42d7a68bdd2390e7cea30a878",
+    "doc_meta": "df9af050cce73707536d2798f62b1e4640747d4cfe595b2e12cddd22d6d472d7",
+    "source_selection": "bc0cecefb1298f193da33efc293e96d2340aa223cd1a97599ba3305d39e5e5df",
+    "selection": "3aa92d11ee886bc160adec3578bbf9e6d30c0f9633a4652fc7ff0d7d2f1014b3",
+    "authorization": "1d469a89f3d859ae92af76adf101cd41fd2ac1b6619f1e8414fa88b6ff68812c",
+    "control_reference": "db90509ba127f662b333e07664e79ff7ce0264db9f1b3cbb34cca177d10d4572",
+    "offline_gate": "6c7ec2a4ff7b9efefe8923bb8c5a8d18e0e7f8f69e63b1b8eba2c8cb50a9b7b0"
+  },
+  "authorization_basis": {
+    "path": "workspace/03_baseline_improvement/experiments/E006_multi_retrieval_coverage/prospective_authorization.json",
+    "sha256": "1d469a89f3d859ae92af76adf101cd41fd2ac1b6619f1e8414fa88b6ff68812c",
+    "required_status": "AUTHORIZED_TO_PREREGISTER_PRIMARY_REPEAT"
+  },
+  "registered_paths": {
+    "primary_output_dir": "outputs/experiments/E006_multi_retrieval_coverage/prospective_primary_01",
+    "repeat_output_dir": "outputs/experiments/E006_multi_retrieval_coverage/prospective_repeat_01",
+    "primary_claim": "outputs/experiments/E006_multi_retrieval_coverage/prospective_primary_claim.json",
+    "repeat_claim": "outputs/experiments/E006_multi_retrieval_coverage/prospective_repeat_claim.json",
+    "churn_report": "outputs/experiments/E006_multi_retrieval_coverage/prospective_churn.json",
+    "labels": "workspace/03_baseline_improvement/experiments/E006_multi_retrieval_coverage/prospective_labels.json",
+    "scored_result": "workspace/03_baseline_improvement/experiments/E006_multi_retrieval_coverage/prospective_scored_result.json"
+  },
+  "pipeline_version": "v2s1-e006-option-doc-route",
+  "pipeline": {
+    "pipeline_version": "v2s1-e006-option-doc-route",
+    "online_parent_pipeline_version": "v2s1",
+    "retrieval_control_profile": "v0-82041d0",
+    "prompt_profile": "v0-82041d0",
+    "enable_option_document_route": true,
+    "top_k": 5,
+    "route_thresholds": {
+      "minimum_title_score": 12,
+      "minimum_longest_match": 4,
+      "minimum_score_ratio": 3.0,
+      "minimum_score_margin": 8
+    },
+    "v0_retrieve_source_sha256": "1e55d7f8c725805fd4b752c2bab929119cb39ee3409275b45b1cdd782484dc3c",
+    "v0_prompts_source_sha256": "161392afcd1528f7bb2b0c8b04df08614aded2d8d6898bd0deae9f0cda35738d",
+    "per_option_call_count": 1,
+    "whole_question_review_calls": 0
+  },
+  "model": {
+    "provider": "dashscope-openai-compatible",
+    "requested_model": "qwen-plus",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+    "temperature": 0.0,
+    "timeout_seconds": 90.0,
+    "max_retries": 2,
+    "served_model_policy": {
+      "required_prefix": "qwen-plus",
+      "one_exact_value_per_attempt": true,
+      "same_exact_value_across_attempts": true
+    }
+  },
+  "call_topology": {
+    "question_count_per_attempt": 15,
+    "logical_calls_per_attempt": 60,
+    "derivations_per_attempt": 15,
+    "physical_attempts_min": 60,
+    "physical_attempts_max": 180
+  },
+  "attempt_nonces": {
+    "primary": "e5d1b0e9909d3e2a9134b5411295f77b",
+    "repeat": "a8dccaf4fa4593c761d1ba76498d9a78"
+  },
+  "initial_state": {
+    "primary_output_exists": false,
+    "repeat_output_exists": false,
+    "primary_claim_exists": false,
+    "repeat_claim_exists": false,
+    "churn_report_exists": false,
+    "labels_created": false,
+    "labels_revealed": false,
+    "scored_result_exists": false
+  },
+  "scoring_policy": {
+    "scoring_arm": "primary",
+    "repeat_non_scoring": true,
+    "failed_or_partial_attempt_may_be_retried": false,
+    "output_or_claim_may_be_deleted_or_replaced": false
+  },
+  "label_isolation": {
+    "status": "LABELS_SEALED",
+    "labels_created": false,
+    "labels_revealed_to_generation": false,
+    "labels_must_remain_absent_through_churn_freeze": true
+  },
+  "candidate_authorized": false,
+  "submission_authorized": false
+}
