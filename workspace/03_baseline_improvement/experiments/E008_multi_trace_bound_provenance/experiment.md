@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`DEVELOPMENT_CONTROL_PASS / TREATMENT_AUTHORIZED / DO_NOT_SUBMIT`。
+`DEVELOPMENT_NO_GO / FROZEN_PARENT_REGRESSION / DO_NOT_SUBMIT`。
 
 E007R1 证明 opaque EV ID 能把未知/越界引用降为 0，但 fresh accuracy 9/13→8/13，不能
 晋升。E008 保留原 `[证据N]` evidence 展示与判断语义，取消模型生成的编号引用字段；每次
@@ -41,3 +41,8 @@ prospective、Gold 或已知标签的 Multi 中按五领域各 3 题冻结全新
 
 fresh control 已完成 13/13、52 logical/physical attempts、零 retry、180,727 tokens；
 receipt/Trace PASS，actual served model 唯一为 `qwen-plus`。treatment authorization 已生成。
+
+treatment 也完成 52/52、零 retry、179,084 tokens。两臂答案 13/13 完全一致，准确率均
+为 8/13；treatment 没有任何 unexpected evidence_refs/extra field，Trace/temporal/schema
+与 retrieval equality 全部 PASS。但 `fc_a_001` 两臂均把冻结父版本正确答案 `ABD` 改成
+`AD`，触发父正确题零回退门。E008 development NO-GO，不运行 prospective。

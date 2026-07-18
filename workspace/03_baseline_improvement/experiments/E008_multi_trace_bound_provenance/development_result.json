@@ -1,0 +1,42 @@
+{
+  "schema_version": "e008-development-result/v1",
+  "experiment_id": "E008",
+  "pair_id": "e008-development-pair-01",
+  "status": "FAIL",
+  "decision": "DEVELOPMENT_NO_GO",
+  "accuracy": {"control_correct": 8, "treatment_correct": 8, "delta": 0},
+  "answer_churn": [],
+  "frozen_parent_correct_regressions": ["fc_a_001"],
+  "reference_integrity": {
+    "control_unknown_or_out_of_range_refs": [],
+    "treatment_unexpected_evidence_refs_or_extra_fields": [],
+    "treatment_option_mismatches": []
+  },
+  "tokens": {"control": 180727, "treatment": 179084, "delta": -1643},
+  "physical_attempts": {"control": 52, "treatment": 52},
+  "served_models": {"control": ["qwen-plus"], "treatment": ["qwen-plus"]},
+  "checks": {
+    "control_trace_receipt_schema_pass": true,
+    "treatment_trace_receipt_schema_pass": true,
+    "treatment_unexpected_evidence_refs_or_extra_fields_zero": true,
+    "treatment_accuracy_not_below_fresh_control": true,
+    "frozen_parent_correct_zero_regression": false,
+    "retrieval_evidence_byte_identical": true,
+    "temporal_claim_chain_pass": true,
+    "both_arms_exact_52_physical_attempts": true
+  },
+  "artifacts": {
+    "run_freeze_sha256": "8680e5988b6eccc54e4f88de5d5c6557d7ce6107fa222365771d062fe1c85e81",
+    "control_output_bundle_sha256": "1f05e725128d3aa61b4d03bfd0614f64f877b99ae6359097fbd60582d7834efd",
+    "treatment_output_bundle_sha256": "326fb8522cd0642bacaa7f76be1e788f1740351852184178f089d46d988f1e90",
+    "control_observations_sha256": "8853b021e8c474c11cf473a6da80df5134bab9d04947ebc9eb690e04c1bab227",
+    "control_receipt_sha256": "b64208d0cab687e6b798388e94fcf7e0a2c150d11a3eb2413cce4b9228f4a877",
+    "treatment_observations_sha256": "74a253286505828c379a34587de949ab7142308fd613fa2eaeef84bba8ac00c3",
+    "treatment_receipt_sha256": "d93f5b427e03518b4a0251f20f102b72ead034ee84fd772378a15dec9fff1f8d",
+    "treatment_claim_sha256": "d55be5a0026cbeeb559eca7867c6c18fab7c8208ceab37c1e3e9afd1afcadcdf",
+    "evaluation_sha256": "02ae1edbcef9f01333b55fb0d29a48bef517f083f7a98bfadeae9e5efd3ee79b"
+  },
+  "prospective_authorized": false,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}
