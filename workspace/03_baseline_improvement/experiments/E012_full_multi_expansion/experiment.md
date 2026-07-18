@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`RUN_FROZEN / AUTHORIZED_TO_RUN_ONCE / API_NOT_STARTED / DO_NOT_SUBMIT`
+`TECHNICAL_NO_GO / PRE_API_WRITE_GUARD_FAILURE / ZERO_API / DO_NOT_SUBMIT`
 
 E012 是 E011 prospective scored PASS 后的部署扩展，不引入新的模型行为变量。它把已经在
 E009 development、E010 primary/repeat 和 E011 独立审计/盲标中通过的 treatment，按官方
@@ -33,3 +33,9 @@ source code commit=`f88bb5749040b39853d2e80ef82b2aa5234ba781`；run-freeze SHA25
 `AUTHORIZED_TO_RUN_ONCE`，所有 claim/output/result/bundle/candidate 槽在冻结时为空。
 下一合法动作是从 macOS Keychain 临时注入 `DASHSCOPE_API_KEY` 与冻结 CA bundle，执行唯一一次
 full Multi run；key 不得打印或写盘。
+
+正式命令在 claim 和任何 API 前被 fail-closed write guard 拦截：claim 父目录尚不存在，
+而父目录创建不在精确文件/目录写白名单内。结果为 0 calls、0 attempts、0 tokens，claim 与
+output dir 均未创建。E012 身份和槽位仍按一次性失败永久关闭，不允许修补后原身份重跑。
+下一步使用 E013 新 identity、nonce、claim/output/candidate 槽；唯一技术修正是在进入 guard 前
+创建全新的空 output root，并让 guard 内只创建已授权的 claim 文件与 output dir。模型行为不变。

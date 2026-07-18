@@ -1,6 +1,6 @@
 # E012 Decision
 
-状态：`RUN_FROZEN / AUTHORIZED_TO_RUN_ONCE / API_NOT_STARTED / DO_NOT_SUBMIT`
+状态：`TECHNICAL_NO_GO / PRE_API_WRITE_GUARD_FAILURE / ZERO_API / DO_NOT_SUBMIT`
 
 - E011 已授权全量 65 道 Multi 扩展；
 - E012 不改变检索、Prompt、Parser、推理、模型或调用拓扑，只扩大到全部 Multi；
@@ -10,3 +10,5 @@
 - 最终只冻结候选三件套和外部审计记录，不自动上传、push 或 merge。
 - runner/builder 已实现，完整测试 192 passed；下一合法动作是提交代码并创建 run-freeze。
 - source commit 与 run-freeze 已冻结且自校验 PASS；下一合法动作是 Keychain 临时注入后的一次性全量运行。
+- 正式命令在 claim/API 前被 output-root mkdir 写护栏拦截；0 calls、0 attempts、0 tokens；
+- E012 不重跑、不覆盖；只允许 E013 用新治理身份修正 pre-guard 空根目录预创建。

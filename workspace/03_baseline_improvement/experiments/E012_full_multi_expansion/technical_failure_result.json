@@ -1,0 +1,21 @@
+{
+  "schema_version": "e012-technical-failure-result/v1",
+  "experiment_id": "E012",
+  "run_id": "e012-full-multi-01",
+  "status": "NO_GO",
+  "decision": "PRE_API_WRITE_GUARD_FAILURE",
+  "attempted_at": "2026-07-18T20:06:00+08:00",
+  "error": "candidate generation write is outside the output allowlist: outputs/experiments/E012_full_multi_expansion",
+  "cause": "claim parent directory creation occurred inside the fail-closed guard while only the exact claim file and output directory were write-allowed",
+  "api_calls": 0,
+  "physical_attempts": 0,
+  "tokens": 0,
+  "claim_created": false,
+  "output_dir_created": false,
+  "model_experiment_started": false,
+  "run_freeze_sha256": "40cb570eabfc6a4aceaaf4f9e1138f4c24a2644dd458ea31e33753d190d8be06",
+  "rerun_same_identity_authorized": false,
+  "required_next_identity": "E013",
+  "candidate_authorized": false,
+  "submission_authorized": false
+}
