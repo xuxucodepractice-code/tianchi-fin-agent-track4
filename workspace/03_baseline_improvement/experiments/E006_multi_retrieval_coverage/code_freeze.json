@@ -1,0 +1,21 @@
+{
+  "schema_version": "e006-code-freeze/v1",
+  "experiment_id": "E006",
+  "phase": "development",
+  "status": "CODE_FROZEN_API_PENDING",
+  "source_commit": "6028d35231b4edd5c69b140f59f7c6771263d891",
+  "agent_code_snapshot_sha256": "9c7343f65e17c5a6abd95a1be558f658e84dcaa1b8b2c32686640b488c4f02e2",
+  "selection_sha256": "f09cb3fc1cdc4e32c771781d9e09a0a2b4e88a4997925961f35515a1c9d7159f",
+  "offline_gate_sha256": "6c7ec2a4ff7b9efefe8923bb8c5a8d18e0e7f8f69e63b1b8eba2c8cb50a9b7b0",
+  "full_test_result": "167 passed",
+  "independent_postfix_audit": "NO_REMAINING_SAME_CLASS_BLOCKER",
+  "frozen_at": "2026-07-18T16:15:28+08:00",
+  "pair_id": "e006-development-pair-01",
+  "trust_boundary": "This is an internally auditable local experiment, not cryptographic third-party attestation. The operator must not delete, move, replace, or roll back the registered control/treatment directories or treatment_claim.json.",
+  "constraints": [
+    "Do not modify agent code between control and treatment.",
+    "Both arms must start from absent output directories.",
+    "Do not inspect development labels during either API arm.",
+    "Do not authorize primary/repeat unless the strict paired evaluator passes."
+  ]
+}

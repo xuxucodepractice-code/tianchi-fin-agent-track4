@@ -10,7 +10,7 @@
 | E003 | MCQ 确定性计算校验 | E002 KEEP 版本 | 仅增加算术复核 | 待测 | 待测 | 待测 | PLANNED |
 | E004 | Multi 逐要素 support 试点 | 最佳已保留版本 | support 判准 | 待测 | 待测 | 待测 | PLANNED |
 | E005 | Multi 整题一致性复核 | E004 KEEP 版本 | 仅增加整题复核 | 待测 | 待测 | 待测 | PLANNED |
-| E006 | Multi 选项到文档的保守路由 | 线上 v2s1 的 v0 Multi 检索 | 仅改变高置信唯一标题命中时的 top-5 chunk 选择 | canonical recall 30/41→34/41，旧命中 0 回退；paired API 待运行 | 离线 0；paired API 待运行 | 不提交 | OFFLINE_PASS / PRE_API_FREEZE / DEVELOPMENT_ONLY |
+| E006 | Multi 选项到文档的保守路由 | 线上 v2s1 的 v0 Multi 检索 | 仅改变高置信唯一标题命中时的 top-5 chunk 选择 | canonical recall 30/41→34/41，旧命中 0 回退；paired API 待运行 | 离线 0；paired API 待运行 | 不提交 | CODE_FROZEN / API_PENDING / DEVELOPMENT_ONLY |
 
 状态建议使用：
 
