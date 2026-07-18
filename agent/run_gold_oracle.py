@@ -112,6 +112,13 @@ def main() -> int:
     if not selected:
         raise ValueError("no O1-ready cases selected")
 
+    # The guard only permits writes inside the exact run directory.  Create that
+    # boundary before activating it so mkdir does not need to touch an unlisted
+    # parent.  Refuse a non-empty directory to keep retries append-free.
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    if any(args.output.parent.iterdir()):
+        raise ValueError(f"output directory must be empty: {args.output.parent}")
+
     questions = {question["qid"]: question for question in load_all_questions()}
     chunks = load_chunks()
     try:
