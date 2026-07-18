@@ -2,8 +2,8 @@
 
 ## 当前状态
 
-`CODE_FROZEN / API_PENDING / DEVELOPMENT_ONLY`。尚未运行 development API，
-prospective 仍由代码封锁，尚未生成候选，不授权提交。
+`DEVELOPMENT_GATE_PASS / PROSPECTIVE_UNLOCKED / DO_NOT_SUBMIT`。development fresh
+paired API 已通过；prospective 尚未运行，尚未生成候选，不授权提交。
 
 ## 为什么先修正 control
 

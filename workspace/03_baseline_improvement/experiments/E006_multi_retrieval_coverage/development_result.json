@@ -1,0 +1,66 @@
+{
+  "schema_version": "e006-development-result/v1",
+  "experiment_id": "E006",
+  "pair_id": "e006-development-pair-01",
+  "status": "PASS",
+  "decision": "DEVELOPMENT_GATE_PASS",
+  "source_code_commit": "6028d35231b4edd5c69b140f59f7c6771263d891",
+  "agent_code_snapshot_sha256": "9c7343f65e17c5a6abd95a1be558f658e84dcaa1b8b2c32686640b488c4f02e2",
+  "question_count": 13,
+  "control": {
+    "trace_run_id": "trace-d1a5a819-5172-4a5e-953c-dfb4aa943ddb",
+    "api_call_count": 52,
+    "derivation_count": 13,
+    "correct": 6,
+    "total_tokens": 180329,
+    "observations_sha256": "0b33e724bf70dd402b1b561ccbcb36c145e4511bd72a044c779baf812af1c452",
+    "receipt_sha256": "315010949f20a4d6c216f142620c6b6c17bce6cfc24a0ca8831e6753c257a3bd",
+    "trace_manifest_sha256": "37654af35a22f4782bf3bb0e1b317dd59cade0596fa737f053ac1332b317e932"
+  },
+  "treatment": {
+    "trace_run_id": "trace-9ffffd6c-0c07-48cd-a00b-8bdcd2638da9",
+    "api_call_count": 52,
+    "derivation_count": 13,
+    "correct": 9,
+    "total_tokens": 180685,
+    "observations_sha256": "058e99b9772d10627cfa67731de9b6b358686f8b6c5f005f0561f9829c1f6db6",
+    "receipt_sha256": "9ad028590c09d583fc39e6bbf7d26cb3af5b3bb6ed505cf09328cd2417bc5056",
+    "trace_manifest_sha256": "1f6166d643133332e27c39e831d761aeda8b6096cb50e1ef141c564390d5fa4c"
+  },
+  "treatment_claim_sha256": "1a60dd3240c67137f006633c4b1b9c4cc6e2508eca50bbed1faf98abb940c198",
+  "evaluation_sha256": "b3fb2f46e12b76d9423fea411fdfd56b76f80d8a39a7d3959c105016aedf4874",
+  "paired_control_to_treatment": {
+    "N": 3,
+    "M": 0,
+    "net": 3,
+    "both_correct": 6,
+    "both_wrong": 4
+  },
+  "treatment_vs_frozen_parent": {
+    "N": 3,
+    "M": 0,
+    "net": 3,
+    "parent_correct": 6,
+    "parent_correct_regressions": []
+  },
+  "answer_changes": [
+    "ins_a_007:AC->BC",
+    "ins_a_009:BC->C",
+    "ins_a_019:ABC->ABCD"
+  ],
+  "retrieval": {
+    "routed_option_count": 27,
+    "changed_option_pack_count": 15,
+    "routed_noop_count": 12,
+    "unique_variable_errors": []
+  },
+  "token_delta": 356,
+  "bundle_errors": [],
+  "all_governance_checks_passed": true,
+  "independent_audit": {
+    "status": "PASS",
+    "strict_replay_equal_to_frozen_evaluation": true,
+    "note": "Read-only independent replay; no files or Git state modified."
+  },
+  "scope": "Development evidence only. This PASS authorizes a newly frozen prospective primary/repeat runner; it does not authorize a candidate or submission."
+}
