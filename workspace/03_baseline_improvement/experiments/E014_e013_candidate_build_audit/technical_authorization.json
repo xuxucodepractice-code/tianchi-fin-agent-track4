@@ -1,0 +1,57 @@
+{
+  "schema_version": "e014-candidate-build-authorization/v1",
+  "experiment_id": "E014",
+  "source_experiment_id": "E013",
+  "status": "AUTHORIZED_TO_FREEZE_ZERO_API_BUILD",
+  "created_at": "2026-07-18T20:30:00+08:00",
+  "only_fix": "validate_external_parent_by_exact_hash_and_native_12_of_12_audit",
+  "source_artifact_sha256": {
+    "run_freeze": "f33e2129a2a7660eae0baec034306d8f585afa764d002bd4efdcddeba97d77d4",
+    "claim": "af6429a368a759f717f587c93353d673d9ccbc080e60a2cc75e8f42ebdf03f3c",
+    "observations": "195ad405daf16f35e614a7bf39e37c64d8128a94ff4f3d9ab97a157ed864cbff",
+    "run_receipt": "60696bd9a3d81f173ba32987c9f08b324f1c1f81d094288615d96a23788cd38f",
+    "calls": "fa7f8a18269b6219aada1951b67df5434d5e540c1e47c24f7700d2af84f7aea3",
+    "derivations": "a8712a68d7f10918d724ba8c5fe036d18413cc051e0ab4a4ebd932b3051d97aa",
+    "trace_manifest": "c2e660bb5b8f190dffa4befc68cd8a6c5298d8e86b5394909cb6526068044989",
+    "full_multi_run_result": "4caf295208ff21913c5df0482b720f1a020c5da30304984da636b78c7873f39e",
+    "failed_builder_result": "ab87dcf9d33f33893b9808f575dbbe54429058f0f417fcbabe0c3a7031f20fcb"
+  },
+  "parent": {
+    "dir": "/Users/xuzijian/Desktop/Agent Competition/outputs/candidates/v2s1_tf_only",
+    "artifact_sha256": {
+      "answer_csv": "5e082b6fe7824ee326ff1d0c2aa209b3d62115860125e25ba0107f93a4a90c69",
+      "evidence_json": "f19091ec079a9162d2d174f00427c4969b5396826c47678b0804606f075f5614",
+      "run_manifest_json": "1f160f367d559e565d063546febd68ed2c9ce3cea05853a0f734551bf3997b87"
+    },
+    "native_audit_path": "/Users/xuzijian/Desktop/Agent Competition/outputs/candidates/v2s1_tf_only/audit_report.json",
+    "native_audit_sha256": "8f7455a76c7c945db0fa7dd42d39859bb8f58e44b3cac1698de4b8fb61f1b684",
+    "native_audit_required": {
+      "ok": true,
+      "checks_passed": 12,
+      "checks_total": 12,
+      "question_count": 100,
+      "total_tokens": 1168763
+    }
+  },
+  "registered_paths": {
+    "rerun_bundle_dir": "outputs/experiments/E014_e013_candidate_build_audit/full_multi_bundle",
+    "candidate_dir": "outputs/candidates/e014_full_multi_candidate",
+    "candidate_audit": "workspace/03_baseline_improvement/experiments/E014_e013_candidate_build_audit/candidate_audit.json",
+    "candidate_build_result": "workspace/03_baseline_improvement/experiments/E014_e013_candidate_build_audit/candidate_build_result.json",
+    "candidate_freeze": "workspace/03_baseline_improvement/experiments/E014_e013_candidate_build_audit/candidate_freeze.json"
+  },
+  "initial_state": {
+    "rerun_bundle_exists": false,
+    "candidate_exists": false,
+    "candidate_audit_exists": false,
+    "candidate_build_result_exists": false,
+    "candidate_freeze_exists": false
+  },
+  "api_calls_authorized": 0,
+  "candidate_authorized": false,
+  "submission_authorized": false,
+  "upload_authorized": false,
+  "push_authorized": false,
+  "merge_authorized": false
+}
+
