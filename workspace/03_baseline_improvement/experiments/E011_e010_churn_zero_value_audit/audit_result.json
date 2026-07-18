@@ -1,0 +1,28 @@
+{
+  "schema_version": "e011-audit-result/v1",
+  "experiment_id": "E011",
+  "audit_id": "e011-e010-churn-audit-01",
+  "audit_target_pair_id": "e010-prospective-pair-01",
+  "status": "PASS",
+  "decision": "READY_FOR_BLIND_LABELING",
+  "bundle_errors": [],
+  "all_checks_pass": true,
+  "answer_churn_C": 0,
+  "option_verdict_churn": 2,
+  "retrieval_drift": [],
+  "served_models": {"primary": ["qwen-plus"], "repeat": ["qwen-plus"]},
+  "primary_tokens": 184925,
+  "repeat_tokens": 184890,
+  "api_calls": 0,
+  "labels_accessed": false,
+  "blind_labeling_authorized": true,
+  "candidate_authorized": false,
+  "submission_authorized": false,
+  "artifacts": {
+    "audit_run_freeze_sha256": "d8b62d84daad54f7efba9b8d9c77d786ca7c4906c938570df7cf54acd41af0b7",
+    "audit_claim_sha256": "4891edc93f0a979504401531f4b3fc3ab961746a239ee5b4c18846434de48f48",
+    "audit_report_sha256": "c614344588a8546df9d57bd1636d0adb27dcc09fec5af45ba30a7cf19cabda68",
+    "e010_frozen_churn_sha256": "99fe664d809fa8689749490905188957fdd176a1648c2518bdc8774b456a508d"
+  },
+  "created_at": "2026-07-18T19:40:22+08:00"
+}

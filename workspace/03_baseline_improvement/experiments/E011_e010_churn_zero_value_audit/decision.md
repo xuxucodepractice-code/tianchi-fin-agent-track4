@@ -1,6 +1,6 @@
 # E011 Decision
 
-状态：`AUDIT_RUN_FROZEN / LABELS_SEALED / DO_NOT_SUBMIT`
+状态：`AUDIT_PASS / CHURN_FROZEN / READY_FOR_BLIND_LABELING / DO_NOT_SUBMIT`
 
 - E010 pair/churn 全部只读；
 - E011 不调用模型，不修改 E010 receipt 或 churn；
@@ -9,3 +9,5 @@
 - candidate、submission、upload、push、merge 均未授权。
 - dry replay bundle errors=0、全部 checks PASS、C=0；下一步冻结 evaluator 与正式 audit 槽。
 - evaluator commit 与 audit run-freeze 已冻结；下一合法动作是一次性零 API 正式 audit。
+- 正式 audit bundle errors=0、全部 checks PASS、C=0；audit report 在 labels 缺席时冻结；
+- 已允许独立盲标，尚未允许全量扩展或 candidate。

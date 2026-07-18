@@ -16,7 +16,7 @@
 | E008 | Multi trace-bound provenance | E006 treatment retrieval | treatment 取消模型自报 evidence_refs，以完整 Trace evidence pack 作为 provenance | refs 通道安全且 accuracy 8/13 持平，但父正确题回退 1 | -1,643 | 不提交 | DEVELOPMENT_NO_GO / FROZEN_PARENT_REGRESSION |
 | E009 | Multi document-order binding | E008 reference-free technical base | 显式绑定题面第一/第二份文档与 doc_ids 顺序 | development 8/13→10/13；primary 60/60 后冻结 validator 误读 evidence 字段，receipt FAIL | primary 192,238 | 不提交 | DEVELOPMENT_GATE_PASS / PROSPECTIVE_PRIMARY_NO_GO / TRACE_VALIDATOR_IMPLEMENTATION_ERROR |
 | E010 | Multi Trace evidence-pack binding | E009 model behavior 与 immutable failure Trace | validator replay 从 `context.evidence` 改为 `call.model_evidence`，模型行为不变 | primary/repeat 均 PASS、C=0；frozen churn evaluator 将 retry=0 误读为 -1 | 184,925 + 184,890 | 不提交 | PRIMARY_REPEAT_PASS / FROZEN_CHURN_NO_GO / LABELS_SEALED |
-| E011 | E010 churn zero-value audit | immutable E010 primary/repeat/churn | 仅把 retry policy 的 0 与 missing 分开读取；零 API | dry replay bundle errors=0、全部 checks PASS、C=0；正式 audit 未运行 | 0 API tokens | 不提交 | PREREGISTERED / OFFLINE_AUDIT_REPLAY_PASS / LABELS_SEALED |
+| E011 | E010 churn zero-value audit | immutable E010 primary/repeat/churn | 仅把 retry policy 的 0 与 missing 分开读取；零 API | 正式 audit bundle errors=0、全部 checks PASS、C=0、retrieval drift=0 | 0 API tokens | 不提交 | AUDIT_PASS / CHURN_FROZEN / READY_FOR_BLIND_LABELING |
 
 状态建议使用：
 
