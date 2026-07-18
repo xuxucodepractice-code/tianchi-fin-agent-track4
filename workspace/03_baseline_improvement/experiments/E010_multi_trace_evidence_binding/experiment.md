@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`PRIMARY_PASS / REPEAT_AUTHORIZED / LABELS_SEALED / DO_NOT_SUBMIT`。
+`PRIMARY_REPEAT_PASS / FROZEN_CHURN_NO_GO / LABELS_SEALED / DO_NOT_SUBMIT`。
 
 E009 prospective primary 已完整执行 15 题、60 calls、零 retry，模型、parser 与实际 messages
 均正常，但冻结 validator 从不存在的 `context.evidence` 重建 prompt；Agent Trace 的完整证据
@@ -42,3 +42,8 @@ code-freeze commit 为 `2ed5c6b51c4815c8996a7a4db8d348f0a83cde31`；run-freeze S
 primary 已完成 15 题、60 logical/physical calls、零 retry、184,925 tokens；唯一 served
 model=`qwen-plus`。Trace、strict contract、messages/model_evidence replay、schema 与 receipt
 全部 PASS，未访问 labels。primary 已永久冻结，允许运行非计分 repeat。
+
+repeat 同样完成 60/60、零 retry、184,890 tokens、served model=`qwen-plus`，receipt PASS。
+两轮 answer churn `C=0`、option churn=2、retrieval drift=0，所有 model/code/input/temporal
+检查均 PASS。但冻结 churn evaluator 用 `int(value or -1)` 校验 retry policy，把合法的 0
+误读为 -1，导致 bundle_integrity FAIL。E010 churn 永久 NO-GO，不替换、不重跑、不盲标。

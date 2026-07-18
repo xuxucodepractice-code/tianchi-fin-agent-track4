@@ -1,0 +1,50 @@
+{
+  "schema_version": "e010-prospective-pair-result/v1",
+  "experiment_id": "E010",
+  "pair_id": "e010-prospective-pair-01",
+  "status": "FAIL",
+  "decision": "PROSPECTIVE_CHURN_NO_GO",
+  "failure_class": "FROZEN_CHURN_EVALUATOR_ZERO_VALUE_ERROR",
+  "failure_detail": "int(receipt.max_retries_per_logical_call or -1) maps the governed value 0 to -1",
+  "generation_facts": {
+    "primary_receipt": "PASS",
+    "repeat_receipt": "PASS",
+    "primary_tokens": 184925,
+    "repeat_tokens": 184890,
+    "logical_calls_each": 60,
+    "physical_attempts_each": 60,
+    "actual_max_retries_each": 0,
+    "served_models": {"primary": ["qwen-plus"], "repeat": ["qwen-plus"]},
+    "answer_churn_C": 0,
+    "option_verdict_churn": 2,
+    "retrieval_drift": [],
+    "pair_elapsed_seconds": 252.128325
+  },
+  "churn_checks_except_bundle_integrity": {
+    "primary_is_registered_scoring_arm": true,
+    "same_code": true,
+    "same_requested_model": true,
+    "same_exact_served_model": true,
+    "same_inputs": true,
+    "same_semantic_config": true,
+    "retrieval_is_byte_identical": true,
+    "temporal_order_and_two_hour_window": true
+  },
+  "governance_effect": {
+    "e010_churn_may_be_deleted_or_replaced": false,
+    "e010_pair_may_be_rerun": false,
+    "labels_authorized": false,
+    "full_expansion_authorized": false,
+    "candidate_authorized": false,
+    "submission_authorized": false
+  },
+  "artifacts": {
+    "primary_observations_sha256": "6a8f0fe60c1b64593be0c78ad5f9a31b45cc351296e6b591756e0cc4fdbc036f",
+    "primary_receipt_sha256": "b58ec5e66cfcfc15dfc3583762fb219f6fe3d8c181e4b6e4aabb4912dc41add6",
+    "repeat_claim_sha256": "a01d7a486884292ed77068057b70ed9ad99908418e41f2f0acb0248777dd7d74",
+    "repeat_observations_sha256": "2f81a20740a6785b1324acd3cc9f9b36d3d073d9136a4d51bdd0dd3dd6e29f8b",
+    "repeat_receipt_sha256": "dd392208156d2ca5508667cf163a2a1badc5f9ab60d9f14ed8edffaac06e9b12",
+    "frozen_churn_sha256": "99fe664d809fa8689749490905188957fdd176a1648c2518bdc8774b456a508d"
+  },
+  "created_at": "2026-07-18T19:32:24+08:00"
+}
