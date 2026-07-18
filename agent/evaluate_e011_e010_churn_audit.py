@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -681,6 +682,12 @@ def _validate_audit_freeze() -> dict[str, Any]:
         or freeze.get("status") != "AUTHORIZED_TO_AUDIT_E010_PAIR"
     ):
         errors.append("E011 audit freeze identity/status mismatch")
+    if re.fullmatch(r"[0-9a-f]{40}", str(freeze.get("source_code_commit") or "")) is None:
+        errors.append("E011 source code commit is invalid")
+    try:
+        datetime.fromisoformat(str(freeze["created_at"]))
+    except (KeyError, TypeError, ValueError):
+        errors.append("E011 run-freeze created_at is invalid")
     if freeze.get("evaluator") != {
         "path": display_path(E011_EVALUATOR_PATH),
         "sha256": sha256_file(E011_EVALUATOR_PATH),
