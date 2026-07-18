@@ -17,6 +17,7 @@
 | E009 | Multi document-order binding | E008 reference-free technical base | 显式绑定题面第一/第二份文档与 doc_ids 顺序 | development 8/13→10/13；primary 60/60 后冻结 validator 误读 evidence 字段，receipt FAIL | primary 192,238 | 不提交 | DEVELOPMENT_GATE_PASS / PROSPECTIVE_PRIMARY_NO_GO / TRACE_VALIDATOR_IMPLEMENTATION_ERROR |
 | E010 | Multi Trace evidence-pack binding | E009 model behavior 与 immutable failure Trace | validator replay 从 `context.evidence` 改为 `call.model_evidence`，模型行为不变 | primary/repeat 均 PASS、C=0；frozen churn evaluator 将 retry=0 误读为 -1 | 184,925 + 184,890 | 不提交 | PRIMARY_REPEAT_PASS / FROZEN_CHURN_NO_GO / LABELS_SEALED |
 | E011 | E010 churn zero-value audit | immutable E010 primary/repeat/churn | 仅把 retry policy 的 0 与 missing 分开读取；零 API | 独立盲标 N=2、M=0、C=0；投影分数 69.3678 > 65.0912 | 0 API tokens（复用 E010 primary 184,925） | 不提交 | PROSPECTIVE_SCORED_PASS / ALLOW_FULL_65_MULTI_EXPANSION |
+| E012 | 65 道 Multi 全量扩展 | E011 scored PASS / v2s1 | 不改变 E009/E010 treatment，仅扩展至官方全部 65 道 Multi | 代码/契约测试完成，192 passed | 上限预注册 260 calls / 0 retries | 不提交 | PREREGISTERED / CODE_TESTED / RUN_FREEZE_PENDING |
 
 状态建议使用：
 
