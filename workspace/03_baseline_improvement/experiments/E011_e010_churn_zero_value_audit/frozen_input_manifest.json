@@ -1,0 +1,23 @@
+{
+  "schema_version": "e011-frozen-input-manifest/v1",
+  "experiment_id": "E011",
+  "audit_target": "e010-prospective-pair-01",
+  "status": "FROZEN",
+  "sha256": {
+    "e010_pair_result": "beb6e4647bf0cf84555af7827721ddc330dd8cb4f14d0f6ee486c040440a8a99",
+    "e010_run_freeze": "f1c7472775724a00f080c27364f355075a3e3b055577ccbd4713417088aea5a5",
+    "e010_selection": "02e331cb33815cb5b64bf5b2406bf7cbdd0738774746929d5f59e47544e0b7ba",
+    "e010_primary_claim": "8a55dbdfacab72d9073bc4e5af21542b4c12318a2aa668345061cb91589c57a1",
+    "e010_repeat_claim": "a01d7a486884292ed77068057b70ed9ad99908418e41f2f0acb0248777dd7d74",
+    "e010_frozen_churn": "99fe664d809fa8689749490905188957fdd176a1648c2518bdc8774b456a508d",
+    "primary_observations": "6a8f0fe60c1b64593be0c78ad5f9a31b45cc351296e6b591756e0cc4fdbc036f",
+    "primary_receipt": "b58ec5e66cfcfc15dfc3583762fb219f6fe3d8c181e4b6e4aabb4912dc41add6",
+    "repeat_observations": "2f81a20740a6785b1324acd3cc9f9b36d3d073d9136a4d51bdd0dd3dd6e29f8b",
+    "repeat_receipt": "dd392208156d2ca5508667cf163a2a1badc5f9ab60d9f14ed8edffaac06e9b12"
+  },
+  "labels_created": false,
+  "api_calls": 0,
+  "candidate_authorized": false,
+  "submission_authorized": false,
+  "frozen_at": "2026-07-18T19:33:48+08:00"
+}

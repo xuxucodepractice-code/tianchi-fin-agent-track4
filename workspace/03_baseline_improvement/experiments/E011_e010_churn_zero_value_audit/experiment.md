@@ -1,0 +1,22 @@
+# E011：E010 churn zero-value audit
+
+## 当前状态
+
+`PREREGISTERED / OFFLINE_AUDIT_REPLAY_PASS / LABELS_SEALED / DO_NOT_SUBMIT`。
+
+E010 primary/repeat 的独立 receipts 均 PASS，答案 churn C=0；冻结 churn evaluator 仅因
+`int(value or -1)` 把合法 `max_retries_per_logical_call=0` 误读为 -1 而 FAIL。E010 的
+churn、输出、claims 与 run-freeze 永久只读，禁止修补、替换或重跑。
+
+E011 是零 API 的独立审计实验：只把 retry policy 读取改为
+`int(value if value is not None else -1)`，并在新 identity、audit claim、run-freeze 和输出槽
+下重新验证 immutable E010 pair。不得过滤其他错误；任何其他 Trace/schema/temporal/parser/
+retrieval/model 错误仍立即 NO-GO。
+
+E011 audit PASS 后才允许创建全新的 E011 blind labels，并以 E010 primary 作为唯一计分臂、
+E010 repeat 只计算稳定性。仍必须满足 `N-M>C` 和 Token 惩罚后预计分数高于 65.0912，
+才允许全量扩展。
+
+新 evaluator 对 immutable E010 pair 的只读 dry replay 已得到 bundle errors=0、全部 checks
+PASS、C=0；没有写入 E011 audit claim/report，也没有访问 labels 或调用 API。正式审计必须
+等待 code commit 与 audit run-freeze。

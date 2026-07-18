@@ -1,0 +1,17 @@
+{
+  "schema_version": "e011-preflight-result/v1",
+  "experiment_id": "E011",
+  "audit_id": "e011-e010-churn-audit-01",
+  "status": "PASS",
+  "decision": "READY_FOR_CODE_COMMIT_AND_AUDIT_RUN_FREEZE",
+  "frozen_input_manifest_sha256": "bb53ccee8a2560b43c1a7a31c48611e43b84adf15723d28f3e2bb02cf4ab5c2f",
+  "dry_replay": {
+    "bundle_errors": [],
+    "all_checks_pass": true,
+    "answer_churn_C": 0
+  },
+  "api_calls": 0,
+  "labels_created": false,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}
