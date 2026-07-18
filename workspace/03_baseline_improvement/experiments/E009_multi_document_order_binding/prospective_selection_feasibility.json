@@ -1,0 +1,61 @@
+{
+  "schema_version": "e009-prospective-selection-feasibility/v1",
+  "experiment_id": "E009",
+  "status": "INFEASIBLE_UNDER_FROZEN_QUOTA",
+  "required": {
+    "total": 15,
+    "per_domain": 3,
+    "domains": [
+      "financial_contracts",
+      "financial_reports",
+      "insurance",
+      "regulatory",
+      "research"
+    ],
+    "must_be_new": true,
+    "must_exclude_e006_development": true,
+    "must_exclude_e006_prospective": true,
+    "must_exclude_gold_and_known_labels": true
+  },
+  "source": {
+    "multi_question_count": 65,
+    "questions_tree_sha256": "c33dde8ac97d8a00ef3796f4312274cea74fce699f52b15c006c45fab80c0676",
+    "e006_development_selection_sha256": "f09cb3fc1cdc4e32c771781d9e09a0a2b4e88a4997925961f35515a1c9d7159f",
+    "e006_prospective_selection_sha256": "3aa92d11ee886bc160adec3578bbf9e6d30c0f9633a4652fc7ff0d7d2f1014b3",
+    "multi_tier1_selection_sha256": "a65ef9eccde78be0a35ceb59b3f5aaa704a481d4ed687ae69d84765ecae01a4f"
+  },
+  "excluded_unique_qid_count": 30,
+  "eligible_by_domain": {
+    "financial_contracts": [
+      "fc_a_002", "fc_a_005", "fc_a_007", "fc_a_011",
+      "fc_a_012", "fc_a_017", "fc_a_019", "fc_a_020"
+    ],
+    "financial_reports": [
+      "fin_a_004", "fin_a_007", "fin_a_009", "fin_a_012",
+      "fin_a_014", "fin_a_017", "fin_a_019", "fin_a_020"
+    ],
+    "insurance": ["ins_a_012"],
+    "regulatory": [
+      "reg_a_001", "reg_a_007", "reg_a_009", "reg_a_011", "reg_a_012",
+      "reg_a_014", "reg_a_016", "reg_a_017", "reg_a_020"
+    ],
+    "research": [
+      "res_a_001", "res_a_004", "res_a_007", "res_a_009", "res_a_011",
+      "res_a_012", "res_a_017", "res_a_019", "res_a_020"
+    ]
+  },
+  "eligible_counts": {
+    "financial_contracts": 8,
+    "financial_reports": 8,
+    "insurance": 1,
+    "regulatory": 9,
+    "research": 9
+  },
+  "blocking_domain": "insurance",
+  "required_in_blocking_domain": 3,
+  "available_in_blocking_domain": 1,
+  "prospective_selection_created": false,
+  "prospective_api_calls": 0,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}
