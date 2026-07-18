@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`RUN_FROZEN / AUTHORIZED_TO_RUN_ONCE / API_NOT_STARTED / DO_NOT_SUBMIT`
+`FULL_MULTI_PASS / BUILDER_TECHNICAL_NO_GO / CANDIDATE_NOT_CREATED / DO_NOT_SUBMIT`
 
 E013 继承 E012 的 E011 scored PASS 授权与全部模型行为。E012 在 claim 和任何 API 前因
 output-root mkdir 不在精确写白名单内而技术 NO-GO，消耗 0 calls、0 attempts、0 tokens。
@@ -26,3 +26,15 @@ source code commit=`c0f126c3071e5fdda4a3c11c07f7689b1992926f`；E013 run-freeze
 SHA256=`f33e2129a2a7660eae0baec034306d8f585afa764d002bd4efdcddeba97d77d4`，
 自校验 `AUTHORIZED_TO_RUN_ONCE`。新 output root/claim/output/result/bundle/candidate 槽全部为空。
 下一合法动作是 Keychain 临时注入与冻结 CA 下的唯一一次 full Multi run。
+
+正式 full Multi run PASS：65 questions、260 logical calls、260 physical attempts、65 derivations、
+0 retries、847,222 tokens；唯一 actual served model 为 `qwen-plus`，Trace/Parser/schema errors=[]。
+observations SHA256=`195ad405daf16f35e614a7bf39e37c64d8128a94ff4f3d9ab97a157ed864cbff`；
+receipt SHA256=`60696bd9a3d81f173ba32987c9f08b324f1c1f81d094288615d96a23788cd38f`。
+
+冻结 builder 在生成 rerun bundle/candidate 前技术失败：只读 v2s1 父 manifest 的 E001 rerun 相对路径
+被按隔离工作树解析，因该目录只存在于主工作区而报 unavailable。父三件套精确哈希、100 题和
+1,168,763 tokens 均匹配；主工作区原生 E001 audit 为 12/12 PASS，SHA256=
+`8f7455a76c7c945db0fa7dd42d39859bb8f58e44b3cac1698de4b8fb61f1b684`。E013 builder
+身份不重跑；E013 full run/claim/Trace 永久只读。E014 只能以零 API 新 builder/candidate 槽复用
+immutable E013 PASS，并严格绑定父三件套与原生 audit 哈希。

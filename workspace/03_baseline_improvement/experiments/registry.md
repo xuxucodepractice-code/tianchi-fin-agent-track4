@@ -18,7 +18,7 @@
 | E010 | Multi Trace evidence-pack binding | E009 model behavior 与 immutable failure Trace | validator replay 从 `context.evidence` 改为 `call.model_evidence`，模型行为不变 | primary/repeat 均 PASS、C=0；frozen churn evaluator 将 retry=0 误读为 -1 | 184,925 + 184,890 | 不提交 | PRIMARY_REPEAT_PASS / FROZEN_CHURN_NO_GO / LABELS_SEALED |
 | E011 | E010 churn zero-value audit | immutable E010 primary/repeat/churn | 仅把 retry policy 的 0 与 missing 分开读取；零 API | 独立盲标 N=2、M=0、C=0；投影分数 69.3678 > 65.0912 | 0 API tokens（复用 E010 primary 184,925） | 不提交 | PROSPECTIVE_SCORED_PASS / ALLOW_FULL_65_MULTI_EXPANSION |
 | E012 | 65 道 Multi 全量扩展 | E011 scored PASS / v2s1 | 不改变 E009/E010 treatment，仅扩展至官方全部 65 道 Multi | claim/API 前 output-root mkdir 被写护栏拦截 | 0 calls / 0 attempts / 0 tokens | 不提交 | TECHNICAL_NO_GO / PRE_API_WRITE_GUARD_FAILURE |
-| E013 | 65 道 Multi 全量扩展技术重跑 | E012 zero-API technical failure | 仅在 guard 前创建新的空 output root；模型行为不变 | 196 tests；新 identity/code/input/nonce/slots 已冻结 | 预注册 260 calls / 0 retries | 不提交 | RUN_FROZEN / AUTHORIZED_TO_RUN_ONCE / API_NOT_STARTED |
+| E013 | 65 道 Multi 全量扩展技术重跑 | E012 zero-API technical failure | 仅在 guard 前创建新的空 output root；模型行为不变 | full run 65/65、260/260、Trace PASS；builder 父 lineage 路径 locality FAIL | 847,222 / 0 retries | 不提交 | FULL_MULTI_PASS / BUILDER_TECHNICAL_NO_GO / CANDIDATE_NOT_CREATED |
 
 状态建议使用：
 

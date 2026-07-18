@@ -1,0 +1,26 @@
+{
+  "schema_version": "e013-candidate-builder-failure-result/v1",
+  "experiment_id": "E013",
+  "status": "NO_GO",
+  "decision": "BUILDER_PARENT_LINEAGE_LOCALITY_FAILURE",
+  "source_full_multi_run_status": "PASS",
+  "failed_before_rerun_bundle_creation": true,
+  "failed_before_candidate_creation": true,
+  "additional_api_calls": 0,
+  "additional_tokens": 0,
+  "error": "frozen v2s1 parent validator could not resolve outputs/experiments/E001_tf_v2s1/rerun_bundle relative to the isolated worktree",
+  "parent_artifact_hashes_matched": true,
+  "parent_question_count": 100,
+  "parent_total_tokens": 1168763,
+  "parent_native_audit": {
+    "path": "/Users/xuzijian/Desktop/Agent Competition/outputs/candidates/v2s1_tf_only/audit_report.json",
+    "sha256": "8f7455a76c7c945db0fa7dd42d39859bb8f58e44b3cac1698de4b8fb61f1b684",
+    "ok": true,
+    "checks_passed": "12/12"
+  },
+  "same_builder_identity_rerun_authorized": false,
+  "required_next_identity": "E014",
+  "candidate_authorized": false,
+  "submission_authorized": false
+}
+

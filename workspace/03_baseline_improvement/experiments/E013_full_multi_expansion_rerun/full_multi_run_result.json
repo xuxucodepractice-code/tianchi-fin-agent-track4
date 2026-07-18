@@ -1,0 +1,32 @@
+{
+  "schema_version": "e013-full-multi-run-result/v1",
+  "experiment_id": "E013",
+  "run_id": "e013-full-multi-01",
+  "status": "PASS",
+  "decision": "FULL_MULTI_TRACE_GATE_PASS",
+  "question_count": 65,
+  "logical_calls": 260,
+  "physical_attempts": 260,
+  "derivations": 65,
+  "max_retries_per_logical_call": 0,
+  "actual_served_models": ["qwen-plus"],
+  "tokens": {
+    "prompt": 835332,
+    "completion": 11890,
+    "total": 847222
+  },
+  "errors": [],
+  "artifacts": {
+    "run_freeze_sha256": "f33e2129a2a7660eae0baec034306d8f585afa764d002bd4efdcddeba97d77d4",
+    "claim_sha256": "af6429a368a759f717f587c93353d673d9ccbc080e60a2cc75e8f42ebdf03f3c",
+    "observations_sha256": "195ad405daf16f35e614a7bf39e37c64d8128a94ff4f3d9ab97a157ed864cbff",
+    "run_receipt_sha256": "60696bd9a3d81f173ba32987c9f08b324f1c1f81d094288615d96a23788cd38f",
+    "calls_sha256": "fa7f8a18269b6219aada1951b67df5434d5e540c1e47c24f7700d2af84f7aea3",
+    "derivations_sha256": "a8712a68d7f10918d724ba8c5fe036d18413cc051e0ab4a4ebd932b3051d97aa",
+    "trace_manifest_sha256": "c2e660bb5b8f190dffa4befc68cd8a6c5298d8e86b5394909cb6526068044989"
+  },
+  "candidate_build_authorized": true,
+  "submission_authorized": false,
+  "created_at": "2026-07-18T20:23:12.724173+08:00"
+}
+
