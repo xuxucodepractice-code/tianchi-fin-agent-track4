@@ -1,0 +1,74 @@
+{
+  "schema_version": "e006-prospective-primary-result/v1",
+  "experiment_id": "E006",
+  "phase": "prospective",
+  "pair_id": "e006-prospective-pair-01",
+  "status": "FAIL",
+  "decision": "PROSPECTIVE_PRIMARY_SCHEMA_NO_GO",
+  "evaluated_at": "2026-07-18T17:00:32.063962+08:00",
+  "labels_accessed": false,
+  "run_freeze": {
+    "path": "workspace/03_baseline_improvement/experiments/E006_multi_retrieval_coverage/prospective_run_freeze.json",
+    "sha256": "a65d3787d25cdde38c57bfef6bc6c30f3f04e545b8ba5db02a08ffa4e7d20680",
+    "source_code_commit": "9af870b2c36bd65ae5524c14b9d05c8680af6fcd",
+    "run_freeze_commit": "33cc92ce442fe9cd6a638aeb03cc343e4114b7d1"
+  },
+  "primary_claim": {
+    "path": "outputs/experiments/E006_multi_retrieval_coverage/prospective_primary_claim.json",
+    "sha256": "350fe37c280dd60c45808febedfafbc93fb2b2989b1a6922b3dd3cc432dcea45",
+    "claimed_at": "2026-07-18T16:55:56.370370+08:00",
+    "attempt_nonce": "e5d1b0e9909d3e2a9134b5411295f77b"
+  },
+  "primary_bundle": {
+    "trace_run_id": "trace-ea65673c-c463-4f0d-8195-8e61e088c601",
+    "observations_sha256": "aa52176801a5eb46c9b5610b7d3ddf3f46a0ea7dcf4cd3129f72506acf527d6d",
+    "receipt_sha256": "8589cade4efa8a6cd5c29a0420fd717a583e34856563745c1c0dd2b8da999677",
+    "trace_manifest_sha256": "6ee02829963b3294d9a5e8b9ca4822e216f606690160ff538d9fdebdb24e2a7e",
+    "runner_receipt_status": "PASS",
+    "question_count": 15,
+    "logical_call_count": 60,
+    "physical_attempt_count": 60,
+    "total_tokens": 196512,
+    "served_models": [
+      "qwen-plus"
+    ],
+    "completed_at": "2026-07-18T16:57:37.519767+08:00"
+  },
+  "strict_primary_audit": {
+    "status": "FAIL",
+    "error_count": 1,
+    "errors": [
+      "primary:ins_a_008:A: evidence_refs outside rendered evidence range"
+    ],
+    "offending_call": {
+      "qid": "ins_a_008",
+      "option": "A",
+      "rendered_evidence_count": 5,
+      "parsed_evidence_refs": [
+        2,
+        23
+      ],
+      "raw_response_content": "{\"option\": \"A\", \"judgment\": \"support\", \"rationale\": \"证据2明确要求特定药品须在保险人指定药店购买；证据23规定需处方审核，且审核通过后方可购药。\", \"evidence_refs\": [2, 23]}",
+      "trace_call_id_matches_observation": true
+    },
+    "interpretation": "The model cited evidence 23 although only evidence 1 through 5 were rendered. This is a provenance/schema failure, not a missing API response."
+  },
+  "checks": {
+    "one_shot_primary_claim_consumed": true,
+    "runner_trace_and_receipt_passed": true,
+    "exact_call_topology_passed": true,
+    "exact_served_model_passed": true,
+    "raw_judgment_and_evidence_ref_binding_passed": false,
+    "labels_remained_sealed": true,
+    "repeat_started": false,
+    "repeat_claim_created": false,
+    "churn_report_created": false
+  },
+  "consequence": {
+    "repeat_authorized_after_primary_audit": false,
+    "blind_labeling_authorized": false,
+    "candidate_authorized": false,
+    "submission_authorized": false,
+    "required_action": "Do not edit or replace the primary bundle. Do not run repeat. Open a separately preregistered schema/provenance experiment if retrying."
+  }
+}

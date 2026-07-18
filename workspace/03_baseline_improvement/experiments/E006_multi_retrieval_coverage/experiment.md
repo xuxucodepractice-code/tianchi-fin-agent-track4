@@ -2,8 +2,10 @@
 
 ## 当前状态
 
-`DEVELOPMENT_GATE_PASS / PROSPECTIVE_UNLOCKED / DO_NOT_SUBMIT`。development fresh
-paired API 已通过；prospective 尚未运行，尚未生成候选，不授权提交。
+`DEVELOPMENT_GATE_PASS / PROSPECTIVE_PRIMARY_SCHEMA_NO_GO / DO_NOT_SUBMIT`。
+development fresh paired API 已通过；prospective primary 已 one-shot 运行，但严格 raw-trace
+复核发现 `ins_a_008:A` 在仅渲染 5 条证据时引用 `[2, 23]`。因此 repeat 未启动、标签继续
+密封、未生成候选，也不授权提交。
 
 ## 为什么先修正 control
 

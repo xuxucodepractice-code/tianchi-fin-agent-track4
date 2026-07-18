@@ -35,3 +35,23 @@ ins_a_019: ABC  -> ABCD
 - 不上传比赛平台；
 - 不查看或使用 prospective 标签调参；
 - 不把 development 的 +3 直接外推成线上 +3。
+
+## Prospective primary 结果
+
+`PROSPECTIVE_PRIMARY_SCHEMA_NO_GO / REPEAT_NOT_RUN / LABELS_STILL_SEALED`。
+
+primary one-shot 于 2026-07-18 完成 15 题、60 个逻辑调用，runner receipt 与基础 Trace
+均为 PASS；总 Token 为 196,512，实际 served model 唯一为 `qwen-plus`，没有发生 HTTP
+重试。但随后按冻结 evaluator 做 raw judgment 复核时发现一处阻断：
+
+```text
+ins_a_008:A
+rendered evidence count = 5
+model evidence_refs      = [2, 23]
+```
+
+模型很可能把条款中的“第二十三条”混成了“证据23”，而实际只提供了证据 1–5。
+这是 provenance/schema failure；不能人工删除越界编号，也不能用 repeat 充当 primary 的
+补考。因此 repeat claim、repeat 目录、churn report 和 prospective labels 均保持不存在。
+完整哈希与失败回执见 `prospective_primary_result.json`。如需继续，必须另开一个明确改变
+schema/provenance 约束的新实验，不能覆盖或重跑本 E006 primary。
