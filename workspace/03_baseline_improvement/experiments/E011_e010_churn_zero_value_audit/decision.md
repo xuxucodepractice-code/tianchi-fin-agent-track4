@@ -11,3 +11,4 @@
 - evaluator commit 与 audit run-freeze 已冻结；下一合法动作是一次性零 API 正式 audit。
 - 正式 audit bundle errors=0、全部 checks PASS、C=0；audit report 在 labels 缺席时冻结；
 - 已允许独立盲标，尚未允许全量扩展或 candidate。
+- scorer 已在 label reveal 前实现，189 tests PASS；下一步冻结 scorer/input/gate 后接收盲标。

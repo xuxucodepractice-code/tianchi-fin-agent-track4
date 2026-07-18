@@ -27,3 +27,7 @@ audit code commit=`cc93266c0739d29845fbcb611888c0248d6e79f8`；run-freeze SHA256
 正式 audit PASS：bundle errors=0、全部 10 项 checks PASS、answer churn C=0、option churn=2、
 retrieval drift=0，且 primary/repeat exact served model 均为 `qwen-plus`。audit report 已在 labels
 不存在时冻结，允许进入独立盲标；E010 原 FAIL churn 哈希保持不变。
+
+scored evaluator 已在 labels 创建前实现并通过 189 tests；它固定读取 E010 primary、E011
+audit 与未来 E011 blind labels，计算 N/M/C 和 65-Multi Token 投影。需先提交 scorer code
+并创建独立 score run-freeze，之后才接收盲标答案。
