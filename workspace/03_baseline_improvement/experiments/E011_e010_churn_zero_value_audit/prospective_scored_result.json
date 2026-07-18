@@ -1,0 +1,61 @@
+{
+  "schema_version": "e011-prospective-scored-result/v1",
+  "experiment_id": "E011",
+  "audit_id": "e011-e010-churn-audit-01",
+  "scoring_source_pair_id": "e010-prospective-pair-01",
+  "status": "PASS",
+  "decision": "ALLOW_FULL_65_MULTI_EXPANSION",
+  "N": 2,
+  "M": 0,
+  "C": 0,
+  "N_minus_M": 2,
+  "improved_qids": [
+    "fc_a_011",
+    "reg_a_020"
+  ],
+  "regressed_qids": [],
+  "unchanged_qids": [
+    "fc_a_002",
+    "fc_a_007",
+    "fc_a_012",
+    "fin_a_017",
+    "fin_a_014",
+    "fin_a_009",
+    "fin_a_007",
+    "reg_a_016",
+    "reg_a_011",
+    "reg_a_009",
+    "res_a_009",
+    "res_a_012",
+    "res_a_020"
+  ],
+  "tokens": {
+    "primary_holdout": 184925,
+    "parent_total": 1168763,
+    "projected_65_multi": 801341.6666666667,
+    "projected_candidate_total": 1970104.6666666667
+  },
+  "score_projection": {
+    "parent_correct": 70,
+    "projected_correct": 78.66666666666667,
+    "token_factor": 0.8817937199999999,
+    "projected_score": 69.36777264,
+    "required_above": 65.0912
+  },
+  "checks": {
+    "N_minus_M_greater_than_C": true,
+    "projected_token_penalized_score_above_parent": true
+  },
+  "allow_full_65_multi_expansion": true,
+  "artifacts": {
+    "score_run_freeze_sha256": "de09b64813d691c101338093e05ad9a6933f7d737132810bb2e3303d86ec8f6c",
+    "audit_report_sha256": "c614344588a8546df9d57bd1636d0adb27dcc09fec5af45ba30a7cf19cabda68",
+    "labels_sha256": "41d2f1177d4846223bb0cf7d39561dde65c80e2936cd31861ff307c7fdd78080",
+    "primary_observations_sha256": "6a8f0fe60c1b64593be0c78ad5f9a31b45cc351296e6b591756e0cc4fdbc036f",
+    "primary_receipt_sha256": "b58ec5e66cfcfc15dfc3583762fb219f6fe3d8c181e4b6e4aabb4912dc41add6",
+    "parent_multi_answers_sha256": "c1a70a5697fbb55b0248d2a6b9aa34ca7279975ed3689d5cadc5f9a7b22421ff"
+  },
+  "candidate_authorized": false,
+  "submission_authorized": false,
+  "created_at": "2026-07-18T19:50:09.792334+08:00"
+}

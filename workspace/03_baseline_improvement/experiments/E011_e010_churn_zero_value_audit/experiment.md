@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`AUDIT_PASS / CHURN_FROZEN / READY_FOR_BLIND_LABELING / DO_NOT_SUBMIT`。
+`PROSPECTIVE_SCORED_PASS / ALLOW_FULL_65_MULTI_EXPANSION / DO_NOT_SUBMIT`。
 
 E010 primary/repeat 的独立 receipts 均 PASS，答案 churn C=0；冻结 churn evaluator 仅因
 `int(value or -1)` 把合法 `max_retries_per_logical_call=0` 误读为 -1 而 FAIL。E010 的
@@ -34,4 +34,15 @@ audit 与未来 E011 blind labels，计算 N/M/C 和 65-Multi Token 投影。需
 
 score code commit=`24781bfb6616096d7193d3811a59bd224d4303c5`；score run-freeze SHA256=
 `de09b64813d691c101338093e05ad9a6933f7d737132810bb2e3303d86ec8f6c`，labels/scored slots
-初始为空且自校验 PASS。现在允许接收独立盲标结果。
+初始为空且自校验 PASS。
+
+三组 context-free 独立盲标已冻结，labels SHA256=
+`41d2f1177d4846223bb0cf7d39561dde65c80e2936cd31861ff307c7fdd78080`。冻结 scorer 的正式结果
+为 PASS：`N=2`、`M=0`、`C=0`、`N-M=2>C`，15 题 primary Token=184,925；按 65 道
+Multi 投影的候选总 Token=1,970,104.67、预计正确数=78.67、Token 惩罚后预计分数=
+`69.36777264`，严格高于 v2s1 的 `65.0912`。scored result SHA256=
+`ef7ec2af6859416e5342dbb27c95b1673b91117b4c19add9b733618c0453b737`。
+
+因此只授权建立并执行全量 65 道 Multi 扩展。扩展 runner、输入、模型、参数、输出槽、claims
+与 run-freeze 必须先行冻结；扩展 Trace/schema/served-model/receipt 任一失败即停止，不生成候选。
+本状态不授权 candidate、answer.csv、平台上传、远端 push 或 main merge。

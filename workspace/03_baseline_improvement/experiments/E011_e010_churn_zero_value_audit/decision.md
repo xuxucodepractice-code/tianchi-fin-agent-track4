@@ -1,6 +1,6 @@
 # E011 Decision
 
-状态：`AUDIT_PASS / CHURN_FROZEN / READY_FOR_BLIND_LABELING / DO_NOT_SUBMIT`
+状态：`PROSPECTIVE_SCORED_PASS / ALLOW_FULL_65_MULTI_EXPANSION / DO_NOT_SUBMIT`
 
 - E010 pair/churn 全部只读；
 - E011 不调用模型，不修改 E010 receipt 或 churn；
@@ -13,3 +13,6 @@
 - 已允许独立盲标，尚未允许全量扩展或 candidate。
 - scorer 已在 label reveal 前实现，189 tests PASS；下一步冻结 scorer/input/gate 后接收盲标。
 - score run-freeze 已绑定 scorer 与所有输入哈希；labels/scored 槽为空，允许接收盲标。
+- 三组独立盲标已冻结；正式计分 `N=2、M=0、C=0`，无父版本正确题回退；
+- 投影总 Token 1,970,104.67、投影分数 69.36777264 > 65.0912，允许全量 65 道 Multi 扩展；
+- 全量扩展 PASS 前 candidate、answer.csv 和 submission 仍未授权。
