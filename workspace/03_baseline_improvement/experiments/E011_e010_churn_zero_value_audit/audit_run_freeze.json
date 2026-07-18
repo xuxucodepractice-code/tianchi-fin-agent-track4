@@ -1,0 +1,42 @@
+{
+  "schema_version": "e011-audit-run-freeze/v1",
+  "experiment_id": "E011",
+  "audit_id": "e011-e010-churn-audit-01",
+  "status": "AUTHORIZED_TO_AUDIT_E010_PAIR",
+  "created_at": "2026-07-18T19:39:24+08:00",
+  "source_code_commit": "cc93266c0739d29845fbcb611888c0248d6e79f8",
+  "evaluator": {
+    "path": "agent/evaluate_e011_e010_churn_audit.py",
+    "sha256": "46f04988e08fd1f4cc4d3626272016b880086f62f7480a73ef32564ca3d66780"
+  },
+  "frozen_input_manifest": {
+    "path": "workspace/03_baseline_improvement/experiments/E011_e010_churn_zero_value_audit/frozen_input_manifest.json",
+    "sha256": "bb53ccee8a2560b43c1a7a31c48611e43b84adf15723d28f3e2bb02cf4ab5c2f"
+  },
+  "registered_paths": {
+    "audit_claim": "outputs/experiments/E011_e010_churn_zero_value_audit/audit_claim.json",
+    "audit_report": "outputs/experiments/E011_e010_churn_zero_value_audit/e010_pair_churn_audit.json",
+    "labels": "workspace/03_baseline_improvement/experiments/E011_e010_churn_zero_value_audit/prospective_labels.json",
+    "scored_result": "workspace/03_baseline_improvement/experiments/E011_e010_churn_zero_value_audit/prospective_scored_result.json"
+  },
+  "zero_value_policy": {
+    "field": "max_retries_per_logical_call",
+    "required_value": 0,
+    "missing_sentinel": -1,
+    "expression": "int(value if value is not None else -1)"
+  },
+  "audit_nonce": "b726d9df429242c988287fc383945959",
+  "initial_state": {
+    "audit_claim_exists": false,
+    "audit_report_exists": false,
+    "labels_created": false,
+    "scored_result_exists": false
+  },
+  "label_isolation": {
+    "labels_must_be_absent_through_audit_freeze": true,
+    "scoring_arm": "E010 primary",
+    "repeat_non_scoring": true
+  },
+  "candidate_authorized": false,
+  "submission_authorized": false
+}

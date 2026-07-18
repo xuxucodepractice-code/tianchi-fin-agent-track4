@@ -3,8 +3,10 @@
   "experiment_id": "E011",
   "audit_id": "e011-e010-churn-audit-01",
   "status": "PASS",
-  "decision": "READY_FOR_CODE_COMMIT_AND_AUDIT_RUN_FREEZE",
+  "decision": "READY_FOR_FORMAL_AUDIT",
   "frozen_input_manifest_sha256": "bb53ccee8a2560b43c1a7a31c48611e43b84adf15723d28f3e2bb02cf4ab5c2f",
+  "source_code_commit": "cc93266c0739d29845fbcb611888c0248d6e79f8",
+  "audit_run_freeze_sha256": "d8b62d84daad54f7efba9b8d9c77d786ca7c4906c938570df7cf54acd41af0b7",
   "dry_replay": {
     "bundle_errors": [],
     "all_checks_pass": true,
