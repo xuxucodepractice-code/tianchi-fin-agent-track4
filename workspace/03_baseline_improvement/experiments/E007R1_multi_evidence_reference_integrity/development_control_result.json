@@ -1,0 +1,24 @@
+{
+  "schema_version": "e007r1-development-control-result/v1",
+  "experiment_id": "E007R1",
+  "pair_id": "e007r1-development-pair-01",
+  "status": "PASS",
+  "question_count": 13,
+  "logical_calls": 52,
+  "physical_attempts": 52,
+  "retry_count": 0,
+  "derivations": 13,
+  "total_tokens": 180692,
+  "served_models": ["qwen-plus"],
+  "trace_run_id": "trace-673b2d70-416a-41c1-98b1-5e3daf49f452",
+  "artifacts": {
+    "run_freeze_sha256": "eadbc368ab9af916a6691f9c1e86c1e9cea5134b6acd76e69d07d04616cf182d",
+    "observations_sha256": "da530b3928dd745dda74b3faf72b21912181658303f6fea9699d2ae4439afdc1",
+    "receipt_sha256": "5bcd82ad20ad1662e3763671cc289ea11daf8233a908c2845543f826a62f4d3a",
+    "trace_manifest_sha256": "e575ac36fc501577cce6993db090017532485f0a8bbbb0c37ac08727a5ac86d1",
+    "treatment_authorization_sha256": "4fede4498dcb942f12c48c247013df3c13c9b0b3b04b94118482cdcd38489ed3"
+  },
+  "treatment_authorized": true,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}
