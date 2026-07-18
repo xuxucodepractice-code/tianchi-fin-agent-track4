@@ -1,4 +1,4 @@
-"""E008 Multi judgments comparing self-reported refs with Trace-bound provenance."""
+"""E009 Multi judgments testing deterministic document-order binding."""
 
 from __future__ import annotations
 
@@ -7,11 +7,11 @@ from typing import Any
 
 from agent.normalize_answer import normalize_answer
 from agent.qwen_client import QwenClient
-from agent.reason_qwen import MODE_QWEN, VALID_JUDGMENTS, _parse_judgment
+from agent.reason_qwen import MODE_QWEN, VALID_JUDGMENTS
 from agent.reason_multi_v0_compat import V0_SYSTEM_PROMPT
 
-E007_PIPELINE_VERSION = "v2s1-e006-route-e008-trace-bound-provenance"
-PROMPT_PROFILE = "e008-v0-judgment-provenance-ablation"
+E007_PIPELINE_VERSION = "v2s1-e006-route-e009-document-order-binding"
+PROMPT_PROFILE = "e009-v0-judgment-document-order-ablation"
 
 CONTROL_INSTRUCTION = """请判断下面这个选项的陈述是否被证据支持。
 
@@ -22,7 +22,7 @@ CONTROL_INSTRUCTION = """请判断下面这个选项的陈述是否被证据支�
 - 不得使用证据之外的任何知识。部分匹配不等于 support。
 
 输出格式（严格 JSON，不要 markdown 代码块，不要多余文字）：
-{{"option": "{option_key}", "judgment": "support|refute|insufficient", "rationale": "不超过50字的简短理由", "evidence_refs": [证据编号列表，如 [1, 2]，没有可引用证据则为 []]}}"""
+{{"option": "{option_key}", "judgment": "support|refute|insufficient", "rationale": "不超过50字的简短理由"}}"""
 
 TREATMENT_INSTRUCTION = """请判断下面这个选项的陈述是否被证据支持。
 
@@ -40,7 +40,7 @@ def format_evidence_block(
     evidence: list[dict[str, Any]], *, arm: str
 ) -> str:
     if arm not in {"control", "treatment"}:
-        raise ValueError(f"unknown E008 arm: {arm!r}")
+        raise ValueError(f"unknown E009 arm: {arm!r}")
     if not evidence:
         return "（无证据）"
     lines: list[str] = []
@@ -63,8 +63,22 @@ def build_option_messages(
     arm: str,
 ) -> list[dict[str, str]]:
     instruction = CONTROL_INSTRUCTION if arm == "control" else TREATMENT_INSTRUCTION
+    order_context = ""
+    if arm == "treatment":
+        ordinal_names = ("第一份", "第二份", "第三份", "第四份", "第五份")
+        bindings = []
+        for index, doc_id in enumerate(question.get("doc_ids") or []):
+            ordinal = ordinal_names[index] if index < len(ordinal_names) else f"第{index + 1}份"
+            bindings.append(f"{ordinal}文档 doc_id={doc_id}")
+        if bindings:
+            order_context = (
+                "文档顺序（仅用于解析题面指代，不作为证据）："
+                + "；".join(bindings)
+                + "\n\n"
+            )
     user_content = (
         f"题目（仅供理解选项语境，不作为证据）：{question.get('question', '')}\n\n"
+        f"{order_context}"
         f"待判断选项 {option_key}：{option_text}\n\n"
         f"证据片段：\n{format_evidence_block(evidence, arm=arm)}\n\n"
         f"{instruction.format(option_key=option_key)}"
@@ -140,15 +154,15 @@ def judge_option(
             trace_context={
                 "qid": question.get("qid", ""),
                 "answer_format": question.get("answer_format", ""),
-                "stage": f"e008_{arm}_option_judgment",
+                "stage": f"e009_{arm}_option_judgment",
                 "option_key": option_key,
                 "option_text": option_text,
                 "evidence": evidence,
                 "prompt_profile": PROMPT_PROFILE,
                 "reference_profile": (
-                    "numeric_evidence_refs"
+                    "trace_bound_without_doc_order"
                     if arm == "control"
-                    else "trace_bound_full_evidence_pack"
+                    else "trace_bound_with_doc_order"
                 ),
             },
         )
@@ -162,12 +176,10 @@ def judge_option(
             "total_tokens": 0,
             "error": f"Qwen call failed: {exc}",
         }
-    if arm == "control":
-        parsed, error = _parse_judgment(response["content"], option_key)
-    elif arm == "treatment":
+    if arm in {"control", "treatment"}:
         parsed, error = parse_treatment_judgment(response["content"], option_key)
     else:
-        raise ValueError(f"unknown E008 arm: {arm!r}")
+        raise ValueError(f"unknown E009 arm: {arm!r}")
     return {
         **parsed,
         "prompt_tokens": response["prompt_tokens"],
@@ -207,7 +219,7 @@ def build_question_result(
         "mode": MODE_QWEN,
         "model": "qwen-plus",
         "pipeline_version": E007_PIPELINE_VERSION,
-        "experiment_id": "E008",
+        "experiment_id": "E009",
         "experiment_arm": arm,
         "prompt_profile": PROMPT_PROFILE,
         "question": question.get("question", ""),

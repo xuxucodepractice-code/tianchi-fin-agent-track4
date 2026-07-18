@@ -14,6 +14,7 @@
 | E007 | Multi evidence reference integrity | E006 treatment 检索 | `[证据N]`+整数引用改为 `[EVN]`+严格字符串引用 | 未形成可评分 paired 结果；control 首调用 TLS 失败 | 1 physical attempt / 0 tokens | 不提交 | DEVELOPMENT_NO_GO / CONTROL_TRANSPORT_FAILURE / TREATMENT_NOT_RUN |
 | E007R1 | Multi evidence reference integrity TLS-fixed rerun | E007 设计、全新治理身份 | 仅 `[证据N]`+整数引用改为 `[EVN]`+严格字符串引用；CA bundle 是冻结传输环境 | refs 违规归零，但 accuracy 9/13→8/13；父正确题回退 1 | +275 | 不提交 | DEVELOPMENT_NO_GO / TREATMENT_ACCURACY_REGRESSION |
 | E008 | Multi trace-bound provenance | E006 treatment retrieval | treatment 取消模型自报 evidence_refs，以完整 Trace evidence pack 作为 provenance | refs 通道安全且 accuracy 8/13 持平，但父正确题回退 1 | -1,643 | 不提交 | DEVELOPMENT_NO_GO / FROZEN_PARENT_REGRESSION |
+| E009 | Multi document-order binding | E008 reference-free technical base | 显式绑定题面第一/第二份文档与 doc_ids 顺序 | 待测 | 待测 | 不提交 | PREREGISTERED / DEVELOPMENT_NOT_RUN |
 
 状态建议使用：
 

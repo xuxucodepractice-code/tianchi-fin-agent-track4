@@ -1,4 +1,4 @@
-"""Evaluate the frozen E008 development pair and enforce its hard gates."""
+"""Evaluate the frozen E009 development pair and enforce its hard gates."""
 
 from __future__ import annotations
 
@@ -28,12 +28,12 @@ from agent.trace_gate import resolve_recorded_path, sha256_file, validate_trace_
 
 EXPERIMENT_DIR = (
     REPO_ROOT
-    / "workspace/03_baseline_improvement/experiments/E008_multi_trace_bound_provenance"
+    / "workspace/03_baseline_improvement/experiments/E009_multi_document_order_binding"
 )
 LABELS_PATH = EXPERIMENT_DIR / "development_labels.json"
 RESULT_PATH = (
     REPO_ROOT
-    / "outputs/experiments/E008_multi_trace_bound_provenance/development_evaluation.json"
+    / "outputs/experiments/E009_multi_document_order_binding/development_evaluation.json"
 )
 
 
@@ -68,7 +68,7 @@ def _load_bundle(arm: str, output_dir: Path) -> dict[str, Any]:
         if line.strip()
     ]
     errors: list[str] = []
-    if observations.get("experiment_id") != "E008" or receipt.get("experiment_id") != "E008":
+    if observations.get("experiment_id") != "E009" or receipt.get("experiment_id") != "E009":
         errors.append(f"{arm}: experiment identity mismatch")
     if observations.get("arm") != arm or receipt.get("arm") != arm:
         errors.append(f"{arm}: arm identity mismatch")
@@ -116,7 +116,7 @@ def _raw_binding_audit(
     unknown_refs: list[str] = []
     duplicate_refs: list[str] = []
     option_mismatches: list[str] = []
-    unexpected_treatment_fields: list[str] = []
+    unexpected_fields: list[str] = []
     rows = bundle["rows"]
     calls = bundle["calls"]
     for qid in DEVELOPMENT_QIDS:
@@ -153,12 +153,12 @@ def _raw_binding_audit(
             if not isinstance(content, str):
                 errors.append(f"{identity}: missing response content")
                 continue
-            if arm == "treatment":
+            if arm in {"control", "treatment"}:
                 parsed, parse_error = parse_treatment_judgment(content, option)
                 if parse_error:
                     errors.append(f"{identity}: {parse_error}")
                     if "schema keys differ" in parse_error:
-                        unexpected_treatment_fields.append(identity)
+                        unexpected_fields.append(identity)
                     if "option identity mismatch" in parse_error:
                         option_mismatches.append(identity)
                 else:
@@ -189,7 +189,7 @@ def _raw_binding_audit(
         "unknown_or_out_of_range_refs": sorted(set(unknown_refs)),
         "duplicate_refs": sorted(set(duplicate_refs)),
         "option_mismatches": sorted(set(option_mismatches)),
-        "unexpected_treatment_fields": sorted(set(unexpected_treatment_fields)),
+        "unexpected_fields": sorted(set(unexpected_fields)),
     }
 
 
@@ -211,14 +211,14 @@ def evaluate_pair(
         qid for qid in DEVELOPMENT_QIDS if labels.get(qid) == frozen_parent.get(qid)
     )
     if (
-        labels_payload.get("schema_version") != "e008-development-labels/v1"
-        or labels_payload.get("experiment_id") != "E008"
+        labels_payload.get("schema_version") != "e009-development-labels/v1"
+        or labels_payload.get("experiment_id") != "E009"
         or set(labels) != set(DEVELOPMENT_QIDS)
         or set(frozen_parent) != set(DEVELOPMENT_QIDS)
         or parent_correct_qids != truth_derived_parent_correct
         or len(parent_correct_qids) != 6
     ):
-        raise ValueError("E008 development labels/parent-correct set mismatch")
+        raise ValueError("E009 development labels/parent-correct set mismatch")
     control_audit = _raw_binding_audit(control, questions, arm="control")
     treatment_audit = _raw_binding_audit(treatment, questions, arm="treatment")
     rows: list[dict[str, Any]] = []
@@ -291,7 +291,7 @@ def evaluate_pair(
         "treatment_trace_receipt_schema_pass": not treatment["errors"]
         and not treatment_audit["errors"],
         "treatment_unexpected_evidence_refs_or_extra_fields_zero": not treatment_audit[
-            "unexpected_treatment_fields"
+            "unexpected_fields"
         ],
         "treatment_accuracy_not_below_fresh_control": treatment_correct >= control_correct,
         "frozen_parent_correct_zero_regression": not parent_regressions,
@@ -303,8 +303,8 @@ def evaluate_pair(
         ),
     }
     return {
-        "schema_version": "e008-development-evaluation/v1",
-        "experiment_id": "E008",
+        "schema_version": "e009-development-evaluation/v1",
+        "experiment_id": "E009",
         "pair_id": PAIR_ID,
         "status": "PASS" if all(checks.values()) and not bundle_errors else "FAIL",
         "decision": (
@@ -321,13 +321,12 @@ def evaluate_pair(
         "answer_churn": answer_churn,
         "frozen_parent_correct_regressions": parent_regressions,
         "reference_integrity": {
-            "control_unknown_or_out_of_range_refs": control_audit[
-                "unknown_or_out_of_range_refs"
+            "control_unexpected_evidence_refs_or_extra_fields": control_audit[
+                "unexpected_fields"
             ],
-            "control_duplicate_refs": control_audit["duplicate_refs"],
             "control_option_mismatches": control_audit["option_mismatches"],
             "treatment_unexpected_evidence_refs_or_extra_fields": treatment_audit[
-                "unexpected_treatment_fields"
+                "unexpected_fields"
             ],
             "treatment_option_mismatches": treatment_audit["option_mismatches"],
         },
@@ -373,7 +372,7 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=RESULT_PATH)
     args = parser.parse_args()
     if args.output.exists():
-        raise ValueError(f"E008 evaluation output must be absent: {args.output}")
+        raise ValueError(f"E009 evaluation output must be absent: {args.output}")
     labels = _load_json(LABELS_PATH)
     questions = {str(item["qid"]): item for item in load_all_questions()}
     report = evaluate_pair(
@@ -385,7 +384,7 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(
-        f"E008 development evaluation={report['status']} "
+        f"E009 development evaluation={report['status']} "
         f"control={report['accuracy']['control_correct']}/13 "
         f"treatment={report['accuracy']['treatment_correct']}/13"
     )

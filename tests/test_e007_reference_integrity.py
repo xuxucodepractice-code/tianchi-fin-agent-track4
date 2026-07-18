@@ -11,7 +11,6 @@ from agent.reason_e007_reference_integrity import (
     format_evidence_block,
     parse_treatment_judgment,
 )
-from agent.reason_multi_v0_compat import build_option_judgment_messages_v0
 from agent.run_e007_development_arm import (
     DEVELOPMENT_QIDS,
     EVALUATOR_PATH,
@@ -55,14 +54,23 @@ def _question():
         "answer_format": "multi",
         "question": "哪些说法正确？",
         "options": {"A": "说法 A", "B": "B", "C": "C", "D": "D"},
+        "doc_ids": ["text01", "text02"],
     }
 
 
-def test_control_prompt_is_exact_v0_prompt():
+def test_treatment_adds_only_deterministic_document_order_context():
     evidence = _evidence()
-    assert build_option_messages(
-        _question(), "A", "说法 A", evidence, arm="control"
-    ) == build_option_judgment_messages_v0(_question(), "A", "说法 A", evidence)
+    control = build_option_messages(_question(), "A", "说法 A", evidence, arm="control")
+    treatment = build_option_messages(
+        _question(), "A", "说法 A", evidence, arm="treatment"
+    )
+    mapping = (
+        "文档顺序（仅用于解析题面指代，不作为证据）："
+        "第一份文档 doc_id=text01；第二份文档 doc_id=text02\n\n"
+    )
+    assert mapping not in control[1]["content"]
+    assert mapping in treatment[1]["content"]
+    assert treatment[1]["content"].replace(mapping, "") == control[1]["content"]
 
 
 def test_treatment_preserves_numeric_evidence_markers():
@@ -112,8 +120,8 @@ def test_strict_treatment_parser_rejects_non_standalone_or_extra_fields():
 
 def _valid_freeze():
     return {
-        "schema_version": "e008-development-run-freeze/v1",
-        "experiment_id": "E008",
+        "schema_version": "e009-development-run-freeze/v1",
+        "experiment_id": "E009",
         "pair_id": PAIR_ID,
         "phase": "development",
         "status": "AUTHORIZED_TO_RUN_DEVELOPMENT_PAIR",
@@ -132,8 +140,8 @@ def _valid_freeze():
         "registered_outputs": {
             "control": display_path(EXPECTED_OUTPUT_DIRS["control"]),
             "treatment": display_path(EXPECTED_OUTPUT_DIRS["treatment"]),
-            "treatment_authorization": "outputs/experiments/E008_multi_trace_bound_provenance/development_treatment_authorization.json",
-            "treatment_claim": "outputs/experiments/E008_multi_trace_bound_provenance/development_treatment_claim.json",
+            "treatment_authorization": "outputs/experiments/E009_multi_document_order_binding/development_treatment_authorization.json",
+            "treatment_claim": "outputs/experiments/E009_multi_document_order_binding/development_treatment_claim.json",
         },
         "prompt_bundle_sha256": sha256_json(
             {
