@@ -1,0 +1,62 @@
+{
+  "schema_version": "e007r1-development-result/v1",
+  "experiment_id": "E007R1",
+  "pair_id": "e007r1-development-pair-01",
+  "status": "FAIL",
+  "decision": "DEVELOPMENT_NO_GO",
+  "accuracy": {
+    "control_correct": 9,
+    "treatment_correct": 8,
+    "delta": -1
+  },
+  "answer_churn": [
+    "ins_a_010:ABCD->ABD",
+    "fc_a_001:ABD->AD"
+  ],
+  "frozen_parent_correct_regressions": ["fc_a_001"],
+  "reference_integrity": {
+    "control_unknown_or_out_of_range_refs": ["control:ins_a_017:A"],
+    "treatment_unknown_or_out_of_range_refs": [],
+    "treatment_duplicate_refs": [],
+    "treatment_option_mismatches": []
+  },
+  "tokens": {
+    "control": 180692,
+    "treatment": 180967,
+    "delta": 275
+  },
+  "physical_attempts": {
+    "control": 52,
+    "treatment": 52
+  },
+  "served_models": {
+    "control": ["qwen-plus"],
+    "treatment": ["qwen-plus"]
+  },
+  "checks": {
+    "control_trace_receipt_schema_pass": true,
+    "treatment_trace_receipt_schema_pass": true,
+    "treatment_unknown_or_out_of_range_refs_zero": true,
+    "treatment_duplicate_refs_zero": true,
+    "treatment_accuracy_not_below_fresh_control": false,
+    "frozen_parent_correct_zero_regression": false,
+    "retrieval_evidence_byte_identical": true,
+    "temporal_claim_chain_pass": true,
+    "both_arms_exact_52_physical_attempts": true
+  },
+  "artifacts": {
+    "run_freeze_sha256": "eadbc368ab9af916a6691f9c1e86c1e9cea5134b6acd76e69d07d04616cf182d",
+    "control_output_bundle_sha256": "5fef4e442055d79dd28ad588a0947d5a0a0118957d6019ce61a27d59afc2f2d7",
+    "treatment_output_bundle_sha256": "c12262af85592941a0491223528074c61eb3da5db539f079c0e1411369e56078",
+    "control_observations_sha256": "da530b3928dd745dda74b3faf72b21912181658303f6fea9699d2ae4439afdc1",
+    "control_receipt_sha256": "5bcd82ad20ad1662e3763671cc289ea11daf8233a908c2845543f826a62f4d3a",
+    "treatment_observations_sha256": "1db04b554d8280cfb2968b3d44abf52cb4465af90261c518953fae52940af5d2",
+    "treatment_receipt_sha256": "f7f4181ab9d7068b01d68f037d8ef0688385d37e9eea1f91b734e71c096a2bdf",
+    "treatment_claim_sha256": "4b5be7c333873133682a6059b1ac4e3a0de1de3840c2306fc366526b8230fdca",
+    "evaluation_sha256": "368b4f9755f494c25e8e1d6139ff247d58f6a0d899671d0a54dfdf1381b3abcf"
+  },
+  "prospective_authorized": false,
+  "candidate_authorized": false,
+  "submission_authorized": false,
+  "retry_same_pair_authorized": false
+}
