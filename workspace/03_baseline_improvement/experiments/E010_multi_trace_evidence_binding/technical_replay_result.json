@@ -1,0 +1,32 @@
+{
+  "schema_version": "e010-technical-replay-result/v1",
+  "experiment_id": "E010",
+  "status": "PASS",
+  "e009_trace_call_count": 60,
+  "old_validator_message_replay_pass": 0,
+  "new_validator_message_replay_pass": 60,
+  "top_level_trace_messages_replay_pass": 60,
+  "strict_parser_pass": 60,
+  "evidence_field_binding": {
+    "old": "context.evidence",
+    "new": "call.model_evidence"
+  },
+  "e009_artifacts_modified": false,
+  "e009_artifact_sha256_before": {
+    "outputs/experiments/E009_multi_document_order_binding/prospective_primary_01/observations.json": "84a003190a2b6d83e59527954ed1532745dc4aa815f225f5bf22ac27649ba08e",
+    "outputs/experiments/E009_multi_document_order_binding/prospective_primary_01/run_receipt.json": "d828bcba3804ba402ce15a1b3315d83376e8f1522e759414ff8d6911dca667f5",
+    "outputs/experiments/E009_multi_document_order_binding/prospective_primary_claim.json": "36a3382b9c30576d6be865f35a966e0a0b99c0fe81480808f5402c14a5fe0e7e",
+    "outputs/experiments/E009_multi_document_order_binding/prospective_primary_01/agent_traces/e009-prospective-primary-27fa4eff-3542-4bcf-ae1e-ceace9b4d2e7/trace_manifest.json": "b44af1e0898993d6910ad38fe7e32bac83a9a6548d6bd58e4c9f72eaafc39ce7",
+    "outputs/experiments/E009_multi_document_order_binding/prospective_primary_01/agent_traces/e009-prospective-primary-27fa4eff-3542-4bcf-ae1e-ceace9b4d2e7/calls.jsonl": "ab68dd475a02906c026f30020787b74e8ba5e11c80304967ae3ec4ba83a9e1b7"
+  },
+  "e009_artifact_sha256_after": {
+    "outputs/experiments/E009_multi_document_order_binding/prospective_primary_01/observations.json": "84a003190a2b6d83e59527954ed1532745dc4aa815f225f5bf22ac27649ba08e",
+    "outputs/experiments/E009_multi_document_order_binding/prospective_primary_01/run_receipt.json": "d828bcba3804ba402ce15a1b3315d83376e8f1522e759414ff8d6911dca667f5",
+    "outputs/experiments/E009_multi_document_order_binding/prospective_primary_claim.json": "36a3382b9c30576d6be865f35a966e0a0b99c0fe81480808f5402c14a5fe0e7e",
+    "outputs/experiments/E009_multi_document_order_binding/prospective_primary_01/agent_traces/e009-prospective-primary-27fa4eff-3542-4bcf-ae1e-ceace9b4d2e7/trace_manifest.json": "b44af1e0898993d6910ad38fe7e32bac83a9a6548d6bd58e4c9f72eaafc39ce7",
+    "outputs/experiments/E009_multi_document_order_binding/prospective_primary_01/agent_traces/e009-prospective-primary-27fa4eff-3542-4bcf-ae1e-ceace9b4d2e7/calls.jsonl": "ab68dd475a02906c026f30020787b74e8ba5e11c80304967ae3ec4ba83a9e1b7"
+  },
+  "api_calls": 0,
+  "labels_accessed": false,
+  "created_at": "2026-07-18T19:20:48+08:00"
+}

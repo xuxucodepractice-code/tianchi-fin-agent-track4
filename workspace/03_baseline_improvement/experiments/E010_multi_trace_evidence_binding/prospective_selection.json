@@ -1,0 +1,46 @@
+{
+  "schema_version": "e010-prospective-selection/v1",
+  "experiment_id": "E010",
+  "role": "prospective_holdout_primary_repeat",
+  "frozen_at": "2026-07-18T19:12:40+08:00",
+  "selection_method": {
+    "method": "ascending_sha256_of_seed_colon_qid_within_each_domain",
+    "seed": "E010-prospective-trace-binding-v1-2026-07-18"
+  },
+  "qids": [
+    "fc_a_011", "fc_a_002", "fc_a_007", "fc_a_012",
+    "fin_a_017", "fin_a_014", "fin_a_009", "fin_a_007",
+    "reg_a_016", "reg_a_011", "reg_a_009", "reg_a_020",
+    "res_a_009", "res_a_012", "res_a_020"
+  ],
+  "selected_by_domain": {
+    "financial_contracts": ["fc_a_011", "fc_a_002", "fc_a_007", "fc_a_012"],
+    "financial_reports": ["fin_a_017", "fin_a_014", "fin_a_009", "fin_a_007"],
+    "insurance": [],
+    "regulatory": ["reg_a_016", "reg_a_011", "reg_a_009", "reg_a_020"],
+    "research": ["res_a_009", "res_a_012", "res_a_020"]
+  },
+  "domain_counts": {
+    "financial_contracts": 4,
+    "financial_reports": 4,
+    "insurance": 0,
+    "regulatory": 4,
+    "research": 3
+  },
+  "eligibility": {
+    "all_qids_from_frozen_remaining_pool": true,
+    "all_qids_are_multi": true,
+    "excluded_e006_development_and_prospective": true,
+    "excluded_e009_selection": true,
+    "excluded_gold_and_known_labels": true,
+    "known_before_freeze_qids": [],
+    "selection_audit_sha256": "feae74976a49f81c73d4eb7b2355319ea52d13f74bd56de785f7c8853315b7ab"
+  },
+  "question_count": 15,
+  "labels_created": false,
+  "labels_revealed_to_generation": false,
+  "primary_is_only_scoring_arm": true,
+  "repeat_is_stability_only": true,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}

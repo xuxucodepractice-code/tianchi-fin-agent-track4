@@ -1,0 +1,23 @@
+{
+  "schema_version": "e010-technical-authorization/v1",
+  "experiment_id": "E010",
+  "status": "AUTHORIZED_E010_PRIMARY_REPEAT",
+  "authorized_at": "2026-07-18T19:20:48+08:00",
+  "authorization_basis": "E009 immutable Trace proves the validator-only field correction on all 60 calls without modifying historical artifacts",
+  "technical_replay_status": "PASS",
+  "technical_replay_result_sha256": "b3ce3711598c95ffe03782790943c7d19e48dc839a04d0ce8608f4046794f24c",
+  "selection_sha256": "02e331cb33815cb5b64bf5b2406bf7cbdd0738774746929d5f59e47544e0b7ba",
+  "authorized_quota": {
+    "financial_contracts": 4,
+    "financial_reports": 4,
+    "insurance": 0,
+    "regulatory": 4,
+    "research": 3
+  },
+  "model_behavior_change": false,
+  "validator_change": "context.evidence -> call.model_evidence",
+  "labels_created": false,
+  "labels_revealed": false,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": "e010-prospective-selection-audit/v1",
+  "experiment_id": "E010",
+  "status": "PASS_WITH_INSURANCE_COVERAGE_GAP",
+  "source_hashes": {
+    "e009_feasibility_sha256": "444362466cde4b2148833f4c06ea6c7f4e0fd7b3142622ac64b0b35dbd45e493",
+    "e009_selection_sha256": "8e6c0efbec5f9c8e53f3253f44d3a7046b7538e95e923516c880a987b6ba0e15",
+    "e009_primary_result_sha256": "809bcb9d6fee5de8817eba35586a0c0a95389a8f4b7dd753a6c73871e7c7c220"
+  },
+  "remaining_eligible_by_domain": {
+    "financial_contracts": ["fc_a_002", "fc_a_007", "fc_a_011", "fc_a_012"],
+    "financial_reports": ["fin_a_007", "fin_a_009", "fin_a_014", "fin_a_017"],
+    "insurance": [],
+    "regulatory": ["reg_a_001", "reg_a_009", "reg_a_011", "reg_a_014", "reg_a_016", "reg_a_020"],
+    "research": ["res_a_001", "res_a_007", "res_a_009", "res_a_012", "res_a_017", "res_a_020"]
+  },
+  "remaining_counts": {
+    "financial_contracts": 4,
+    "financial_reports": 4,
+    "insurance": 0,
+    "regulatory": 6,
+    "research": 6
+  },
+  "authorized_quota": {
+    "financial_contracts": 4,
+    "financial_reports": 4,
+    "insurance": 0,
+    "regulatory": 4,
+    "research": 3
+  },
+  "selection_method": {
+    "method": "ascending_sha256_of_seed_colon_qid_within_each_domain",
+    "seed": "E010-prospective-trace-binding-v1-2026-07-18"
+  },
+  "fresh_question_count": 15,
+  "known_before_freeze_qids": [],
+  "labels_created": false,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}
