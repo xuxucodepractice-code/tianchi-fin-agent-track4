@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`PREREGISTERED / CODE_TESTED / RUN_FREEZE_PENDING / API_NOT_STARTED / DO_NOT_SUBMIT`
+`RUN_FROZEN / AUTHORIZED_TO_RUN_ONCE / API_NOT_STARTED / DO_NOT_SUBMIT`
 
 E013 继承 E012 的 E011 scored PASS 授权与全部模型行为。E012 在 claim 和任何 API 前因
 output-root mkdir 不在精确写白名单内而技术 NO-GO，消耗 0 calls、0 attempts、0 tokens。
@@ -21,3 +21,8 @@ Prompt、Parser、Trace binding、答案派生、qwen-plus、temperature=0、max
 E013 使用独立 runner/builder 文件与独立契约测试。新增的 precreated-root test 在同一
 fail-closed guard 下实际写入一次临时 claim，证明只允许精确 claim 文件且不会重现 E012
 父目录 mkdir 失败；完整测试 `196 passed`。下一步先提交代码快照，再创建 E013 run-freeze。
+
+source code commit=`c0f126c3071e5fdda4a3c11c07f7689b1992926f`；E013 run-freeze
+SHA256=`f33e2129a2a7660eae0baec034306d8f585afa764d002bd4efdcddeba97d77d4`，
+自校验 `AUTHORIZED_TO_RUN_ONCE`。新 output root/claim/output/result/bundle/candidate 槽全部为空。
+下一合法动作是 Keychain 临时注入与冻结 CA 下的唯一一次 full Multi run。
