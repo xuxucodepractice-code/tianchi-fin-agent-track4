@@ -1,0 +1,58 @@
+{
+  "schema_version": "e009-prospective-selection/v1",
+  "experiment_id": "E009",
+  "role": "prospective_holdout_primary_repeat",
+  "frozen_at": "2026-07-18T18:53:43+08:00",
+  "selection_method": {
+    "method": "ascending_sha256_of_seed_colon_qid_within_each_domain",
+    "seed": "E009-prospective-balanced-relaxation-v1-2026-07-18"
+  },
+  "qids": [
+    "fc_a_017",
+    "fc_a_005",
+    "fc_a_019",
+    "fc_a_020",
+    "fin_a_012",
+    "fin_a_004",
+    "fin_a_020",
+    "fin_a_019",
+    "ins_a_012",
+    "reg_a_012",
+    "reg_a_007",
+    "reg_a_017",
+    "res_a_004",
+    "res_a_011",
+    "res_a_019"
+  ],
+  "selected_by_domain": {
+    "financial_contracts": ["fc_a_017", "fc_a_005", "fc_a_019", "fc_a_020"],
+    "financial_reports": ["fin_a_012", "fin_a_004", "fin_a_020", "fin_a_019"],
+    "insurance": ["ins_a_012"],
+    "regulatory": ["reg_a_012", "reg_a_007", "reg_a_017"],
+    "research": ["res_a_004", "res_a_011", "res_a_019"]
+  },
+  "domain_counts": {
+    "financial_contracts": 4,
+    "financial_reports": 4,
+    "insurance": 1,
+    "regulatory": 3,
+    "research": 3
+  },
+  "eligibility": {
+    "all_qids_from_frozen_eligible_pool": true,
+    "all_qids_are_multi": true,
+    "excluded_e006_development": true,
+    "excluded_e006_prospective": true,
+    "excluded_gold_and_known_labels": true,
+    "known_before_freeze_qids": [],
+    "feasibility_sha256": "444362466cde4b2148833f4c06ea6c7f4e0fd7b3142622ac64b0b35dbd45e493",
+    "quota_authorization_sha256": "f3ee2f7b65c1fa1d79e2388ac1c6b25db89a0231d4ae6ce4fe970adf443d6e3e"
+  },
+  "question_count": 15,
+  "labels_created": false,
+  "labels_revealed_to_generation": false,
+  "primary_is_only_scoring_arm": true,
+  "repeat_is_stability_only": true,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}

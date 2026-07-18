@@ -1,0 +1,42 @@
+{
+  "schema_version": "e009-prospective-quota-authorization/v1",
+  "experiment_id": "E009",
+  "status": "AUTHORIZED_MINIMAL_QUOTA_RELAXATION",
+  "authorized_at": "2026-07-18T18:53:43+08:00",
+  "authorization_basis": "competition principal directed the persistent goal to proceed autonomously until the next submission-ready candidate",
+  "frozen_requirement_infeasible": {
+    "total": 15,
+    "domain_counts": {
+      "financial_contracts": 3,
+      "financial_reports": 3,
+      "insurance": 3,
+      "regulatory": 3,
+      "research": 3
+    },
+    "eligible_insurance_count": 1,
+    "feasibility_sha256": "444362466cde4b2148833f4c06ea6c7f4e0fd7b3142622ac64b0b35dbd45e493"
+  },
+  "authorized_quota": {
+    "financial_contracts": 4,
+    "financial_reports": 4,
+    "insurance": 1,
+    "regulatory": 3,
+    "research": 3
+  },
+  "selection_method": {
+    "method": "ascending_sha256_of_seed_colon_qid_within_each_domain",
+    "seed": "E009-prospective-balanced-relaxation-v1-2026-07-18",
+    "selection_occurs_without_answer_or_label_access": true
+  },
+  "constraints_preserved": {
+    "total_questions": 15,
+    "fresh_only": true,
+    "exclude_e006_development": true,
+    "exclude_e006_prospective": true,
+    "exclude_gold_and_known_labels": true,
+    "labels_created": false,
+    "labels_revealed": false
+  },
+  "candidate_authorized": false,
+  "submission_authorized": false
+}

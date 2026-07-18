@@ -1,0 +1,24 @@
+{
+  "schema_version": "e009-prospective-preflight-result/v1",
+  "experiment_id": "E009",
+  "pair_id": "e009-prospective-pair-01",
+  "status": "PASS",
+  "decision": "READY_FOR_CODE_COMMIT_AND_RUN_FREEZE",
+  "selection_sha256": "8e6c0efbec5f9c8e53f3253f44d3a7046b7538e95e923516c880a987b6ba0e15",
+  "quota_authorization_sha256": "f3ee2f7b65c1fa1d79e2388ac1c6b25db89a0231d4ae6ce4fe970adf443d6e3e",
+  "question_count": 15,
+  "domain_counts": {
+    "financial_contracts": 4,
+    "financial_reports": 4,
+    "insurance": 1,
+    "regulatory": 3,
+    "research": 3
+  },
+  "tests": {"passed": 183, "failed": 0},
+  "labels_created": false,
+  "primary_output_exists": false,
+  "repeat_output_exists": false,
+  "prospective_api_calls": 0,
+  "candidate_authorized": false,
+  "submission_authorized": false
+}

@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-`DEVELOPMENT_GATE_PASS / PROSPECTIVE_SELECTION_INFEASIBLE_UNDER_FROZEN_QUOTA / DO_NOT_SUBMIT`。
+`DEVELOPMENT_GATE_PASS / PROSPECTIVE_SELECTION_FROZEN / PRIMARY_NOT_RUN / DO_NOT_SUBMIT`。
 
 E008 的 control/treatment 13/13 答案完全一致，reference-free provenance 可稳定工作，但
 `fc_a_001` 把 evidence 呈现顺序误当成题面“第一份/第二份文档”的顺序。题面 `doc_ids`
@@ -43,4 +43,15 @@ Trace/schema/temporal、reference-free provenance 与 retrieval equality 全部 
 只读枚举 65 道 Multi，并排除 E006 development、E006 prospective、Multi Tier-1 已知标签
 及既有 E004/E006 holdout 后，合格余量为：financial_contracts=8、financial_reports=8、
 insurance=1、regulatory=9、research=9。insurance 仅剩 `ins_a_012`，所以“全新且五领域
-各 3 道”在当前数据集上数学不可行。未创建 prospective selection，未调用后续 API。
+各 3 道”在当前数据集上数学不可行。
+
+主理人随后要求 persistent goal 自主推进至下一份可提交候选。为保持 15 题全部全新、
+未标注且不复用旧 holdout，采用最小必要配额放宽 `4/4/1/3/3`；保险使用唯一合格题，
+其余领域尽量均衡。领域内以冻结 seed 对 `seed:qid` 的 SHA256 升序选择，未访问答案。
+selection、配额授权和可行性审计已分别冻结并互相绑定。
+
+prospective runner、churn evaluator 与 scored evaluator 已完成：primary/repeat 固定各 15 题、
+60 logical/physical calls、max_retries=0、同一 exact served model；primary 是唯一计分臂，
+repeat 只计算稳定性；labels 在 churn 冻结前必须不存在。评分门同时要求 `N-M>C` 且按
+5,000,000 Token 预算公式惩罚后的预计分数严格高于 65.0912。全量 183 tests PASS；
+当前尚未读取 API key、未创建 run-freeze、未调用 prospective API。
