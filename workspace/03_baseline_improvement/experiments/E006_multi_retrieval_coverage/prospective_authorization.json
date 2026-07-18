@@ -1,0 +1,18 @@
+{
+  "schema_version": "e006-prospective-authorization/v1",
+  "experiment_id": "E006",
+  "status": "AUTHORIZED_TO_PREREGISTER_PRIMARY_REPEAT",
+  "development_result_path": "workspace/03_baseline_improvement/experiments/E006_multi_retrieval_coverage/development_result.json",
+  "development_result_sha256": "ab802eb75adfcac98ca4dda22335de04348814c1d393175bf268a76bf5b2a065",
+  "development_decision": "DEVELOPMENT_GATE_PASS",
+  "development_paired_net": 3,
+  "development_parent_regressions": 0,
+  "development_bundle_errors": 0,
+  "independent_audit": "PASS",
+  "source_selection_sha256": "bc0cecefb1298f193da33efc293e96d2340aa223cd1a97599ba3305d39e5e5df",
+  "labels_created": false,
+  "labels_revealed": false,
+  "candidate_authorized": false,
+  "submission_authorized": false,
+  "created_at": "2026-07-18T16:27:24+08:00"
+}

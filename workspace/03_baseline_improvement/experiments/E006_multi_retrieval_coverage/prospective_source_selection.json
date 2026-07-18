@@ -1,0 +1,55 @@
+{
+  "schema_version": "e004-prospective-selection/v1",
+  "selection_id": "E004_MULTI_PROSPECTIVE_PILOT_2026-07-18",
+  "experiment_id": "E004",
+  "parent_version": "v2s1",
+  "frozen_before_labeling": true,
+  "labels_created": false,
+  "labels_revealed_to_generation": false,
+  "selection_seed": "E004_MULTI_PROSPECTIVE_PILOT_2026-07-18",
+  "selection_algorithm": "For each domain, exclude the 15 S2 Multi Tier-1 qids; rank remaining Multi qids by SHA256(seed + '|' + qid), then take the first three.",
+  "by_domain": {
+    "financial_contracts": [
+      "fc_a_004",
+      "fc_a_014",
+      "fc_a_009"
+    ],
+    "financial_reports": [
+      "fin_a_001",
+      "fin_a_011",
+      "fin_a_016"
+    ],
+    "insurance": [
+      "ins_a_011",
+      "ins_a_018",
+      "ins_a_008"
+    ],
+    "regulatory": [
+      "reg_a_004",
+      "reg_a_005",
+      "reg_a_019"
+    ],
+    "research": [
+      "res_a_002",
+      "res_a_005",
+      "res_a_016"
+    ]
+  },
+  "qids": [
+    "fc_a_004",
+    "fc_a_014",
+    "fc_a_009",
+    "fin_a_001",
+    "fin_a_011",
+    "fin_a_016",
+    "ins_a_011",
+    "ins_a_018",
+    "ins_a_008",
+    "reg_a_004",
+    "reg_a_005",
+    "reg_a_019",
+    "res_a_002",
+    "res_a_005",
+    "res_a_016"
+  ]
+}

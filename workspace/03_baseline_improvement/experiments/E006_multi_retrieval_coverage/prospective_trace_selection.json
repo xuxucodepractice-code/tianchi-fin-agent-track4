@@ -1,0 +1,42 @@
+{
+  "selection_id": "E006_MULTI_PROSPECTIVE_PILOT_2026-07-18",
+  "frozen_before_labeling": true,
+  "selection_rule": "Carry forward the exact E004 frozen 15-qid holdout after E006 development PASS; preserve source order.",
+  "qids": [
+    "fc_a_004",
+    "fc_a_014",
+    "fc_a_009",
+    "fin_a_001",
+    "fin_a_011",
+    "fin_a_016",
+    "ins_a_011",
+    "ins_a_018",
+    "ins_a_008",
+    "reg_a_004",
+    "reg_a_005",
+    "reg_a_019",
+    "res_a_002",
+    "res_a_005",
+    "res_a_016"
+  ],
+  "prospective_qids": [
+    "fc_a_004",
+    "fc_a_014",
+    "fc_a_009",
+    "fin_a_001",
+    "fin_a_011",
+    "fin_a_016",
+    "ins_a_011",
+    "ins_a_018",
+    "ins_a_008",
+    "reg_a_004",
+    "reg_a_005",
+    "reg_a_019",
+    "res_a_002",
+    "res_a_005",
+    "res_a_016"
+  ],
+  "known_before_freeze_qids": [],
+  "source_selection_path": "workspace/03_baseline_improvement/experiments/E006_multi_retrieval_coverage/prospective_source_selection.json",
+  "source_selection_sha256": "bc0cecefb1298f193da33efc293e96d2340aa223cd1a97599ba3305d39e5e5df"
+}
