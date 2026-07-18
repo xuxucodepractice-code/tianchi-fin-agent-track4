@@ -1,0 +1,129 @@
+{
+  "schema_version": "e012-full-multi-run-freeze/v1",
+  "freeze_id": "E012_FULL_MULTI_01_2026-07-18",
+  "experiment_id": "E012",
+  "run_id": "e012-full-multi-01",
+  "phase": "full_multi_expansion",
+  "status": "AUTHORIZED_TO_RUN_ONCE",
+  "source_code_commit": "f88bb5749040b39853d2e80ef82b2aa5234ba781",
+  "created_at": "2026-07-18T20:04:33.308251+08:00",
+  "agent_code_snapshot_sha256": "c32952d74db5f39e1d2b197fb852b0d11709e446a5a91631d92596e743587e2e",
+  "code_files": {
+    "runner": {
+      "path": "agent/run_e012_full_multi.py",
+      "sha256": "bde2fce77cda850db35bd4fc3e51449e5fd7766772ba7ad12464bc8ef9a085ba"
+    },
+    "builder": {
+      "path": "agent/build_e012_candidate.py",
+      "sha256": "b42ae71d5928f6f543c304f9eb1f225f9dfa220eaea98d674d9ebb3721c26e28"
+    },
+    "reasoner": {
+      "path": "agent/reason_e007_reference_integrity.py",
+      "sha256": "c9453d58afa06950cdc7671bc86d117820ad603f388caa65d37e855840336954"
+    }
+  },
+  "frozen_input_sha256": {
+    "questions": "c33dde8ac97d8a00ef3796f4312274cea74fce699f52b15c006c45fab80c0676",
+    "chunks": "02aa2f9b33f304a4d9a74789acc5aa47ec9efff42d7a68bdd2390e7cea30a878",
+    "doc_meta": "df9af050cce73707536d2798f62b1e4640747d4cfe595b2e12cddd22d6d472d7",
+    "selection": "b6fc9e0707ebe5d3ef71cf8a522b259e668358a5e5556ff48926a5f26eaa7e2e",
+    "authorization": "8095b9b872ffcd9434c97238b866a82245aa2458cbf2706329e0036e94c247a0",
+    "e011_scored_result": "ef7ec2af6859416e5342dbb27c95b1673b91117b4c19add9b733618c0453b737",
+    "control_reference": "db90509ba127f662b333e07664e79ff7ce0264db9f1b3cbb34cca177d10d4572",
+    "offline_gate": "6c7ec2a4ff7b9efefe8923bb8c5a8d18e0e7f8f69e63b1b8eba2c8cb50a9b7b0",
+    "tls_ca_bundle": "9dae8d76e55cb08991f2b672d58999ea15560d910759c16b544f843bdffbb994"
+  },
+  "qids": [
+    "fc_a_001", "fc_a_002", "fc_a_004", "fc_a_005", "fc_a_007",
+    "fc_a_009", "fc_a_011", "fc_a_012", "fc_a_014", "fc_a_016",
+    "fc_a_017", "fc_a_019", "fc_a_020",
+    "fin_a_001", "fin_a_002", "fin_a_004", "fin_a_005", "fin_a_007",
+    "fin_a_009", "fin_a_011", "fin_a_012", "fin_a_014", "fin_a_016",
+    "fin_a_017", "fin_a_019", "fin_a_020",
+    "ins_a_005", "ins_a_007", "ins_a_008", "ins_a_009", "ins_a_010",
+    "ins_a_011", "ins_a_012", "ins_a_014", "ins_a_015", "ins_a_016",
+    "ins_a_017", "ins_a_018", "ins_a_019",
+    "reg_a_001", "reg_a_002", "reg_a_004", "reg_a_005", "reg_a_007",
+    "reg_a_009", "reg_a_011", "reg_a_012", "reg_a_014", "reg_a_016",
+    "reg_a_017", "reg_a_019", "reg_a_020",
+    "res_a_001", "res_a_002", "res_a_004", "res_a_005", "res_a_007",
+    "res_a_009", "res_a_011", "res_a_012", "res_a_014", "res_a_016",
+    "res_a_017", "res_a_019", "res_a_020"
+  ],
+  "attempt_nonce": "4f9485cab9f54e08879a75af31bcf7b1",
+  "registered_paths": {
+    "selection": "workspace/03_baseline_improvement/experiments/E012_full_multi_expansion/full_multi_selection.json",
+    "authorization": "workspace/03_baseline_improvement/experiments/E012_full_multi_expansion/technical_authorization.json",
+    "output_dir": "outputs/experiments/E012_full_multi_expansion/full_multi_01",
+    "claim": "outputs/experiments/E012_full_multi_expansion/full_multi_claim.json",
+    "full_multi_result": "workspace/03_baseline_improvement/experiments/E012_full_multi_expansion/full_multi_result.json",
+    "rerun_bundle_dir": "outputs/experiments/E012_full_multi_expansion/full_multi_bundle",
+    "candidate_dir": "outputs/candidates/e012_full_multi_candidate",
+    "candidate_audit": "workspace/03_baseline_improvement/experiments/E012_full_multi_expansion/candidate_audit.json",
+    "candidate_freeze": "workspace/03_baseline_improvement/experiments/E012_full_multi_expansion/candidate_freeze.json"
+  },
+  "pipeline": {
+    "pipeline_version": "v2s1-e006-route-e009-document-order-binding",
+    "online_parent_pipeline_version": "v2s1",
+    "retrieval_control_profile": "v0-82041d0",
+    "prompt_profile": "e009-v0-judgment-document-order-ablation",
+    "reference_profile": "trace_bound_with_doc_order",
+    "trace_evidence_binding": "call.model_evidence",
+    "enable_option_document_route": true,
+    "top_k": 5,
+    "route_thresholds": {
+      "minimum_title_score": 12,
+      "minimum_longest_match": 4,
+      "minimum_score_ratio": 3.0,
+      "minimum_score_margin": 8
+    },
+    "v0_retrieve_source_sha256": "1e55d7f8c725805fd4b752c2bab929119cb39ee3409275b45b1cdd782484dc3c",
+    "per_option_call_count": 1,
+    "whole_question_review_calls": 0,
+    "normalize_answer": "agent.normalize_answer.normalize_answer"
+  },
+  "model": {
+    "provider": "dashscope-openai-compatible",
+    "requested_model": "qwen-plus",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+    "temperature": 0.0,
+    "timeout_seconds": 90.0,
+    "max_retries": 0,
+    "served_model_policy": {
+      "required_exact_value": "qwen-plus",
+      "one_value": true
+    }
+  },
+  "transport": {
+    "ssl_cert_file": "/etc/ssl/cert.pem",
+    "ssl_cert_file_sha256": "9dae8d76e55cb08991f2b672d58999ea15560d910759c16b544f843bdffbb994"
+  },
+  "call_topology": {
+    "question_count": 65,
+    "logical_calls": 260,
+    "derivations": 65,
+    "physical_attempts": 260,
+    "max_retries_per_logical_call": 0
+  },
+  "initial_state": {
+    "output_exists": false,
+    "claim_exists": false,
+    "full_multi_result_exists": false,
+    "rerun_bundle_exists": false,
+    "candidate_exists": false,
+    "candidate_audit_exists": false,
+    "candidate_freeze_exists": false
+  },
+  "failure_policy": {
+    "failed_or_partial_run_may_be_retried": false,
+    "claim_or_output_may_be_deleted_or_replaced": false,
+    "fail_fast_on_first_parser_api_error": true,
+    "candidate_forbidden_unless_receipt_pass": true
+  },
+  "candidate_authorized": false,
+  "submission_authorized": false,
+  "upload_authorized": false,
+  "push_authorized": false,
+  "merge_authorized": false
+}
