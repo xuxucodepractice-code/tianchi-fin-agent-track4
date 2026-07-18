@@ -65,37 +65,35 @@ def test_control_prompt_is_exact_v0_prompt():
     ) == build_option_judgment_messages_v0(_question(), "A", "说法 A", evidence)
 
 
-def test_treatment_changes_only_reference_markers_and_output_example():
+def test_treatment_preserves_numeric_evidence_markers():
     evidence = _evidence()
     control = format_evidence_block(evidence, arm="control")
     treatment = format_evidence_block(evidence, arm="treatment")
     assert "[证据1]" in control and "[证据2]" in control
-    assert "[EV1]" in treatment and "[EV2]" in treatment
-    assert control.replace("证据1", "EV1").replace("证据2", "EV2") == treatment
+    assert "[证据1]" in treatment and "[证据2]" in treatment
+    assert control == treatment
     assert "第二十三条" in treatment
 
 
-def test_strict_treatment_parser_accepts_only_rendered_unique_ev_ids():
+def test_strict_treatment_parser_accepts_reference_free_schema():
     content = json.dumps(
         {
             "option": "A",
             "judgment": "support",
             "rationale": "有依据",
-            "evidence_refs": ["EV1", "EV2"],
         },
         ensure_ascii=False,
     )
-    parsed, error = parse_treatment_judgment(content, "A", evidence_count=2)
+    parsed, error = parse_treatment_judgment(content, "A")
     assert error is None
-    assert parsed["evidence_refs"] == ["EV1", "EV2"]
+    assert "evidence_refs" not in parsed
 
 
-def test_strict_treatment_parser_rejects_non_standalone_or_repaired_refs():
+def test_strict_treatment_parser_rejects_non_standalone_or_extra_fields():
     base = {
         "option": "A",
         "judgment": "support",
         "rationale": "有依据",
-        "evidence_refs": ["EV1"],
     }
     cases = []
     cases.append("prefix " + json.dumps(base))
@@ -104,22 +102,18 @@ def test_strict_treatment_parser_rejects_non_standalone_or_repaired_refs():
     cases.append(json.dumps(wrong_option))
     integer_refs = dict(base, evidence_refs=[1])
     cases.append(json.dumps(integer_refs))
-    unknown_refs = dict(base, evidence_refs=["EV1", "EV23"])
-    cases.append(json.dumps(unknown_refs))
-    duplicate_refs = dict(base, evidence_refs=["EV1", "EV1"])
-    cases.append(json.dumps(duplicate_refs))
     extra_key = dict(base, qid="q1")
     cases.append(json.dumps(extra_key))
     for content in cases:
-        parsed, error = parse_treatment_judgment(content, "A", evidence_count=2)
+        parsed, error = parse_treatment_judgment(content, "A")
         assert error is not None
         assert parsed["judgment"] == "error"
 
 
 def _valid_freeze():
     return {
-        "schema_version": "e007r1-development-run-freeze/v1",
-        "experiment_id": "E007R1",
+        "schema_version": "e008-development-run-freeze/v1",
+        "experiment_id": "E008",
         "pair_id": PAIR_ID,
         "phase": "development",
         "status": "AUTHORIZED_TO_RUN_DEVELOPMENT_PAIR",
@@ -138,8 +132,8 @@ def _valid_freeze():
         "registered_outputs": {
             "control": display_path(EXPECTED_OUTPUT_DIRS["control"]),
             "treatment": display_path(EXPECTED_OUTPUT_DIRS["treatment"]),
-            "treatment_authorization": "outputs/experiments/E007R1_multi_evidence_reference_integrity/development_treatment_authorization.json",
-            "treatment_claim": "outputs/experiments/E007R1_multi_evidence_reference_integrity/development_treatment_claim.json",
+            "treatment_authorization": "outputs/experiments/E008_multi_trace_bound_provenance/development_treatment_authorization.json",
+            "treatment_claim": "outputs/experiments/E008_multi_trace_bound_provenance/development_treatment_claim.json",
         },
         "prompt_bundle_sha256": sha256_json(
             {

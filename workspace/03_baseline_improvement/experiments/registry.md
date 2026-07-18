@@ -13,6 +13,7 @@
 | E006 | Multi 选项到文档的保守路由 | 线上 v2s1 的 v0 Multi 检索 | 仅改变高置信唯一标题命中时的 top-5 chunk 选择 | canonical recall 30/41→34/41；development 6/13→9/13；prospective primary 因 1 个越界 evidence ref NO-GO | development +356；primary 196,512 tokens | 不提交 | DEVELOPMENT_GATE_PASS / PROSPECTIVE_PRIMARY_SCHEMA_NO_GO / REPEAT_NOT_RUN |
 | E007 | Multi evidence reference integrity | E006 treatment 检索 | `[证据N]`+整数引用改为 `[EVN]`+严格字符串引用 | 未形成可评分 paired 结果；control 首调用 TLS 失败 | 1 physical attempt / 0 tokens | 不提交 | DEVELOPMENT_NO_GO / CONTROL_TRANSPORT_FAILURE / TREATMENT_NOT_RUN |
 | E007R1 | Multi evidence reference integrity TLS-fixed rerun | E007 设计、全新治理身份 | 仅 `[证据N]`+整数引用改为 `[EVN]`+严格字符串引用；CA bundle 是冻结传输环境 | refs 违规归零，但 accuracy 9/13→8/13；父正确题回退 1 | +275 | 不提交 | DEVELOPMENT_NO_GO / TREATMENT_ACCURACY_REGRESSION |
+| E008 | Multi trace-bound provenance | E006 treatment retrieval | treatment 取消模型自报 evidence_refs，以完整 Trace evidence pack 作为 provenance | 待测 | 待测 | 不提交 | PREREGISTERED / DEVELOPMENT_NOT_RUN |
 
 状态建议使用：
 

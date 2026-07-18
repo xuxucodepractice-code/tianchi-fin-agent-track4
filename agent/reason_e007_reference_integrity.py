@@ -1,4 +1,4 @@
-"""E007R1 Multi option judgments with control numeric refs or opaque EV refs."""
+"""E008 Multi judgments comparing self-reported refs with Trace-bound provenance."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from agent.qwen_client import QwenClient
 from agent.reason_qwen import MODE_QWEN, VALID_JUDGMENTS, _parse_judgment
 from agent.reason_multi_v0_compat import V0_SYSTEM_PROMPT
 
-E007_PIPELINE_VERSION = "v2s1-e006-route-e007r1-reference-integrity"
-PROMPT_PROFILE = "e007r1-v0-judgment-reference-ablation"
+E007_PIPELINE_VERSION = "v2s1-e006-route-e008-trace-bound-provenance"
+PROMPT_PROFILE = "e008-v0-judgment-provenance-ablation"
 
 CONTROL_INSTRUCTION = """请判断下面这个选项的陈述是否被证据支持。
 
@@ -33,14 +33,14 @@ TREATMENT_INSTRUCTION = """请判断下面这个选项的陈述是否被证据�
 - 不得使用证据之外的任何知识。部分匹配不等于 support。
 
 输出格式（严格 JSON，不要 markdown 代码块，不要多余文字）：
-{{"option": "{option_key}", "judgment": "support|refute|insufficient", "rationale": "不超过50字的简短理由", "evidence_refs": [证据ID字符串列表，如 ["EV1", "EV2"]，没有可引用证据则为 []]}}"""
+{{"option": "{option_key}", "judgment": "support|refute|insufficient", "rationale": "不超过50字的简短理由"}}"""
 
 
 def format_evidence_block(
     evidence: list[dict[str, Any]], *, arm: str
 ) -> str:
     if arm not in {"control", "treatment"}:
-        raise ValueError(f"unknown E007R1 arm: {arm!r}")
+        raise ValueError(f"unknown E008 arm: {arm!r}")
     if not evidence:
         return "（无证据）"
     lines: list[str] = []
@@ -50,8 +50,7 @@ def format_evidence_block(
             location += f" 第{item['page']}页"
         if item.get("section"):
             location += f" [{item['section'][:40]}]"
-        marker = f"证据{index}" if arm == "control" else f"EV{index}"
-        lines.append(f"[{marker}] ({location})\n{item['text']}")
+        lines.append(f"[证据{index}] ({location})\n{item['text']}")
     return "\n\n".join(lines)
 
 
@@ -77,65 +76,46 @@ def build_option_messages(
 
 
 def parse_treatment_judgment(
-    content: str, option_key: str, *, evidence_count: int
+    content: str, option_key: str
 ) -> tuple[dict[str, Any], str | None]:
-    """Strictly parse one standalone treatment JSON object without repair."""
+    """Strictly parse one standalone reference-free JSON object without repair."""
     try:
         obj = json.loads(content)
     except (json.JSONDecodeError, TypeError) as exc:
         return (
-            {"judgment": "error", "rationale": "", "evidence_refs": []},
+            {"judgment": "error", "rationale": ""},
             f"standalone JSON required: {exc}",
         )
     if not isinstance(obj, dict):
         return (
-            {"judgment": "error", "rationale": "", "evidence_refs": []},
+            {"judgment": "error", "rationale": ""},
             "standalone JSON must be an object",
         )
-    required_keys = {"option", "judgment", "rationale", "evidence_refs"}
+    required_keys = {"option", "judgment", "rationale"}
     if set(obj) != required_keys:
         return (
-            {"judgment": "error", "rationale": "", "evidence_refs": []},
+            {"judgment": "error", "rationale": ""},
             f"schema keys differ: {sorted(map(str, obj))}",
         )
     if obj["option"] != option_key:
         return (
-            {"judgment": "error", "rationale": "", "evidence_refs": []},
+            {"judgment": "error", "rationale": ""},
             f"option identity mismatch: {obj['option']!r} != {option_key!r}",
         )
     if not isinstance(obj["judgment"], str) or obj["judgment"] not in VALID_JUDGMENTS:
         return (
-            {"judgment": "error", "rationale": "", "evidence_refs": []},
+            {"judgment": "error", "rationale": ""},
             f"invalid judgment: {obj['judgment']!r}",
         )
     if not isinstance(obj["rationale"], str):
         return (
-            {"judgment": "error", "rationale": "", "evidence_refs": []},
+            {"judgment": "error", "rationale": ""},
             "rationale must be a string",
-        )
-    refs = obj["evidence_refs"]
-    if not isinstance(refs, list) or any(not isinstance(ref, str) for ref in refs):
-        return (
-            {"judgment": "error", "rationale": obj["rationale"], "evidence_refs": []},
-            "evidence_refs must be a string array",
-        )
-    if len(refs) != len(set(refs)):
-        return (
-            {"judgment": "error", "rationale": obj["rationale"], "evidence_refs": refs},
-            f"duplicate evidence_refs are forbidden: {refs!r}",
-        )
-    allowed = {f"EV{index}" for index in range(1, evidence_count + 1)}
-    unknown = [ref for ref in refs if ref not in allowed]
-    if unknown:
-        return (
-            {"judgment": "error", "rationale": obj["rationale"], "evidence_refs": refs},
-            f"unknown or unrendered evidence_refs: {unknown!r}",
         )
     return (
         {
             "judgment": obj["judgment"],
             "rationale": obj["rationale"],
-            "evidence_refs": refs,
         },
         None,
     )
@@ -160,13 +140,15 @@ def judge_option(
             trace_context={
                 "qid": question.get("qid", ""),
                 "answer_format": question.get("answer_format", ""),
-                "stage": f"e007r1_{arm}_option_judgment",
+                "stage": f"e008_{arm}_option_judgment",
                 "option_key": option_key,
                 "option_text": option_text,
                 "evidence": evidence,
                 "prompt_profile": PROMPT_PROFILE,
                 "reference_profile": (
-                    "numeric_evidence_refs" if arm == "control" else "opaque_ev_refs"
+                    "numeric_evidence_refs"
+                    if arm == "control"
+                    else "trace_bound_full_evidence_pack"
                 ),
             },
         )
@@ -183,11 +165,9 @@ def judge_option(
     if arm == "control":
         parsed, error = _parse_judgment(response["content"], option_key)
     elif arm == "treatment":
-        parsed, error = parse_treatment_judgment(
-            response["content"], option_key, evidence_count=len(evidence)
-        )
+        parsed, error = parse_treatment_judgment(response["content"], option_key)
     else:
-        raise ValueError(f"unknown E007R1 arm: {arm!r}")
+        raise ValueError(f"unknown E008 arm: {arm!r}")
     return {
         **parsed,
         "prompt_tokens": response["prompt_tokens"],
@@ -227,7 +207,7 @@ def build_question_result(
         "mode": MODE_QWEN,
         "model": "qwen-plus",
         "pipeline_version": E007_PIPELINE_VERSION,
-        "experiment_id": "E007R1",
+        "experiment_id": "E008",
         "experiment_arm": arm,
         "prompt_profile": PROMPT_PROFILE,
         "question": question.get("question", ""),

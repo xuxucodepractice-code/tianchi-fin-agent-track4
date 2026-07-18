@@ -1,4 +1,4 @@
-"""Run one governed fresh E007R1 development arm without retries."""
+"""Run one governed fresh E008 development arm without retries."""
 
 from __future__ import annotations
 
@@ -50,18 +50,18 @@ from agent.trace_gate import (
 )
 
 ARMS = {"control", "treatment"}
-PAIR_ID = "e007r1-development-pair-01"
+PAIR_ID = "e008-development-pair-01"
 EXPERIMENT_DIR = (
     REPO_ROOT
     / "workspace"
     / "03_baseline_improvement"
     / "experiments"
-    / "E007R1_multi_evidence_reference_integrity"
+    / "E008_multi_trace_bound_provenance"
 )
 SELECTION_PATH = EXPERIMENT_DIR / "development_selection.json"
 RUN_FREEZE_PATH = EXPERIMENT_DIR / "development_run_freeze.json"
 OUTPUT_ROOT = (
-    REPO_ROOT / "outputs" / "experiments" / "E007R1_multi_evidence_reference_integrity"
+    REPO_ROOT / "outputs" / "experiments" / "E008_multi_trace_bound_provenance"
 )
 EXPECTED_OUTPUT_DIRS = {
     "control": OUTPUT_ROOT / "development_control_01",
@@ -97,7 +97,7 @@ FROZEN_INPUT_SHA256 = {
     "questions": "c33dde8ac97d8a00ef3796f4312274cea74fce699f52b15c006c45fab80c0676",
     "chunks": "02aa2f9b33f304a4d9a74789acc5aa47ec9efff42d7a68bdd2390e7cea30a878",
     "doc_meta": "df9af050cce73707536d2798f62b1e4640747d4cfe595b2e12cddd22d6d472d7",
-    "selection": "702a88a95aee2a51f8acf8e30b7c2dbdbb9ff7d85456f15e7d96a8bd3225dfea",
+    "selection": "851c594198ff7a006a83261ce39b9ac3ece8737d061b9db04b026db18d378795",
     "tls_ca_bundle": TLS_CA_BUNDLE_SHA256,
     "e006_control_reference": "db90509ba127f662b333e07664e79ff7ce0264db9f1b3cbb34cca177d10d4572",
     "e006_offline_gate": "6c7ec2a4ff7b9efefe8923bb8c5a8d18e0e7f8f69e63b1b8eba2c8cb50a9b7b0",
@@ -121,18 +121,18 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 def _load_selection(path: Path) -> dict[str, Any]:
     if path.resolve() != SELECTION_PATH.resolve():
-        raise ValueError("E007R1 development must use the registered selection path")
+        raise ValueError("E008 development must use the registered selection path")
     if sha256_file(path) != FROZEN_INPUT_SHA256["selection"]:
-        raise ValueError("E007R1 development selection SHA256 mismatch")
+        raise ValueError("E008 development selection SHA256 mismatch")
     payload = _load_json(path)
     if (
-        payload.get("schema_version") != "e007r1-development-selection/v1"
-        or payload.get("experiment_id") != "E007R1"
+        payload.get("schema_version") != "e008-development-selection/v1"
+        or payload.get("experiment_id") != "E008"
         or payload.get("role") != "retrospective_development_only"
         or payload.get("labels_known_before_code_freeze") is not True
         or tuple(map(str, payload.get("qids") or [])) != DEVELOPMENT_QIDS
     ):
-        raise ValueError("E007R1 development selection semantics mismatch")
+        raise ValueError("E008 development selection semantics mismatch")
     return payload
 
 
@@ -153,7 +153,7 @@ def _verify_frozen_inputs(selection_path: Path) -> dict[str, dict[str, Any]]:
         if item.get("sha256") != FROZEN_INPUT_SHA256[name]
     }
     if mismatch:
-        raise ValueError(f"E007R1 frozen input SHA256 mismatch: {mismatch}")
+        raise ValueError(f"E008 frozen input SHA256 mismatch: {mismatch}")
     offline = _load_json(E006_OFFLINE_GATE_PATH)
     if offline.get("status") != "PASS" or offline.get("lost_required_chunks") != []:
         raise ValueError("E006 treatment retrieval gate is not frozen PASS")
@@ -172,10 +172,10 @@ def validate_run_freeze_payload(
             "sha256": sha256_file(EVALUATOR_PATH),
         },
     }
-    if payload.get("schema_version") != "e007r1-development-run-freeze/v1":
+    if payload.get("schema_version") != "e008-development-run-freeze/v1":
         errors.append("run-freeze schema mismatch")
     if (
-        payload.get("experiment_id") != "E007R1"
+        payload.get("experiment_id") != "E008"
         or payload.get("pair_id") != PAIR_ID
         or payload.get("phase") != "development"
         or payload.get("status") != "AUTHORIZED_TO_RUN_DEVELOPMENT_PAIR"
@@ -265,7 +265,7 @@ def _load_run_freeze() -> tuple[dict[str, Any], dict[str, Any]]:
     payload = _load_json(RUN_FREEZE_PATH)
     errors = validate_run_freeze_payload(payload, current_code_snapshot=code_snapshot())
     if errors:
-        raise ValueError(f"E007R1 development run-freeze invalid: {errors}")
+        raise ValueError(f"E008 development run-freeze invalid: {errors}")
     return payload, input_artifact_snapshot(RUN_FREEZE_PATH)
 
 
@@ -279,7 +279,7 @@ def _validate_questions(qids: list[str], questions: dict[str, dict[str, Any]]) -
         or not questions[qid].get("doc_ids")
     ]
     if invalid:
-        raise ValueError(f"E007R1 requires governed A/B/C/D Multi questions: {invalid}")
+        raise ValueError(f"E008 requires governed A/B/C/D Multi questions: {invalid}")
 
 
 def _compact_retrieval(retrieval: dict[str, Any]) -> dict[str, Any]:
@@ -295,7 +295,7 @@ def _control_anchor() -> dict[str, str]:
     receipt_path = control_dir / "run_receipt.json"
     for path in (observations_path, receipt_path, TREATMENT_AUTHORIZATION_PATH):
         if not path.is_file():
-            raise ValueError(f"E007R1 treatment requires completed control artifact: {path}")
+            raise ValueError(f"E008 treatment requires completed control artifact: {path}")
     observations = _load_json(observations_path)
     receipt = _load_json(receipt_path)
     trace_dir = resolve_recorded_path(
@@ -305,7 +305,7 @@ def _control_anchor() -> dict[str, str]:
         trace_dir, require_candidate_eligible=False, require_current_code_match=True
     )
     if not report.get("ok") or receipt.get("status") != "PASS":
-        raise ValueError("E007R1 registered control no longer passes Trace/receipt validation")
+        raise ValueError("E008 registered control no longer passes Trace/receipt validation")
     anchor = {
         "pair_id": PAIR_ID,
         "control_trace_run_id": str(
@@ -317,18 +317,18 @@ def _control_anchor() -> dict[str, str]:
     }
     authorization = _load_json(TREATMENT_AUTHORIZATION_PATH)
     if (
-        authorization.get("schema_version") != "e007r1-treatment-authorization/v1"
+        authorization.get("schema_version") != "e008-treatment-authorization/v1"
         or authorization.get("status") != "AUTHORIZED_FOR_ONE_TREATMENT_ATTEMPT"
         or authorization.get("control_anchor") != anchor
     ):
-        raise ValueError("E007R1 treatment authorization does not bind current control")
+        raise ValueError("E008 treatment authorization does not bind current control")
     return anchor
 
 
 def _claim_treatment(control_anchor: dict[str, str]) -> str:
     claim = {
-        "schema_version": "e007r1-treatment-claim/v1",
-        "experiment_id": "E007R1",
+        "schema_version": "e008-treatment-claim/v1",
+        "experiment_id": "E008",
         "pair_id": PAIR_ID,
         "status": "TREATMENT_ATTEMPT_CLAIMED",
         "control_anchor": control_anchor,
@@ -343,8 +343,8 @@ def _claim_treatment(control_anchor: dict[str, str]) -> str:
 
 def _write_treatment_authorization(anchor: dict[str, str]) -> None:
     payload = {
-        "schema_version": "e007r1-treatment-authorization/v1",
-        "experiment_id": "E007R1",
+        "schema_version": "e008-treatment-authorization/v1",
+        "experiment_id": "E008",
         "pair_id": PAIR_ID,
         "status": "AUTHORIZED_FOR_ONE_TREATMENT_ATTEMPT",
         "control_anchor": anchor,
@@ -371,14 +371,14 @@ def _trace_contract_errors(
         if line.strip()
     ]
     if completed and (len(calls) != 52 or len(derivations) != 13):
-        errors.append("completed E007R1 arm must have 52 calls and 13 derivations")
+        errors.append("completed E008 arm must have 52 calls and 13 derivations")
     for call in calls:
         context = call.get("context") or {}
         qid = str(context.get("qid") or "")
         option = str(context.get("option_key") or "")
         if qid not in DEVELOPMENT_QIDS or option not in "ABCD":
             errors.append("call has unknown qid/option")
-        if context.get("stage") != f"e007r1_{arm}_option_judgment":
+        if context.get("stage") != f"e008_{arm}_option_judgment":
             errors.append(f"{qid}:{option}: stage mismatch")
         if context.get("prompt_profile") != PROMPT_PROFILE:
             errors.append(f"{qid}:{option}: prompt profile mismatch")
@@ -405,7 +405,7 @@ def main() -> int:
     if args.output_dir.exists():
         raise ValueError(f"output directory must be absent: {args.output_dir}")
     if args.output_dir.resolve() != EXPECTED_OUTPUT_DIRS[args.arm].resolve():
-        raise ValueError(f"E007R1 arm must use registered output slot: {EXPECTED_OUTPUT_DIRS[args.arm]}")
+        raise ValueError(f"E008 arm must use registered output slot: {EXPECTED_OUTPUT_DIRS[args.arm]}")
     selection = _load_selection(args.selection)
     frozen_inputs = _verify_frozen_inputs(args.selection)
     run_freeze, run_freeze_snapshot = _load_run_freeze()
@@ -416,11 +416,11 @@ def main() -> int:
     chunks = load_chunks()
     doc_meta = load_doc_meta()
     if not doc_meta:
-        raise ValueError("E007R1 freezes E006 treatment and requires doc_meta")
+        raise ValueError("E008 freezes E006 treatment and requires doc_meta")
     if os.environ.get("SSL_CERT_FILE") != str(TLS_CA_BUNDLE_PATH):
-        raise ValueError("E007R1 requires SSL_CERT_FILE=/etc/ssl/cert.pem")
+        raise ValueError("E008 requires SSL_CERT_FILE=/etc/ssl/cert.pem")
     if sha256_file(TLS_CA_BUNDLE_PATH) != TLS_CA_BUNDLE_SHA256:
-        raise ValueError("E007R1 TLS CA bundle SHA256 mismatch")
+        raise ValueError("E008 TLS CA bundle SHA256 mismatch")
     try:
         client = QwenClient(
             model=REQUESTED_MODEL,
@@ -431,16 +431,16 @@ def main() -> int:
         print(f"[error] {exc}")
         return 1
     if client.model != REQUESTED_MODEL or client.max_retries != 0:
-        raise ValueError("E007R1 model/retry configuration drift")
+        raise ValueError("E008 model/retry configuration drift")
     if client.base_url.rstrip("/") != OFFICIAL_DASHSCOPE_BASE_URL:
-        raise ValueError("E007R1 requires the official DashScope endpoint")
+        raise ValueError("E008 requires the official DashScope endpoint")
 
     treatment_claim_sha256 = (
         _claim_treatment(control_anchor) if args.arm == "treatment" else None
     )
     args.output_dir.mkdir(parents=True, exist_ok=False)
     observations_path = args.output_dir / "observations.json"
-    trace_dir = args.output_dir / "agent_traces" / f"e007r1-{args.arm}-{uuid.uuid4()}"
+    trace_dir = args.output_dir / "agent_traces" / f"e008-{args.arm}-{uuid.uuid4()}"
     allowed_read_roots = (
         (REPO_ROOT / "agent").resolve(),
         (REPO_ROOT / "public_dataset_upload/questions/group_a").resolve(),
@@ -467,12 +467,12 @@ def main() -> int:
         ):
             recorder = AgentTraceRecorder(
                 trace_dir,
-                purpose=f"e007r1_development_{args.arm}",
+                purpose=f"e008_development_{args.arm}",
                 model=client.model,
                 base_url=client.base_url,
                 config={
                     "runner": "agent.run_e007_development_arm",
-                    "experiment_id": "E007R1",
+                    "experiment_id": "E008",
                     "pair_id": PAIR_ID,
                     "phase": "development",
                     "arm": args.arm,
@@ -482,7 +482,9 @@ def main() -> int:
                     "retrieval_parent": "E006-treatment",
                     "enable_option_document_route": True,
                     "reference_profile": (
-                        "numeric_evidence_refs" if args.arm == "control" else "opaque_ev_refs"
+                        "numeric_evidence_refs"
+                        if args.arm == "control"
+                        else "trace_bound_full_evidence_pack"
                     ),
                     "qids": qids,
                     "top_k": V0_TOP_K,
@@ -546,8 +548,8 @@ def main() -> int:
                 recorder.record_derivation(result)
 
             payload = {
-                "schema_version": "e007r1-development-observations/v1",
-                "experiment_id": "E007R1",
+                "schema_version": "e008-development-observations/v1",
+                "experiment_id": "E008",
                 "pair_id": PAIR_ID,
                 "phase": "development",
                 "arm": args.arm,
@@ -556,7 +558,9 @@ def main() -> int:
                 "pipeline_version": E007_PIPELINE_VERSION,
                 "retrieval_parent": "E006-treatment",
                 "reference_profile": (
-                    "numeric_evidence_refs" if args.arm == "control" else "opaque_ev_refs"
+                    "numeric_evidence_refs"
+                    if args.arm == "control"
+                    else "trace_bound_full_evidence_pack"
                 ),
                 "selection_file": display_path(args.selection),
                 "selection_sha256": sha256_file(args.selection),
@@ -621,8 +625,8 @@ def main() -> int:
         {str(call.get("response_model") or "") for call in calls if call.get("response_model")}
     )
     receipt = {
-        "schema_version": "e007r1-development-run-receipt/v1",
-        "experiment_id": "E007R1",
+        "schema_version": "e008-development-run-receipt/v1",
+        "experiment_id": "E008",
         "pair_id": PAIR_ID,
         "phase": "development",
         "arm": args.arm,
@@ -653,7 +657,7 @@ def main() -> int:
     receipt_path.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if receipt["status"] != "PASS":
         for error in receipt["errors"]:
-            print(f"[e007r1-error] {error}")
+            print(f"[e008-error] {error}")
         return 1
     if args.arm == "control":
         anchor = {
@@ -665,7 +669,7 @@ def main() -> int:
         }
         _write_treatment_authorization(anchor)
     print(
-        f"E007R1 development/{args.arm}=PASS questions=13 calls=52 "
+        f"E008 development/{args.arm}=PASS questions=13 calls=52 "
         f"physical=52 tokens={receipt['total_tokens']} served={served_models}"
     )
     return 0
