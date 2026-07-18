@@ -12,6 +12,7 @@ E001_tf_direct_judgment/
 E002_mcq_global_comparison/
 E003_mcq_calculation_check/
 E004_multi_atomic_support/
+E006_multi_retrieval_coverage/
 ```
 
 ## 每个实验目录

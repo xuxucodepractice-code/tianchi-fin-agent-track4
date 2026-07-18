@@ -1,0 +1,93 @@
+{
+  "schema_version": "e006-gold-retrieval-cases/v1",
+  "experiment_id": "E006",
+  "metric": "Per-option canonical chunk recall before rendering; v0 evidence has no merged chunks.",
+  "denominator_chunk_count": 41,
+  "denominator_option_count": 31,
+  "cases": [
+    {
+      "qid": "fc_a_016",
+      "options": {
+        "A": ["financial_contracts:text09:31:0"],
+        "B": ["financial_contracts:text04:30:0", "financial_contracts:text09:33:0"],
+        "C": ["financial_contracts:text09:191:0"],
+        "D": ["financial_contracts:text04:1:0", "financial_contracts:text09:37:0"]
+      }
+    },
+    {
+      "qid": "fin_a_005",
+      "options": {
+        "A": ["financial_reports:annual_byd_2024_report:10:0", "financial_reports:annual_midea_2024_report:9:0"],
+        "B": ["financial_reports:annual_byd_2024_report:34:0", "financial_reports:annual_midea_2024_report:53:0"],
+        "C": ["financial_reports:annual_byd_2024_report:11:0", "financial_reports:annual_midea_2024_report:9:0"],
+        "D": ["financial_reports:annual_byd_2024_report:11:0", "financial_reports:annual_midea_2024_report:9:0"]
+      },
+      "semantic_equivalence_note": "A/C have equivalent pages in the control; canonical misses alone must not be treated as proof of a retrieval defect."
+    },
+    {
+      "qid": "ins_a_005",
+      "options": {
+        "A": ["insurance:1:6:0"],
+        "B": ["insurance:4:5:0"],
+        "C": ["insurance:7:3:0"],
+        "D": ["insurance:13:2:0"]
+      }
+    },
+    {
+      "qid": "ins_a_007",
+      "excluded_options": {
+        "A": "Full-document absence check; no positive required chunk."
+      },
+      "options": {
+        "B": ["insurance:2:7:0"],
+        "C": ["insurance:16:9:0"],
+        "D": ["insurance:16:9:0"]
+      }
+    },
+    {
+      "qid": "ins_a_009",
+      "options": {
+        "A": ["insurance:7:2:0"],
+        "B": ["insurance:8:2:0", "insurance:8:7:0"],
+        "C": ["insurance:9:1:0", "insurance:9:5:0", "insurance:9:6:0", "insurance:9:7:0"],
+        "D": ["insurance:9:1:0"]
+      },
+      "option_d_note": "Also depends on the question-stated insured-product fact, which is not a chunk-recall denominator item."
+    },
+    {
+      "qid": "ins_a_010",
+      "options": {
+        "A": ["insurance:1:13:0"],
+        "B": ["insurance:2:9:0"],
+        "C": ["insurance:4:9:0"],
+        "D": ["insurance:16:9:0"]
+      }
+    },
+    {
+      "qid": "ins_a_019",
+      "options": {
+        "A": ["insurance:1:11:0"],
+        "B": ["insurance:2:9:0"],
+        "C": ["insurance:4:9:0"],
+        "D": ["insurance:16:4:0"]
+      }
+    },
+    {
+      "qid": "res_a_014",
+      "options": {
+        "A": ["research:pack2_text03:7:0"],
+        "B": ["research:pack2_text09:26:0"],
+        "C": ["research:pack2_text03:12:0"],
+        "D": ["research:pack2_text09:25:0"]
+      }
+    }
+  ],
+  "actionable_control_gaps": [
+    "fc_a_016:D -> financial_contracts:text09:37:0",
+    "fin_a_005:B -> financial_reports:annual_midea_2024_report:53:0",
+    "ins_a_010:C -> insurance:4:9:0",
+    "ins_a_019:A -> insurance:1:11:0",
+    "ins_a_019:C -> insurance:4:9:0",
+    "ins_a_019:D -> insurance:16:4:0"
+  ]
+}

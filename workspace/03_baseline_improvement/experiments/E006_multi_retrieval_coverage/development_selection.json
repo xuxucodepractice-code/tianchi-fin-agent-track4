@@ -1,0 +1,23 @@
+{
+  "schema_version": "e006-development-selection/v1",
+  "experiment_id": "E006",
+  "role": "retrospective_development_only",
+  "labels_known_before_code_freeze": true,
+  "qids": [
+    "fc_a_016",
+    "fin_a_005",
+    "ins_a_005",
+    "ins_a_007",
+    "ins_a_009",
+    "ins_a_010",
+    "ins_a_015",
+    "ins_a_016",
+    "ins_a_017",
+    "ins_a_019",
+    "res_a_014",
+    "fc_a_001",
+    "reg_a_002"
+  ],
+  "selection_source": "E004 retrospective development set",
+  "evaluation_limit": "May tune and diagnose E006, but cannot estimate prospective N/M or authorize a submission."
+}

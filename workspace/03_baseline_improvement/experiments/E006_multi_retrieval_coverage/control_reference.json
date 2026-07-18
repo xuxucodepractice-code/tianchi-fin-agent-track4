@@ -1,0 +1,26 @@
+{
+  "schema_version": "e006-v2s1-multi-control-reference/v1",
+  "online_submission": "v2s1",
+  "online_score": 65.0912,
+  "multi_question_count": 65,
+  "option_pack_count": 260,
+  "frozen_v2s1_evidence_sha256": "f19091ec079a9162d2d174f00427c4969b5396826c47678b0804606f075f5614",
+  "canonical_multi_retrieval_sha256": "274652fc800589a61eb964717f75ec5e16cd8f248f8382f0dea08ba4abff1740",
+  "canonicalization": "JSON list in frozen question order; each item is {qid,retrieval}; ensure_ascii=false, sort_keys=true, separators=(',',':').",
+  "source_commit": "82041d0e0666b449f715bf69a9b63ed971d974f7",
+  "source_hashes": {
+    "agent/retrieve.py": "1e55d7f8c725805fd4b752c2bab929119cb39ee3409275b45b1cdd782484dc3c",
+    "agent/query_terms.py": "5db02bf30c393dc52adb250d52525a0bbb9dd7f5694bc3312a145eee25df5102",
+    "processed_data/chunks.jsonl": "02aa2f9b33f304a4d9a74789acc5aa47ec9efff42d7a68bdd2390e7cea30a878",
+    "agent/prompts.py": "161392afcd1528f7bb2b0c8b04df08614aded2d8d6898bd0deae9f0cda35738d"
+  },
+  "control_contract": {
+    "top_k": 5,
+    "single_chunk": true,
+    "document_quota": false,
+    "neighbor_merge": false,
+    "source_header": false,
+    "max_evidence_chars": 1200
+  },
+  "historical_limit": "51/65 frozen Multi answers came from pre-Trace reasoning cache. Retrieval is exactly reproducible, but original model-visible evidence for those cached answers is not independently proven; API causality therefore requires fresh paired control/treatment."
+}

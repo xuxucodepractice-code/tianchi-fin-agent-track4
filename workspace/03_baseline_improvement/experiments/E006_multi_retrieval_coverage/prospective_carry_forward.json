@@ -1,0 +1,15 @@
+{
+  "schema_version": "e006-prospective-carry-forward/v1",
+  "experiment_id": "E006",
+  "status": "SEALED_NOT_AUTHORIZED_TO_RUN",
+  "source_experiment": "E004",
+  "question_count": 15,
+  "source_selection_sha256": "bc0cecefb1298f193da33efc293e96d2340aa223cd1a97599ba3305d39e5e5df",
+  "e004_primary_api_calls": 0,
+  "e004_repeat_api_calls": 0,
+  "labels_created": false,
+  "labels_revealed": false,
+  "candidate_created": false,
+  "submission_created": false,
+  "constraint": "Do not inspect or tune against holdout question content before the E006 development gate passes. A new wrapper and fresh-directory receipt are required before any prospective run."
+}
