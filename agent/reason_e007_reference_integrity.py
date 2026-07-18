@@ -1,4 +1,4 @@
-"""E007 Multi option judgments with control numeric refs or opaque EV refs."""
+"""E007R1 Multi option judgments with control numeric refs or opaque EV refs."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from agent.qwen_client import QwenClient
 from agent.reason_qwen import MODE_QWEN, VALID_JUDGMENTS, _parse_judgment
 from agent.reason_multi_v0_compat import V0_SYSTEM_PROMPT
 
-E007_PIPELINE_VERSION = "v2s1-e006-route-e007-reference-integrity"
-PROMPT_PROFILE = "e007-v0-judgment-reference-ablation"
+E007_PIPELINE_VERSION = "v2s1-e006-route-e007r1-reference-integrity"
+PROMPT_PROFILE = "e007r1-v0-judgment-reference-ablation"
 
 CONTROL_INSTRUCTION = """请判断下面这个选项的陈述是否被证据支持。
 
@@ -40,7 +40,7 @@ def format_evidence_block(
     evidence: list[dict[str, Any]], *, arm: str
 ) -> str:
     if arm not in {"control", "treatment"}:
-        raise ValueError(f"unknown E007 arm: {arm!r}")
+        raise ValueError(f"unknown E007R1 arm: {arm!r}")
     if not evidence:
         return "（无证据）"
     lines: list[str] = []
@@ -160,7 +160,7 @@ def judge_option(
             trace_context={
                 "qid": question.get("qid", ""),
                 "answer_format": question.get("answer_format", ""),
-                "stage": f"e007_{arm}_option_judgment",
+                "stage": f"e007r1_{arm}_option_judgment",
                 "option_key": option_key,
                 "option_text": option_text,
                 "evidence": evidence,
@@ -187,7 +187,7 @@ def judge_option(
             response["content"], option_key, evidence_count=len(evidence)
         )
     else:
-        raise ValueError(f"unknown E007 arm: {arm!r}")
+        raise ValueError(f"unknown E007R1 arm: {arm!r}")
     return {
         **parsed,
         "prompt_tokens": response["prompt_tokens"],
@@ -227,7 +227,7 @@ def build_question_result(
         "mode": MODE_QWEN,
         "model": "qwen-plus",
         "pipeline_version": E007_PIPELINE_VERSION,
-        "experiment_id": "E007",
+        "experiment_id": "E007R1",
         "experiment_arm": arm,
         "prompt_profile": PROMPT_PROFILE,
         "question": question.get("question", ""),

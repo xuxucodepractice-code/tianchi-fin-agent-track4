@@ -1,4 +1,4 @@
-"""Evaluate the frozen E007 development pair and enforce its hard gates."""
+"""Evaluate the frozen E007R1 development pair and enforce its hard gates."""
 
 from __future__ import annotations
 
@@ -28,12 +28,12 @@ from agent.trace_gate import resolve_recorded_path, sha256_file, validate_trace_
 
 EXPERIMENT_DIR = (
     REPO_ROOT
-    / "workspace/03_baseline_improvement/experiments/E007_multi_evidence_reference_integrity"
+    / "workspace/03_baseline_improvement/experiments/E007R1_multi_evidence_reference_integrity"
 )
 LABELS_PATH = EXPERIMENT_DIR / "development_labels.json"
 RESULT_PATH = (
     REPO_ROOT
-    / "outputs/experiments/E007_multi_evidence_reference_integrity/development_evaluation.json"
+    / "outputs/experiments/E007R1_multi_evidence_reference_integrity/development_evaluation.json"
 )
 
 
@@ -68,6 +68,8 @@ def _load_bundle(arm: str, output_dir: Path) -> dict[str, Any]:
         if line.strip()
     ]
     errors: list[str] = []
+    if observations.get("experiment_id") != "E007R1" or receipt.get("experiment_id") != "E007R1":
+        errors.append(f"{arm}: experiment identity mismatch")
     if observations.get("arm") != arm or receipt.get("arm") != arm:
         errors.append(f"{arm}: arm identity mismatch")
     if observations.get("pair_id") != PAIR_ID or receipt.get("pair_id") != PAIR_ID:
@@ -160,6 +162,8 @@ def _raw_binding_audit(
                         unknown_refs.append(identity)
                     if "duplicate" in parse_error:
                         duplicate_refs.append(identity)
+                    if "option identity mismatch" in parse_error:
+                        option_mismatches.append(identity)
                 else:
                     expected_judgment = {
                         "judgment": judgment.get("judgment"),
@@ -177,11 +181,11 @@ def _raw_binding_audit(
                     option_mismatches.append(identity)
                 refs = obj.get("evidence_refs")
                 if isinstance(refs, list):
-                    seen: set[Any] = set()
+                    seen: list[Any] = []
                     for ref in refs:
-                        if ref in seen:
+                        if any(ref == previous for previous in seen):
                             duplicate_refs.append(identity)
-                        seen.add(ref)
+                        seen.append(ref)
                         if not isinstance(ref, int) or isinstance(ref, bool) or not 1 <= ref <= len(evidence):
                             unknown_refs.append(identity)
     return {
@@ -199,11 +203,25 @@ def evaluate_pair(
     questions: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     labels = {str(k): str(v) for k, v in (labels_payload.get("labels") or {}).items()}
+    frozen_parent = {
+        str(k): str(v)
+        for k, v in (labels_payload.get("frozen_online_v2s1_answers") or {}).items()
+    }
     parent_correct_qids = tuple(
         map(str, labels_payload.get("frozen_parent_correct_qids") or [])
     )
-    if set(labels) != set(DEVELOPMENT_QIDS) or len(parent_correct_qids) != 6:
-        raise ValueError("E007 development labels/parent-correct set mismatch")
+    truth_derived_parent_correct = tuple(
+        qid for qid in DEVELOPMENT_QIDS if labels.get(qid) == frozen_parent.get(qid)
+    )
+    if (
+        labels_payload.get("schema_version") != "e007r1-development-labels/v1"
+        or labels_payload.get("experiment_id") != "E007R1"
+        or set(labels) != set(DEVELOPMENT_QIDS)
+        or set(frozen_parent) != set(DEVELOPMENT_QIDS)
+        or parent_correct_qids != truth_derived_parent_correct
+        or len(parent_correct_qids) != 6
+    ):
+        raise ValueError("E007R1 development labels/parent-correct set mismatch")
     control_audit = _raw_binding_audit(control, questions, arm="control")
     treatment_audit = _raw_binding_audit(treatment, questions, arm="treatment")
     rows: list[dict[str, Any]] = []
@@ -289,8 +307,8 @@ def evaluate_pair(
         ),
     }
     return {
-        "schema_version": "e007-development-evaluation/v1",
-        "experiment_id": "E007",
+        "schema_version": "e007r1-development-evaluation/v1",
+        "experiment_id": "E007R1",
         "pair_id": PAIR_ID,
         "status": "PASS" if all(checks.values()) and not bundle_errors else "FAIL",
         "decision": (
@@ -360,7 +378,7 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=RESULT_PATH)
     args = parser.parse_args()
     if args.output.exists():
-        raise ValueError(f"E007 evaluation output must be absent: {args.output}")
+        raise ValueError(f"E007R1 evaluation output must be absent: {args.output}")
     labels = _load_json(LABELS_PATH)
     questions = {str(item["qid"]): item for item in load_all_questions()}
     report = evaluate_pair(
@@ -372,7 +390,7 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(
-        f"E007 development evaluation={report['status']} "
+        f"E007R1 development evaluation={report['status']} "
         f"control={report['accuracy']['control_correct']}/13 "
         f"treatment={report['accuracy']['treatment_correct']}/13"
     )

@@ -20,6 +20,9 @@ from agent.run_e007_development_arm import (
     PAIR_ID,
     REASON_PATH,
     RUNNER_PATH,
+    SELECTION_PATH,
+    TLS_CA_BUNDLE_PATH,
+    TLS_CA_BUNDLE_SHA256,
     _load_selection,
     _verify_frozen_inputs,
     validate_run_freeze_payload,
@@ -115,8 +118,8 @@ def test_strict_treatment_parser_rejects_non_standalone_or_repaired_refs():
 
 def _valid_freeze():
     return {
-        "schema_version": "e007-development-run-freeze/v1",
-        "experiment_id": "E007",
+        "schema_version": "e007r1-development-run-freeze/v1",
+        "experiment_id": "E007R1",
         "pair_id": PAIR_ID,
         "phase": "development",
         "status": "AUTHORIZED_TO_RUN_DEVELOPMENT_PAIR",
@@ -135,8 +138,8 @@ def _valid_freeze():
         "registered_outputs": {
             "control": display_path(EXPECTED_OUTPUT_DIRS["control"]),
             "treatment": display_path(EXPECTED_OUTPUT_DIRS["treatment"]),
-            "treatment_authorization": "outputs/experiments/E007_multi_evidence_reference_integrity/development_treatment_authorization.json",
-            "treatment_claim": "outputs/experiments/E007_multi_evidence_reference_integrity/development_treatment_claim.json",
+            "treatment_authorization": "outputs/experiments/E007R1_multi_evidence_reference_integrity/development_treatment_authorization.json",
+            "treatment_claim": "outputs/experiments/E007R1_multi_evidence_reference_integrity/development_treatment_claim.json",
         },
         "prompt_bundle_sha256": sha256_json(
             {
@@ -169,6 +172,16 @@ def _valid_freeze():
             "timeout_seconds": 90.0,
             "max_retries": 0,
         },
+        "transport": {
+            "ssl_cert_file": str(TLS_CA_BUNDLE_PATH),
+            "ssl_cert_file_sha256": TLS_CA_BUNDLE_SHA256,
+            "pre_freeze_probe": {
+                "api_key_used": False,
+                "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+                "expected_http_status": 400,
+                "observed_http_status": 400,
+            },
+        },
         "call_topology": {
             "question_count_per_arm": 13,
             "logical_calls_per_arm": 52,
@@ -185,15 +198,9 @@ def _valid_freeze():
 
 
 def test_governed_selection_inputs_and_freeze_contract():
-    selection = _load_selection(
-        RUNNER_PATH.parent.parent
-        / "workspace/03_baseline_improvement/experiments/E007_multi_evidence_reference_integrity/development_selection.json"
-    )
+    selection = _load_selection(SELECTION_PATH)
     assert tuple(selection["qids"]) == DEVELOPMENT_QIDS
-    snapshots = _verify_frozen_inputs(
-        RUNNER_PATH.parent.parent
-        / "workspace/03_baseline_improvement/experiments/E007_multi_evidence_reference_integrity/development_selection.json"
-    )
+    snapshots = _verify_frozen_inputs(SELECTION_PATH)
     assert {name: item["sha256"] for name, item in snapshots.items()} == FROZEN_INPUT_SHA256
     assert validate_run_freeze_payload(
         _valid_freeze(), current_code_snapshot=code_snapshot()
