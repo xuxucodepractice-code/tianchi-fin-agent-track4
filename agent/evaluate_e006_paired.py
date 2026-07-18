@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from agent.doc_meta import load_doc_meta
 from agent.load_questions import load_all_questions
+from agent.normalize_answer import normalize_answer
 from agent.paths import REPO_ROOT
 from agent.reason_multi_v0_compat import E006_PIPELINE_VERSION
 from agent.reason_multi_v0_compat import build_option_judgment_messages_v0
@@ -17,8 +19,11 @@ from agent.retrieve_v0_compat import V0_TOP_K, retrieve_multi_v0_compatible
 from agent.run_e006_paired_arm import (
     DEVELOPMENT_QIDS,
     DEVELOPMENT_SELECTION_PATH,
+    EXPECTED_OUTPUT_DIRS,
     FROZEN_INPUT_SHA256,
     OFFLINE_GATE_PATH,
+    PAIR_ID,
+    TREATMENT_CLAIM_PATH,
     _compact_retrieval,
     _validate_result,
     validate_e006_trace_contract,
@@ -56,6 +61,8 @@ def _observation_rows(payload: dict[str, Any], *, arm: str) -> list[dict[str, An
         raise ValueError(f"{arm}: observations schema mismatch")
     if payload.get("experiment_id") != "E006" or payload.get("phase") != "development":
         raise ValueError(f"{arm}: experiment/phase mismatch")
+    if payload.get("pair_id") != PAIR_ID:
+        raise ValueError(f"{arm}: pair identity mismatch")
     if payload.get("arm") != arm:
         raise ValueError(f"{arm}: arm identity mismatch")
     if payload.get("pipeline_version") != E006_PIPELINE_VERSION:
@@ -83,6 +90,31 @@ def _observation_rows(payload: dict[str, Any], *, arm: str) -> list[dict[str, An
         errors = _validate_result(row, arm=arm)
         if errors:
             raise ValueError(f"{arm}: invalid result: {errors}")
+        judgments = row.get("option_judgments") or {}
+        if sorted(judgments) != list("ABCD"):
+            raise ValueError(f"{arm}:{row.get('qid')}: judgments must be A/B/C/D")
+        expected_inputs = {
+            option: {
+                "judgment": judgment.get("judgment"),
+                "evidence_refs": judgment.get("evidence_refs", []),
+                "error": judgment.get("error"),
+            }
+            for option, judgment in sorted(judgments.items())
+        }
+        derivation = row.get("answer_derivation") or {}
+        if derivation.get("method") != "agent.normalize_answer.normalize_answer":
+            raise ValueError(f"{arm}:{row.get('qid')}: normalizer identity mismatch")
+        if derivation.get("answer_format") != "multi":
+            raise ValueError(f"{arm}:{row.get('qid')}: derivation format mismatch")
+        if derivation.get("input_judgments") != expected_inputs:
+            raise ValueError(
+                f"{arm}:{row.get('qid')}: derivation inputs differ from option judgments"
+            )
+        if str(derivation.get("output_answer") or "") != str(row.get("answer") or ""):
+            raise ValueError(f"{arm}:{row.get('qid')}: derivation output mismatch")
+        replay = normalize_answer("multi", judgments, row.get("options") or {})
+        if str(replay.get("answer") or "") != str(row.get("answer") or ""):
+            raise ValueError(f"{arm}:{row.get('qid')}: option judgments replay changed answer")
     return rows
 
 
@@ -91,7 +123,14 @@ def _semantic_config(config: dict[str, Any]) -> dict[str, Any]:
     return {
         key: value
         for key, value in config.items()
-        if key not in {"arm", "enable_option_document_route", "output_dir"}
+        if key
+        not in {
+            "arm",
+            "enable_option_document_route",
+            "output_dir",
+            "control_anchor",
+            "treatment_claim_sha256",
+        }
     }
 
 
@@ -104,6 +143,10 @@ def load_run_bundle(
     """Load and cryptographically bind observations, receipt, and strict Trace."""
     observations_path = observations_path.resolve()
     receipt_path = receipt_path.resolve()
+    if observations_path != (EXPECTED_OUTPUT_DIRS[expected_arm] / "observations.json").resolve():
+        raise ValueError(f"{expected_arm}: observations are outside the registered pair slot")
+    if receipt_path != (EXPECTED_OUTPUT_DIRS[expected_arm] / "run_receipt.json").resolve():
+        raise ValueError(f"{expected_arm}: receipt is outside the registered pair slot")
     observations = _load(observations_path)
     receipt = _load(receipt_path)
     errors: list[str] = []
@@ -134,6 +177,7 @@ def load_run_bundle(
     expected_receipt = {
         "schema_version": "e006-run-receipt/v1",
         "experiment_id": "E006",
+        "pair_id": PAIR_ID,
         "phase": "development",
         "arm": expected_arm,
         "status": "PASS",
@@ -273,6 +317,13 @@ def call_prompt_binding_errors(
                 errors.append(f"{option_id}: model evidence differs from retrieval")
             if call.get("messages") != expected_messages:
                 errors.append(f"{option_id}: exact messages differ from v0 prompt replay")
+            judgment = (row.get("option_judgments") or {}).get(option_key) or {}
+            if str(judgment.get("trace_call_id") or "") != str(call.get("call_id") or ""):
+                errors.append(f"{option_id}: judgment trace_call_id differs from raw call")
+            if str(judgment.get("trace_run_id") or "") != str(
+                call.get("trace_run_id") or ""
+            ):
+                errors.append(f"{option_id}: judgment trace_run_id differs from raw call")
     expected_pairs = {(qid, option) for qid in qids for option in "ABCD"}
     actual_pairs = {
         (
@@ -323,6 +374,91 @@ def replay_retrieval_errors(
                 arm=arm,
             )
         )
+    return errors
+
+
+def verify_pair_anchor_errors(
+    control_bundle: dict[str, Any],
+    treatment_bundle: dict[str, Any],
+    *,
+    output_dirs: dict[str, Path] | None = None,
+    claim_path: Path | None = None,
+) -> list[str]:
+    """Bind the only treatment attempt to the exact preceding control bundle."""
+    errors: list[str] = []
+    resolved_output_dirs = output_dirs or EXPECTED_OUTPUT_DIRS
+    resolved_claim_path = claim_path or TREATMENT_CLAIM_PATH
+    control_observations_path = resolved_output_dirs["control"] / "observations.json"
+    control_receipt_path = resolved_output_dirs["control"] / "run_receipt.json"
+    control_trace_dir = control_bundle["trace_dir"]
+    expected_anchor = {
+        "pair_id": PAIR_ID,
+        "control_trace_run_id": str(
+            (control_bundle["observations"].get("agent_trace") or {}).get(
+                "trace_run_id"
+            )
+            or ""
+        ),
+        "control_observations_sha256": sha256_file(control_observations_path),
+        "control_trace_manifest_sha256": sha256_file(
+            control_trace_dir / "trace_manifest.json"
+        ),
+        "control_receipt_sha256": sha256_file(control_receipt_path),
+    }
+    control_config = control_bundle["manifest"].get("config") or {}
+    treatment_config = treatment_bundle["manifest"].get("config") or {}
+    if control_config.get("control_anchor") is not None:
+        errors.append("control: control_anchor must be null")
+    if control_config.get("treatment_claim_sha256") is not None:
+        errors.append("control: treatment claim must be null")
+    if control_bundle["receipt"].get("control_anchor") is not None:
+        errors.append("control: receipt control_anchor must be null")
+    if control_bundle["receipt"].get("treatment_claim_sha256") is not None:
+        errors.append("control: receipt treatment claim must be null")
+    for label, value in (
+        ("treatment config", treatment_config.get("control_anchor")),
+        ("treatment observations", treatment_bundle["observations"].get("control_anchor")),
+        ("treatment receipt", treatment_bundle["receipt"].get("control_anchor")),
+    ):
+        if value != expected_anchor:
+            errors.append(f"{label}: control anchor mismatch")
+    if not resolved_claim_path.is_file():
+        return [*errors, "registered treatment claim is missing"]
+    claim = _load(resolved_claim_path)
+    claim_sha256 = sha256_file(resolved_claim_path)
+    if claim.get("schema_version") != "e006-treatment-claim/v1":
+        errors.append("treatment claim schema mismatch")
+    if claim.get("pair_id") != PAIR_ID or claim.get("experiment_id") != "E006":
+        errors.append("treatment claim identity mismatch")
+    if claim.get("status") != "TREATMENT_ATTEMPT_CLAIMED":
+        errors.append("treatment claim status mismatch")
+    if claim.get("control_anchor") != expected_anchor:
+        errors.append("treatment claim control anchor mismatch")
+    for label, value in (
+        ("treatment config", treatment_config.get("treatment_claim_sha256")),
+        (
+            "treatment observations",
+            treatment_bundle["observations"].get("treatment_claim_sha256"),
+        ),
+        (
+            "treatment receipt",
+            treatment_bundle["receipt"].get("treatment_claim_sha256"),
+        ),
+    ):
+        if value != claim_sha256:
+            errors.append(f"{label}: treatment claim hash mismatch")
+    try:
+        control_finished = datetime.fromisoformat(
+            str(control_bundle["manifest"]["finished_at"])
+        )
+        claimed_at = datetime.fromisoformat(str(claim["claimed_at"]))
+        treatment_started = datetime.fromisoformat(
+            str(treatment_bundle["manifest"]["started_at"])
+        )
+        if not control_finished <= claimed_at <= treatment_started:
+            errors.append("treatment claim time is outside control/treatment boundary")
+    except (KeyError, TypeError, ValueError):
+        errors.append("unable to validate treatment claim timestamps")
     return errors
 
 
@@ -475,6 +611,20 @@ def evaluate_paired(
 
     control_config = control_manifest.get("config") or {}
     treatment_config = treatment_manifest.get("config") or {}
+    try:
+        control_started = datetime.fromisoformat(str(control_manifest["started_at"]))
+        control_finished = datetime.fromisoformat(str(control_manifest["finished_at"]))
+        treatment_started = datetime.fromisoformat(str(treatment_manifest["started_at"]))
+        treatment_finished = datetime.fromisoformat(str(treatment_manifest["finished_at"]))
+        pair_time_order_valid = (
+            control_started <= control_finished <= treatment_started <= treatment_finished
+        )
+        pair_elapsed_seconds = (treatment_finished - control_started).total_seconds()
+        pair_within_two_hours = 0 <= pair_elapsed_seconds <= 7200
+    except (KeyError, TypeError, ValueError):
+        pair_time_order_valid = False
+        pair_elapsed_seconds = None
+        pair_within_two_hours = False
     receipt_checks = {
         "control_receipt_pass": control_receipt.get("status") == "PASS",
         "treatment_receipt_pass": treatment_receipt.get("status") == "PASS",
@@ -482,6 +632,14 @@ def evaluate_paired(
             control_receipt.get("selection_sha256")
             == treatment_receipt.get("selection_sha256")
             == FROZEN_INPUT_SHA256["selection"]
+        ),
+        "receipts_bind_registered_pair": (
+            control_receipt.get("pair_id")
+            == treatment_receipt.get("pair_id")
+            == PAIR_ID
+            and control_config.get("pair_id")
+            == treatment_config.get("pair_id")
+            == PAIR_ID
         ),
         "receipts_bind_exact_topology": (
             control_receipt.get("call_count")
@@ -509,6 +667,8 @@ def evaluate_paired(
         "same_semantic_config_except_arm_route_output": (
             _semantic_config(control_config) == _semantic_config(treatment_config)
         ),
+        "pair_time_order_control_then_treatment": pair_time_order_valid,
+        "pair_completed_within_two_hours": pair_within_two_hours,
     }
     checks = {
         "bundle_integrity": not bundle_errors,
@@ -565,6 +725,14 @@ def evaluate_paired(
             "treatment": treatment_tokens,
             "delta": treatment_tokens - control_tokens,
         },
+        "pair": {
+            "pair_id": PAIR_ID,
+            "control_started_at": control_manifest.get("started_at"),
+            "control_finished_at": control_manifest.get("finished_at"),
+            "treatment_started_at": treatment_manifest.get("started_at"),
+            "treatment_finished_at": treatment_manifest.get("finished_at"),
+            "elapsed_seconds": pair_elapsed_seconds,
+        },
         "retrieval": {
             "changed_option_pack_count": len(changed_evidence_options),
             "changed_option_packs": changed_evidence_options,
@@ -611,6 +779,9 @@ def main() -> int:
             args.treatment, args.treatment_receipt, expected_arm="treatment"
         )
         replay_errors = replay_retrieval_errors(control_bundle, treatment_bundle)
+        pair_anchor_errors = verify_pair_anchor_errors(
+            control_bundle, treatment_bundle
+        )
         report = evaluate_paired(
             control_bundle["observations"],
             treatment_bundle["observations"],
@@ -623,6 +794,7 @@ def main() -> int:
                 *control_bundle["errors"],
                 *treatment_bundle["errors"],
                 *replay_errors,
+                *pair_anchor_errors,
             ],
         )
     except (OSError, TypeError, ValueError, KeyError, json.JSONDecodeError) as exc:

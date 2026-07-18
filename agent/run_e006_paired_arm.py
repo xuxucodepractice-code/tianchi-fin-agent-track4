@@ -36,6 +36,7 @@ from agent.trace_gate import (
     display_path,
     input_artifact_snapshot,
     now_iso,
+    resolve_recorded_path,
     sha256_file,
     sha256_json,
     validate_trace_directory,
@@ -56,6 +57,12 @@ OFFLINE_GATE_PATH = EXPERIMENT_DIR / "offline_retrieval_gate.json"
 GOVERNED_OUTPUT_ROOT = (
     REPO_ROOT / "outputs" / "experiments" / "E006_multi_retrieval_coverage"
 )
+PAIR_ID = "e006-development-pair-01"
+EXPECTED_OUTPUT_DIRS = {
+    "control": GOVERNED_OUTPUT_ROOT / "development_control_01",
+    "treatment": GOVERNED_OUTPUT_ROOT / "development_treatment_01",
+}
+TREATMENT_CLAIM_PATH = EXPECTED_OUTPUT_DIRS["control"] / "treatment_claim.json"
 
 DEVELOPMENT_QIDS = (
     "fc_a_016",
@@ -160,6 +167,90 @@ def _verify_frozen_inputs(selection_path: Path) -> dict[str, dict[str, Any]]:
     ):
         raise ValueError("E006 offline retrieval gate semantics mismatch")
     return snapshots
+
+
+def _load_json_object(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"expected JSON object: {path}")
+    return payload
+
+
+def _verified_control_anchor() -> dict[str, str]:
+    """Require one completed, strict control before a treatment can start."""
+    control_dir = EXPECTED_OUTPUT_DIRS["control"]
+    observations_path = control_dir / "observations.json"
+    receipt_path = control_dir / "run_receipt.json"
+    if not observations_path.is_file() or not receipt_path.is_file():
+        raise ValueError("E006 treatment requires the registered control run first")
+    observations = _load_json_object(observations_path)
+    receipt = _load_json_object(receipt_path)
+    trace_dir = resolve_recorded_path(
+        str((observations.get("agent_trace") or {}).get("trace_dir") or "")
+    )
+    trace_report = validate_trace_directory(
+        trace_dir,
+        require_candidate_eligible=False,
+        require_current_code_match=True,
+    )
+    strict_errors = validate_e006_trace_contract(
+        trace_report,
+        trace_dir=trace_dir,
+        arm="control",
+        output_dir=control_dir,
+    )
+    if not trace_report.get("ok") or strict_errors:
+        raise ValueError(
+            "registered E006 control failed strict revalidation: "
+            f"{[*trace_report.get('errors', []), *strict_errors]}"
+        )
+    manifest_path = trace_dir / "trace_manifest.json"
+    anchor = {
+        "pair_id": PAIR_ID,
+        "control_trace_run_id": str(
+            (observations.get("agent_trace") or {}).get("trace_run_id") or ""
+        ),
+        "control_observations_sha256": sha256_file(observations_path),
+        "control_trace_manifest_sha256": sha256_file(manifest_path),
+        "control_receipt_sha256": sha256_file(receipt_path),
+    }
+    required_receipt = {
+        "status": "PASS",
+        "experiment_id": "E006",
+        "pair_id": PAIR_ID,
+        "phase": "development",
+        "arm": "control",
+        "selection_sha256": FROZEN_INPUT_SHA256["selection"],
+        "observations_sha256": anchor["control_observations_sha256"],
+        "trace_run_id": anchor["control_trace_run_id"],
+        "trace_manifest_sha256": anchor["control_trace_manifest_sha256"],
+        "call_count": 52,
+        "derivation_count": 13,
+    }
+    mismatches = {
+        key: (receipt.get(key), value)
+        for key, value in required_receipt.items()
+        if receipt.get(key) != value
+    }
+    if mismatches or receipt.get("errors") != []:
+        raise ValueError(f"registered E006 control receipt mismatch: {mismatches}")
+    return anchor
+
+
+def _claim_treatment_once(control_anchor: dict[str, str]) -> tuple[dict[str, Any], str]:
+    """Atomically consume the only treatment attempt attached to this control."""
+    claim = {
+        "schema_version": "e006-treatment-claim/v1",
+        "experiment_id": "E006",
+        "pair_id": PAIR_ID,
+        "status": "TREATMENT_ATTEMPT_CLAIMED",
+        "control_anchor": control_anchor,
+        "claimed_at": now_iso(),
+    }
+    TREATMENT_CLAIM_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with TREATMENT_CLAIM_PATH.open("x", encoding="utf-8") as handle:
+        handle.write(json.dumps(claim, ensure_ascii=False, indent=2) + "\n")
+    return claim, sha256_file(TREATMENT_CLAIM_PATH)
 
 
 def _validate_questions(qids: list[str], questions: dict[str, dict[str, Any]]) -> None:
@@ -290,6 +381,18 @@ def validate_e006_trace_contract(
         errors.append("E006 runner identity mismatch")
     if config.get("experiment_id") != "E006" or config.get("phase") != "development":
         errors.append("E006 experiment/phase identity mismatch")
+    if config.get("pair_id") != PAIR_ID:
+        errors.append("E006 pair identity mismatch")
+    if arm == "control" and (
+        config.get("control_anchor") is not None
+        or config.get("treatment_claim_sha256") is not None
+    ):
+        errors.append("E006 control must not contain a treatment anchor/claim")
+    if arm == "treatment" and (
+        not isinstance(config.get("control_anchor"), dict)
+        or not str(config.get("treatment_claim_sha256") or "")
+    ):
+        errors.append("E006 treatment lacks its control anchor/one-shot claim")
     if config.get("arm") != arm:
         errors.append("E006 trace arm mismatch")
     if config.get("pipeline_version") != E006_PIPELINE_VERSION:
@@ -310,6 +413,8 @@ def validate_e006_trace_contract(
         errors.append("E006 trace selection path mismatch")
     if config.get("output_dir") != display_path(output_dir.resolve()):
         errors.append("E006 trace output path mismatch")
+    if output_dir.resolve() != EXPECTED_OUTPUT_DIRS[arm].resolve():
+        errors.append("E006 trace output is outside its registered pair slot")
     artifact_hashes = {
         name: str((entry or {}).get("sha256") or "")
         for name, entry in (config.get("input_artifacts") or {}).items()
@@ -341,6 +446,11 @@ def validate_e006_trace_contract(
         call_ids = list(map(str, row.get("trace_call_ids") or []))
         if len(call_ids) != 4 or len(set(call_ids)) != 4:
             errors.append(f"{row.get('qid')}: derivation must claim four unique calls")
+        input_judgments = (row.get("answer_derivation") or {}).get(
+            "input_judgments"
+        ) or {}
+        if sorted(input_judgments) != list("ABCD"):
+            errors.append(f"{row.get('qid')}: derivation must contain A/B/C/D judgments")
         claimed.extend(call_ids)
     actual_ids = [str(call.get("call_id") or "") for call in calls]
     if len(claimed) != len(set(claimed)) or set(claimed) != set(actual_ids):
@@ -399,17 +509,15 @@ def main() -> int:
         (REPO_ROOT / "outputs" / "candidates").resolve(),
     }:
         raise ValueError("E006 pilot cannot write to a candidate/submission directory")
-    if (
-        args.output_dir.resolve() == GOVERNED_OUTPUT_ROOT.resolve()
-        or not args.output_dir.resolve().is_relative_to(GOVERNED_OUTPUT_ROOT.resolve())
-    ):
+    if args.output_dir.resolve() != EXPECTED_OUTPUT_DIRS[args.arm].resolve():
         raise ValueError(
-            "E006 output must be a fresh child of outputs/experiments/"
-            "E006_multi_retrieval_coverage"
+            f"E006 {PAIR_ID}/{args.arm} must use its exact registered output directory: "
+            f"{EXPECTED_OUTPUT_DIRS[args.arm]}"
         )
 
     selection = _load_selection(args.selection, phase=args.phase, arm=args.arm)
     frozen_inputs = _verify_frozen_inputs(args.selection)
+    control_anchor = _verified_control_anchor() if args.arm == "treatment" else None
     qids = selection["qids"]
     questions = {str(item["qid"]): item for item in load_all_questions()}
     _validate_questions(qids, questions)
@@ -426,6 +534,11 @@ def main() -> int:
         raise ValueError(f"E006 freezes model=qwen-plus, got {client.model!r}")
     if client.base_url.rstrip("/") != OFFICIAL_DASHSCOPE_BASE_URL:
         raise ValueError("E006 requires the official DashScope endpoint")
+
+    treatment_claim: dict[str, Any] | None = None
+    treatment_claim_sha256: str | None = None
+    if args.arm == "treatment":
+        treatment_claim, treatment_claim_sha256 = _claim_treatment_once(control_anchor)
 
     args.output_dir.mkdir(parents=True, exist_ok=False)
     observations_path = args.output_dir / "observations.json"
@@ -458,6 +571,9 @@ def main() -> int:
                 config={
                     "runner": "agent.run_e006_paired_arm",
                     "experiment_id": "E006",
+                    "pair_id": PAIR_ID,
+                    "control_anchor": control_anchor,
+                    "treatment_claim_sha256": treatment_claim_sha256,
                     "phase": args.phase,
                     "arm": args.arm,
                     "pipeline_version": E006_PIPELINE_VERSION,
@@ -516,6 +632,9 @@ def main() -> int:
             payload = {
                 "schema_version": "e006-observations/v1",
                 "experiment_id": "E006",
+                "pair_id": PAIR_ID,
+                "control_anchor": control_anchor,
+                "treatment_claim_sha256": treatment_claim_sha256,
                 "phase": args.phase,
                 "arm": args.arm,
                 "pipeline_version": E006_PIPELINE_VERSION,
@@ -598,6 +717,9 @@ def main() -> int:
     receipt = {
         "schema_version": "e006-run-receipt/v1",
         "experiment_id": "E006",
+        "pair_id": PAIR_ID,
+        "control_anchor": control_anchor,
+        "treatment_claim_sha256": treatment_claim_sha256,
         "phase": args.phase,
         "arm": args.arm,
         "status": "PASS" if trace_report.get("ok") and not failures else "FAIL",

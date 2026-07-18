@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 import copy
+import json
 
 import pytest
 
-from agent.evaluate_e006_paired import call_prompt_binding_errors, evaluate_paired
+from agent.evaluate_e006_paired import (
+    call_prompt_binding_errors,
+    evaluate_paired,
+    verify_pair_anchor_errors,
+)
 from agent.reason_multi_v0_compat import (
     E006_PIPELINE_VERSION,
     build_option_judgment_messages_v0,
@@ -16,6 +21,7 @@ from agent.run_e006_paired_arm import (
     _load_selection,
     _verify_frozen_inputs,
 )
+from agent.trace_gate import sha256_file
 
 
 def _evidence(qid: str, option: str, *, prefix: str = "base", doc_id: str = "d"):
@@ -62,19 +68,42 @@ def _row(qid: str, answer: str, arm: str, *, changed_route: bool = False):
             "selected_chunk_ids": selected_ids,
         }
         retrieval[option] = {"option_text": option, "evidence": evidence}
+    judgments = {
+        option: {
+            "judgment": "support" if option in answer else "refute",
+            "evidence_refs": [],
+            "error": None,
+            "trace_call_id": f"{qid}-{arm}-{option}",
+            "trace_run_id": f"trace-{arm}",
+        }
+        for option in "ABCD"
+    }
+    inputs = {
+        option: {
+            "judgment": judgment["judgment"],
+            "evidence_refs": [],
+            "error": None,
+        }
+        for option, judgment in judgments.items()
+    }
     return {
         "qid": qid,
         "answer": answer,
+        "answer_format": "multi",
         "pipeline_version": E006_PIPELINE_VERSION,
         "experiment_arm": arm,
+        "options": {option: option for option in "ABCD"},
         "retrieval": retrieval,
         "route_diagnostics": {
             "enabled": arm == "treatment",
             "options": diagnostics,
         },
-        "option_judgments": {
-            option: {"error": None, "trace_call_id": f"{qid}-{arm}-{option}"}
-            for option in "ABCD"
+        "option_judgments": judgments,
+        "answer_derivation": {
+            "method": "agent.normalize_answer.normalize_answer",
+            "answer_format": "multi",
+            "input_judgments": inputs,
+            "output_answer": answer,
         },
     }
 
@@ -83,6 +112,7 @@ def _payload(arm: str, answers: dict[str, str], *, changed_qid: str | None = Non
     return {
         "schema_version": "e006-observations/v1",
         "experiment_id": "E006",
+        "pair_id": "e006-development-pair-01",
         "phase": "development",
         "arm": arm,
         "pipeline_version": E006_PIPELINE_VERSION,
@@ -123,6 +153,7 @@ def _labels():
 def _receipt():
     return {
         "status": "PASS",
+        "pair_id": "e006-development-pair-01",
         "selection_sha256": FROZEN_INPUT_SHA256["selection"],
         "call_count": 52,
         "derivation_count": 13,
@@ -134,7 +165,18 @@ def _receipt():
 
 def _manifest(arm: str):
     return {
+        "started_at": (
+            "2026-07-18T10:00:00+08:00"
+            if arm == "control"
+            else "2026-07-18T10:10:00+08:00"
+        ),
+        "finished_at": (
+            "2026-07-18T10:10:00+08:00"
+            if arm == "control"
+            else "2026-07-18T10:20:00+08:00"
+        ),
         "config": {
+            "pair_id": "e006-development-pair-01",
             "arm": arm,
             "enable_option_document_route": arm == "treatment",
             "output_dir": arm,
@@ -170,6 +212,8 @@ def _calls(payload):
                         "stage": f"e006_{payload['arm']}_v0_option_judgment",
                         "prompt_profile": "v0-82041d0",
                     },
+                    "call_id": f"{qid}-{payload['arm']}-{option}",
+                    "trace_run_id": f"trace-{payload['arm']}",
                     "model_evidence": evidence,
                     "messages": build_option_judgment_messages_v0(
                         questions[qid], option, option, evidence
@@ -261,6 +305,18 @@ def test_declared_parent_correct_set_is_recomputed_from_truth():
         )
 
 
+def test_derivation_cannot_drop_one_of_four_raw_judgments():
+    labels = _labels()
+    control = _payload("control", labels["frozen_online_v2s1_answers"])
+    control["observations"][0]["answer_derivation"]["input_judgments"].pop("D")
+    with pytest.raises(ValueError, match="derivation inputs differ"):
+        _evaluate(
+            control,
+            _payload("treatment", labels["frozen_online_v2s1_answers"]),
+            labels,
+        )
+
+
 def test_development_selection_and_all_frozen_inputs_are_bound():
     loaded = _load_selection(
         DEVELOPMENT_SELECTION_PATH, phase="development", arm="control"
@@ -302,3 +358,85 @@ def test_exact_call_topology_and_prompt_evidence_binding():
     )
     assert any("model evidence differs" in error for error in errors)
     assert any("exact messages differ" in error for error in errors)
+
+
+def test_treatment_is_bound_to_exact_control_and_one_shot_claim(tmp_path):
+    control_dir = tmp_path / "control"
+    treatment_dir = tmp_path / "treatment"
+    trace_dir = control_dir / "trace"
+    trace_dir.mkdir(parents=True)
+    treatment_dir.mkdir()
+    observations_path = control_dir / "observations.json"
+    receipt_path = control_dir / "run_receipt.json"
+    manifest_path = trace_dir / "trace_manifest.json"
+    observations_path.write_text("{}\n", encoding="utf-8")
+    receipt_path.write_text("{}\n", encoding="utf-8")
+    manifest_path.write_text("{}\n", encoding="utf-8")
+    anchor = {
+        "pair_id": "e006-development-pair-01",
+        "control_trace_run_id": "trace-control",
+        "control_observations_sha256": sha256_file(observations_path),
+        "control_trace_manifest_sha256": sha256_file(manifest_path),
+        "control_receipt_sha256": sha256_file(receipt_path),
+    }
+    claim_path = control_dir / "treatment_claim.json"
+    claim_path.write_text(
+        json.dumps(
+            {
+                "schema_version": "e006-treatment-claim/v1",
+                "experiment_id": "E006",
+                "pair_id": "e006-development-pair-01",
+                "status": "TREATMENT_ATTEMPT_CLAIMED",
+                "control_anchor": anchor,
+                "claimed_at": "2026-07-18T10:10:30+08:00",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    claim_sha = sha256_file(claim_path)
+    control_bundle = {
+        "observations": {"agent_trace": {"trace_run_id": "trace-control"}},
+        "receipt": {},
+        "trace_dir": trace_dir,
+        "manifest": {
+            "finished_at": "2026-07-18T10:10:00+08:00",
+            "config": {"control_anchor": None, "treatment_claim_sha256": None},
+        },
+    }
+    treatment_bundle = {
+        "observations": {
+            "control_anchor": anchor,
+            "treatment_claim_sha256": claim_sha,
+        },
+        "receipt": {
+            "control_anchor": anchor,
+            "treatment_claim_sha256": claim_sha,
+        },
+        "manifest": {
+            "started_at": "2026-07-18T10:11:00+08:00",
+            "config": {
+                "control_anchor": anchor,
+                "treatment_claim_sha256": claim_sha,
+            },
+        },
+    }
+    output_dirs = {"control": control_dir, "treatment": treatment_dir}
+    assert verify_pair_anchor_errors(
+        control_bundle,
+        treatment_bundle,
+        output_dirs=output_dirs,
+        claim_path=claim_path,
+    ) == []
+
+    treatment_bundle["receipt"]["control_anchor"] = {
+        **anchor,
+        "control_trace_run_id": "different-control",
+    }
+    errors = verify_pair_anchor_errors(
+        control_bundle,
+        treatment_bundle,
+        output_dirs=output_dirs,
+        claim_path=claim_path,
+    )
+    assert any("treatment receipt: control anchor mismatch" in error for error in errors)
