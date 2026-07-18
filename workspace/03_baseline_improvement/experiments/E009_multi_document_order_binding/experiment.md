@@ -54,4 +54,6 @@ prospective runner、churn evaluator 与 scored evaluator 已完成：primary/re
 60 logical/physical calls、max_retries=0、同一 exact served model；primary 是唯一计分臂，
 repeat 只计算稳定性；labels 在 churn 冻结前必须不存在。评分门同时要求 `N-M>C` 且按
 5,000,000 Token 预算公式惩罚后的预计分数严格高于 65.0912。全量 183 tests PASS；
-当前尚未读取 API key、未创建 run-freeze、未调用 prospective API。
+run-freeze 已绑定 code-freeze commit `9f8d76c0e49223f121b5883e5ffc8e34c283d73e`，SHA256
+为 `04af55a5b552f933d061261bc769d99623c8dd09439b7563bb3fe2bfea548b72`。当前尚未读取
+API key、未调用 prospective API。

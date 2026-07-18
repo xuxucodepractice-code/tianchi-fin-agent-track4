@@ -1,0 +1,144 @@
+{
+  "schema_version": "e009-prospective-run-freeze/v1",
+  "freeze_id": "E009_PROSPECTIVE_PAIR_01_2026-07-18",
+  "experiment_id": "E009",
+  "phase": "prospective",
+  "pair_id": "e009-prospective-pair-01",
+  "status": "AUTHORIZED_TO_RUN_PRIMARY_REPEAT",
+  "created_at": "2026-07-18T19:06:13+08:00",
+  "source_code_commit": "9f8d76c0e49223f121b5883e5ffc8e34c283d73e",
+  "agent_code_snapshot_sha256": "dbec30563840530b05a2e7e964a2fefc74cfc7341e2411d15e2892efe9f0791e",
+  "code_files": {
+    "runner": {
+      "path": "agent/run_e009_prospective_arm.py",
+      "sha256": "3c2d3d91a68f29d80787e7179ef23e50d14c7a547ef25b5ff857ca56793ba863"
+    },
+    "churn_evaluator": {
+      "path": "agent/evaluate_e009_prospective_churn.py",
+      "sha256": "4df3a4def10eea876523504561031bec7c1c927b87c690e49502163621e69538"
+    },
+    "scored_evaluator": {
+      "path": "agent/evaluate_e009_prospective_scored.py",
+      "sha256": "d23cdbeef59b78dbf9333649a4271e7b9fe9afb56c31b23aa3f6cf5a41d6795e"
+    },
+    "reasoner": {
+      "path": "agent/reason_e007_reference_integrity.py",
+      "sha256": "c9453d58afa06950cdc7671bc86d117820ad603f388caa65d37e855840336954"
+    }
+  },
+  "qids": [
+    "fc_a_017",
+    "fc_a_005",
+    "fc_a_019",
+    "fc_a_020",
+    "fin_a_012",
+    "fin_a_004",
+    "fin_a_020",
+    "fin_a_019",
+    "ins_a_012",
+    "reg_a_012",
+    "reg_a_007",
+    "reg_a_017",
+    "res_a_004",
+    "res_a_011",
+    "res_a_019"
+  ],
+  "frozen_input_sha256": {
+    "questions": "c33dde8ac97d8a00ef3796f4312274cea74fce699f52b15c006c45fab80c0676",
+    "chunks": "02aa2f9b33f304a4d9a74789acc5aa47ec9efff42d7a68bdd2390e7cea30a878",
+    "doc_meta": "df9af050cce73707536d2798f62b1e4640747d4cfe595b2e12cddd22d6d472d7",
+    "selection_feasibility": "444362466cde4b2148833f4c06ea6c7f4e0fd7b3142622ac64b0b35dbd45e493",
+    "selection": "8e6c0efbec5f9c8e53f3253f44d3a7046b7538e95e923516c880a987b6ba0e15",
+    "authorization": "f3ee2f7b65c1fa1d79e2388ac1c6b25db89a0231d4ae6ce4fe970adf443d6e3e",
+    "development_result": "6db056d5f81844edf3e93dfeef2f1470cf647f07fa7a8b0319f31ccb3ccdda4a",
+    "tls_ca_bundle": "9dae8d76e55cb08991f2b672d58999ea15560d910759c16b544f843bdffbb994",
+    "control_reference": "db90509ba127f662b333e07664e79ff7ce0264db9f1b3cbb34cca177d10d4572",
+    "offline_gate": "6c7ec2a4ff7b9efefe8923bb8c5a8d18e0e7f8f69e63b1b8eba2c8cb50a9b7b0"
+  },
+  "authorization_basis": {
+    "path": "workspace/03_baseline_improvement/experiments/E009_multi_document_order_binding/prospective_quota_authorization.json",
+    "sha256": "f3ee2f7b65c1fa1d79e2388ac1c6b25db89a0231d4ae6ce4fe970adf443d6e3e",
+    "required_status": "AUTHORIZED_MINIMAL_QUOTA_RELAXATION"
+  },
+  "registered_paths": {
+    "primary_output_dir": "outputs/experiments/E009_multi_document_order_binding/prospective_primary_01",
+    "repeat_output_dir": "outputs/experiments/E009_multi_document_order_binding/prospective_repeat_01",
+    "primary_claim": "outputs/experiments/E009_multi_document_order_binding/prospective_primary_claim.json",
+    "repeat_claim": "outputs/experiments/E009_multi_document_order_binding/prospective_repeat_claim.json",
+    "churn_report": "outputs/experiments/E009_multi_document_order_binding/prospective_churn.json",
+    "labels": "workspace/03_baseline_improvement/experiments/E009_multi_document_order_binding/prospective_labels.json",
+    "scored_result": "workspace/03_baseline_improvement/experiments/E009_multi_document_order_binding/prospective_scored_result.json"
+  },
+  "pipeline_version": "v2s1-e006-route-e009-document-order-binding",
+  "pipeline": {
+    "pipeline_version": "v2s1-e006-route-e009-document-order-binding",
+    "online_parent_pipeline_version": "v2s1",
+    "retrieval_control_profile": "v0-82041d0",
+    "prompt_profile": "e009-v0-judgment-document-order-ablation",
+    "reference_profile": "trace_bound_with_doc_order",
+    "enable_option_document_route": true,
+    "top_k": 5,
+    "route_thresholds": {
+      "minimum_title_score": 12,
+      "minimum_longest_match": 4,
+      "minimum_score_ratio": 3.0,
+      "minimum_score_margin": 8
+    },
+    "v0_retrieve_source_sha256": "1e55d7f8c725805fd4b752c2bab929119cb39ee3409275b45b1cdd782484dc3c",
+    "per_option_call_count": 1,
+    "whole_question_review_calls": 0,
+    "normalize_answer": "agent.normalize_answer.normalize_answer"
+  },
+  "model": {
+    "provider": "dashscope-openai-compatible",
+    "requested_model": "qwen-plus",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+    "temperature": 0.0,
+    "timeout_seconds": 90.0,
+    "max_retries": 0,
+    "served_model_policy": {
+      "required_prefix": "qwen-plus",
+      "one_exact_value_per_attempt": true,
+      "same_exact_value_across_attempts": true
+    }
+  },
+  "transport": {
+    "ssl_cert_file": "/etc/ssl/cert.pem",
+    "ssl_cert_file_sha256": "9dae8d76e55cb08991f2b672d58999ea15560d910759c16b544f843bdffbb994"
+  },
+  "call_topology": {
+    "question_count_per_attempt": 15,
+    "logical_calls_per_attempt": 60,
+    "derivations_per_attempt": 15,
+    "physical_attempts_per_attempt": 60
+  },
+  "attempt_nonces": {
+    "primary": "13fc38bbad514858955ff37ca506e577",
+    "repeat": "a48c3c13dde94e7b9d184b1708d33193"
+  },
+  "initial_state": {
+    "primary_output_exists": false,
+    "repeat_output_exists": false,
+    "primary_claim_exists": false,
+    "repeat_claim_exists": false,
+    "churn_report_exists": false,
+    "labels_created": false,
+    "labels_revealed": false,
+    "scored_result_exists": false
+  },
+  "scoring_policy": {
+    "scoring_arm": "primary",
+    "repeat_non_scoring": true,
+    "failed_or_partial_attempt_may_be_retried": false,
+    "output_or_claim_may_be_deleted_or_replaced": false
+  },
+  "label_isolation": {
+    "status": "LABELS_SEALED",
+    "labels_created": false,
+    "labels_revealed_to_generation": false,
+    "labels_must_remain_absent_through_churn_freeze": true
+  },
+  "candidate_authorized": false,
+  "submission_authorized": false
+}

@@ -3,9 +3,11 @@
   "experiment_id": "E009",
   "pair_id": "e009-prospective-pair-01",
   "status": "PASS",
-  "decision": "READY_FOR_CODE_COMMIT_AND_RUN_FREEZE",
+  "decision": "READY_FOR_PRIMARY",
   "selection_sha256": "8e6c0efbec5f9c8e53f3253f44d3a7046b7538e95e923516c880a987b6ba0e15",
   "quota_authorization_sha256": "f3ee2f7b65c1fa1d79e2388ac1c6b25db89a0231d4ae6ce4fe970adf443d6e3e",
+  "source_code_commit": "9f8d76c0e49223f121b5883e5ffc8e34c283d73e",
+  "run_freeze_sha256": "04af55a5b552f933d061261bc769d99623c8dd09439b7563bb3fe2bfea548b72",
   "question_count": 15,
   "domain_counts": {
     "financial_contracts": 4,
